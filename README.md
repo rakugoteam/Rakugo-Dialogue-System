@@ -25,6 +25,10 @@ Support this project here [itch.io](https://rakugoteam.github.io/donations/).
 ## Feature
 * Save/Load system
 * Funcs, Objects and Vars like in Ren'Py
+* Dialog system
+* Ability to Rollback
+* History
+* Skipping
 * Documentation: https://rakugodocs.readthedocs.io
 
 ## Showcase
@@ -41,11 +45,10 @@ To install Rakugo plugin, download it as a [ZIP archive](). Extract the `addons/
 If you want to know more about installing plugins you can read the [official documentation page](https://docs.godotengine.org/en/stable/tutorials/plugins/editor/installing_plugins.html).
 
 ## Rakugo Addons
-- Emojis For Rakugo 1.0
-- Material Icons For Godot 1.3
-- Visual Novels ![](https://img.shields.io/badge/VN-100%25-brightgreen.svg)
-- Click & Point Adventures ![](https://img.shields.io/badge/Adv-25%25-yellowgreen.svg)
-- RPG ![](https://img.shields.io/badge/RPG-55%25-green.svg)
+- [Advanced Text](https://github.com/rakugoteam/AdvancedText)
+- [Visual Novels Kit](https://github.com/rakugoteam/VisualNovelKit)
+- [Click & Point Adventures](https://github.com/rakugoteam/Adventure)
+- [RPG](https://github.com/rakugoteam/rakugo-open-rpg)
 
 ## Roadmap
 Project Roadmap : <https://github.com/rakugoteam/Rakugo/projects/1>
