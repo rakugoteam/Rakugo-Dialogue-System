@@ -1,0 +1,110 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://addons/Rakugo/tools/SceneLinks/SceneLinkEdit.gd" type="Script" id=1]
+[ext_resource path="res://addons/Rakugo/tools/SceneLinks/choose_icon.tres" type="Texture" id=3]
+[ext_resource path="res://addons/Rakugo/tools/SceneLinks/scene_icon.tres" type="Texture" id=4]
+[ext_resource path="res://addons/Rakugo/tools/SceneLinks/browse_icon.tres" type="Texture" id=5]
+[ext_resource path="res://addons/Rakugo/tools/SceneLinks/remove_icon.tres" type="Texture" id=6]
+
+[node name="SceneLinkEdit" type="HBoxContainer"]
+margin_right = 501.0
+margin_bottom = 30.0
+size_flags_horizontal = 3
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+menu_rect = Rect2( 0, 3, 200, 100 )
+
+[node name="Icon" type="TextureRect" parent="."]
+margin_right = 24.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 24, 24 )
+texture = ExtResource( 4 )
+expand = true
+
+[node name="SceneEdit" type="LineEdit" parent="."]
+margin_left = 28.0
+margin_right = 199.0
+margin_bottom = 30.0
+size_flags_horizontal = 3
+
+[node name="Choose" type="Button" parent="."]
+margin_left = 203.0
+margin_right = 234.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 24, 24 )
+hint_tooltip = "Choose from open scenes"
+custom_fonts/font = SubResource( 1 )
+text = "󱜋"
+icon = ExtResource( 3 )
+flat = true
+
+[node name="Menu" type="PopupMenu" parent="Choose"]
+margin_left = -5.0
+margin_top = 31.0
+margin_right = 187.0
+margin_bottom = 178.0
+
+[node name="Browse" type="Button" parent="."]
+margin_left = 238.0
+margin_right = 269.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 24, 24 )
+hint_tooltip = "Browse Scene"
+custom_fonts/font = SubResource( 2 )
+text = "󰿎"
+icon = ExtResource( 5 )
+flat = true
+
+[node name="Label2" type="Label" parent="."]
+margin_left = 273.0
+margin_top = 8.0
+margin_right = 286.0
+margin_bottom = 22.0
+text = "Id"
+
+[node name="IdEdit" type="LineEdit" parent="."]
+margin_left = 290.0
+margin_right = 462.0
+margin_bottom = 30.0
+size_flags_horizontal = 3
+
+[node name="Remove" type="Button" parent="."]
+margin_left = 466.0
+margin_right = 497.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 24, 24 )
+hint_tooltip = "Remove this scene link"
+custom_fonts/font = SubResource( 3 )
+text = "󱜉"
+icon = ExtResource( 6 )
+flat = true
+
+[node name="FreePos" type="Control" parent="."]
+margin_left = 501.0
+margin_right = 501.0
+margin_bottom = 30.0
+
+[node name="TscnDialog" type="FileDialog" parent="FreePos"]
+margin_left = -881.481
+margin_top = 97.5956
+margin_right = -108.481
+margin_bottom = 526.596
+window_title = "Open a File"
+resizable = true
+dialog_hide_on_ok = true
+mode = 0
+filters = PoolStringArray( "*.tscn" )
+current_dir = "res://Game"
+current_file = "scene_links.tres"
+current_path = "res://Game/scene_links.tres"
+
+[connection signal="text_changed" from="SceneEdit" to="." method="_on_changed"]
+[connection signal="pressed" from="Choose" to="." method="_on_choose"]
+[connection signal="id_pressed" from="Choose/Menu" to="." method="_on_item"]
+[connection signal="index_pressed" from="Choose/Menu" to="." method="_on_item"]
+[connection signal="pressed" from="Browse" to="." method="_on_browse"]
+[connection signal="text_changed" from="IdEdit" to="." method="_on_changed"]
+[connection signal="pressed" from="Remove" to="." method="_on_remove"]
+[connection signal="confirmed" from="FreePos/TscnDialog" to="." method="_on_tscn_dialog"]

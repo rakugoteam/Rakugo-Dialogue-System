@@ -1,0 +1,112 @@
+{
+  "bold":
+  { 
+    "color": "#ffff44",
+    "sings": ["[b]", "[/b]"]
+  },
+  "italic":
+  {
+    "sings": ["[i]", "[/i]"],
+    "color": "#ffff6d"
+  },
+  "underline":
+  {
+    "color": "#ffff99",
+    "sings": ["[u]", "[/u]"]
+  },
+  "strike":
+  {
+    "color": "#7d7d7d",
+    "sings": ["[s]", "[/s]"]
+  },
+  "center":
+  {
+    "color": "#5e5e9d",
+    "sings": ["[center]", "[/center]"]
+  },
+  "right":
+  {
+    "color": "#36369d",
+    "sings": ["[right]", "[/right]"]
+  },
+  "fill":
+  {
+    "color": "#25259d",
+    "sings": ["[fill]", "[/fill]"]
+  },
+  "font":
+  {
+    "color": "#000000",
+    "sings": ["[font=",  "[/font]"]
+  },
+  "indent":
+  {
+    "color": "#000000",
+    "sings": ["[indent=",  "[/indent]"]
+  },
+  "url":
+  {
+    "color": "#9959ff",
+    "sings": ["[url=",  "[/url]"]
+  },
+  "img":
+  {
+    "color": "#7823ff",
+    "sings": ["[img=",  "[/img]"]
+  },
+  "color":
+  {
+    "color": "#000000",
+    "sings": ["[color=",  "[/color]"]
+  },
+  "emoji":
+  {
+    "color": "#7823ff",
+    "sings": ["[:", ":]"]
+  },
+  "code":
+  {
+    "color": "#959595",
+    "sings": ["[code]", "[/code]"]
+  },
+  "table":
+  {
+    "color": "#000000",
+    "sings": ["[table=",  "[/table]"]
+  },
+  "cell":
+  {
+    "color": "#000000",
+    "sings": ["[cell=]", "[/cell]"]
+  },
+  "wave":
+  {
+    "color": "#ff9999",
+    "sings": ["[wave",  "[/wave]"]
+  },
+  "tornado":
+  {
+    "color": "#ff9999",
+    "sings": ["[tornado",  "[/tornado]"]
+  },
+  "shake":
+  {
+    "color": "#ff9999",
+    "sings": ["[shake",  "[/shake]"]
+  },
+  "fade":
+  {
+    "color": "#ff9999",
+    "sings": ["[fade",  "[/fade]"]
+  },
+  "rainbow":
+  {
+    "color": "#ff9999",
+    "sings": ["[rainbow",  "[/rainbow]"]
+  },
+  "var":
+  {
+    "color": "#99ff99",
+    "sings": ["<", ">"]
+  }
+}

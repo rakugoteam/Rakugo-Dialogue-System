@@ -1,0 +1,112 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://addons/Rakugo/lib/nodes/RakugoTextLabel.gd" type="Script" id=1]
+[ext_resource path="res://addons/Rakugo/lib/nodes/CodeEdit.gd" type="Script" id=2]
+[ext_resource path="res://addons/Rakugo/tools/MarkupEditor/MarkupEdit.gd" type="Script" id=3]
+
+
+
+
+[node name="MarkupEdit" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+jsons = [ "res://addons/Rakugo/keywords/renpy.json", "res://addons/Rakugo/keywords/markdown.json", "res://addons/Rakugo/keywords/bbcode.json" ]
+markups_options_nodepath = NodePath("CenterContainer/HBoxContainer/MarkupOption")
+layout_options_nodepath = NodePath("CenterContainer/HBoxContainer/LayoutOption")
+layout_nodepath = NodePath("Grid")
+code_edit_nodepath = NodePath("Grid/MakrupEdit")
+rakugo_text_label_nodepath = NodePath("Grid/RakugoTextLabel")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+margin_right = 1280.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer"]
+margin_left = 441.0
+margin_right = 838.0
+margin_bottom = 20.0
+
+[node name="Label" type="Label" parent="CenterContainer/HBoxContainer"]
+margin_top = 3.0
+margin_right = 137.0
+margin_bottom = 17.0
+text = "Select markup to test"
+
+[node name="MarkupOption" type="OptionButton" parent="CenterContainer/HBoxContainer"]
+margin_left = 141.0
+margin_right = 209.0
+margin_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "RenPy"
+flat = true
+items = [ "RenPy", null, false, 0, null, "Markdown", null, false, 1, null, "BBCode", null, false, 2, null ]
+selected = 0
+
+[node name="Label2" type="Label" parent="CenterContainer/HBoxContainer"]
+margin_left = 213.0
+margin_top = 3.0
+margin_right = 298.0
+margin_bottom = 17.0
+text = "Select Layout"
+
+[node name="LayoutOption" type="OptionButton" parent="CenterContainer/HBoxContainer"]
+margin_left = 302.0
+margin_right = 397.0
+margin_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Horizontal"
+flat = true
+items = [ "Horizontal", null, false, 0, null, "Vertical", null, false, 1, null ]
+selected = 0
+
+[node name="Grid" type="GridContainer" parent="."]
+margin_top = 24.0
+margin_right = 1280.0
+margin_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+rect_min_size = Vector2( 800, 500 )
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MakrupEdit" type="TextEdit" parent="Grid"]
+margin_right = 1280.0
+margin_bottom = 346.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Test Selected Markup **here** wave dgfdsgdf djsdnjkjdskgn"
+highlight_current_line = true
+syntax_highlighting = true
+show_line_numbers = true
+smooth_scrolling = true
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+load_classes = false
+jsons = [ "res://addons/Rakugo/keywords/renpy.json" ]
+
+[node name="RakugoTextLabel" type="RichTextLabel" parent="Grid"]
+margin_top = 350.0
+margin_right = 1280.0
+margin_bottom = 696.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+bbcode_text = "Test Selected Markup here"
+text = "Test Selected Markup here"
+script = ExtResource( 1 )
+rakugo_text = "Test Selected Markup here"
+markup = "renpy"
