@@ -8,10 +8,102 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Resource",
+"class": "Character",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/Character.gd"
+}, {
+"base": "TextEdit",
+"class": "CodeEdit",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/nodes/CodeEdit.gd"
+}, {
+"base": "Node",
+"class": "Dialogue",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/nodes/Dialogue.gd"
+}, {
+"base": "Resource",
+"class": "HistoryEntry",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/HistoryEntry.gd"
+}, {
+"base": "Reference",
+"class": "ProjectTools",
+"language": "GDScript",
+"path": "res://addons/Rakugo/tools/ProjectSettings/ProjectTools.gd"
+}, {
+"base": "Reference",
+"class": "PropertyInfo",
+"language": "GDScript",
+"path": "res://addons/Rakugo/tools/ProjectSettings/PropertyInfo.gd"
+}, {
+"base": "RichTextLabel",
+"class": "RakugoTextLabel",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/nodes/RakugoTextLabel.gd"
+}, {
+"base": "Node",
+"class": "RakugoTextParser",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/systems/TextParser.gd"
+}, {
+"base": "Theme",
+"class": "RakugoTheme",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/RakugoTheme.gd"
+}, {
+"base": "Resource",
+"class": "SceneLinks",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/SceneLinks.gd"
+}, {
+"base": "Object",
+"class": "SettingsList",
+"language": "GDScript",
+"path": "res://addons/Rakugo/SettingsList.gd"
+}, {
+"base": "Resource",
+"class": "Store",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/Store.gd"
+}, {
+"base": "Resource",
+"class": "StoreStack",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/StoreStack.gd"
+} ]
+_global_script_class_icons={
+"Character": "",
+"CodeEdit": "res://addons/Rakugo/icons/CodeEdit.svg",
+"Dialogue": "res://addons/Rakugo/icons/Dialogue.svg",
+"HistoryEntry": "",
+"ProjectTools": "",
+"PropertyInfo": "",
+"RakugoTextLabel": "res://addons/Rakugo/icons/RakugoTextLabel.svg",
+"RakugoTextParser": "",
+"RakugoTheme": "",
+"SceneLinks": "",
+"SettingsList": "",
+"Store": "",
+"StoreStack": ""
+}
+
 [application]
 
 config/name="Empty"
+run/main_scene="res://Test.tscn"
 config/icon="res://icon.png"
+
+[autoload]
+
+Rakugo="*res://addons/Rakugo/Rakugo.tscn"
+Settings="*res://addons/Rakugo/Settings.gd"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "Rakugo" )
 
 [physics]
 
