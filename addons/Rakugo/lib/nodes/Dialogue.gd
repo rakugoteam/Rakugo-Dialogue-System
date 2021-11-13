@@ -62,7 +62,10 @@ func _ready():
 		thread.start(self, default_starting_event)
 
 func _exit_tree():
-	if thread:
+	if thread and thread.is_active():
+		if step_semaphore:
+			step_semaphore.post()
+		
 		thread.wait_to_finish()
 
 ## Dialogue life cycle state
@@ -171,6 +174,8 @@ func cond(condition):
 	return condition
 
 func step():
+	Rakugo.step()
+	
 	if thread and thread.is_active():
 		if not step_semaphore:
 			step_semaphore = Semaphore.new()
@@ -247,22 +252,29 @@ func say(character, text:String, parameters: Dictionary = {}) -> void:
 	Rakugo.call_deferred('say', character, text, parameters)
 
 func ask(default_answer:String, parameters: Dictionary = {}):
-	if is_active():
-		return_lock = Semaphore.new()
-		var returns = [null]
-		_ask_yield(returns)
-		Rakugo.call_deferred('ask', default_answer, parameters)
-		return_lock.wait()
-		return_lock = null
-		return returns[0]
+	if thread and thread.is_alive():
+		if !step_semaphore:
+			step_semaphore = Semaphore.new()
+			
+	
+		Rakugo.ask(default_answer, parameters)
+		
+		#not work, but close
+		var ret = _ask_yield()
+		
+		step_semaphore.wait()
+		
+		return ret
 
 	return null
 
-func _ask_yield(returns:Array):
-	returns[0] = yield(Rakugo, "ask_return")
+func _ask_yield() -> String:
+	var ret = yield(Rakugo, "ask_return")
 
-	if return_lock:
-		return_lock.post()
+	if thread and step_semaphore:
+		step_semaphore.post()
+		
+	return ret;
 
 func menu(choices:Array, parameters: Dictionary = {}):
 	if is_active():

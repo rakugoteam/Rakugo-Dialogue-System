@@ -31,6 +31,7 @@ onready var Say = $Statements/Say
 onready var Ask = $Statements/Ask
 onready var Menu = $Statements/Menu
 
+signal step()
 signal say(character, text, parameters)
 signal notify(text, parameters)
 signal ask(default_answer, parameters)
@@ -178,6 +179,9 @@ func debug(some_text = []):
 
 ## Statements
 
+func step():
+	emit_signal("step")
+
 # statement of type say
 # its make given 'character' say 'text'
 # 'parameters' keywords:typing, type_speed, avatar, avatar_state, add
@@ -189,6 +193,7 @@ func say(character, text:String, parameters:Dictionary):
 # with keywords: placeholder
 func ask(default_answer:String, parameters:Dictionary):
 	Ask.exec(default_answer, parameters)
+	
 func ask_return(result:String):
 	Ask.return(result)
 
