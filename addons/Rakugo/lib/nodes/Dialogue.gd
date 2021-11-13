@@ -41,9 +41,8 @@ func _restore(save):
 		start_thread(_event_stack)
 
 func _step():
-	if Rakugo.current_dialogue == self and is_running():
-		if self.step_semaphore:
-			self.step_semaphore.post()
+	if thread and thread.is_active() and step_semaphore:
+		step_semaphore.post()
 
 func start(event_name=''):
 	if event_name:
@@ -55,6 +54,16 @@ func start(event_name=''):
 
 	else:
 		push_error("Dialogue '%s' started without given event nor default event." % self.name)
+
+func _ready():
+	if has_method(default_starting_event):
+		Rakugo.set_current_dialogue(self)
+		thread = Thread.new()
+		thread.start(self, default_starting_event)
+
+func _exit_tree():
+	if thread:
+		thread.wait_to_finish()
 
 ## Dialogue life cycle state
 
@@ -97,7 +106,6 @@ func start_thread(_event_stack):
 	Rakugo.set_current_dialogue(self)
 	thread = Thread.new()
 	thread.start(self, "dialogue_loop")
-
 
 func dialogue_loop():
 	self.state = State.RUNNING
@@ -163,15 +171,11 @@ func cond(condition):
 	return condition
 
 func step():
-	if not step_semaphore:
-		step_semaphore = Semaphore.new()
+	if thread and thread.is_active():
+		if not step_semaphore:
+			step_semaphore = Semaphore.new()
 
-	if is_active():
 		step_semaphore.wait()
-
-	event_stack[0][1] += 1
-	# Preventing a case of multiple post skipping steps
-	step_semaphore = Semaphore.new()
 
 func end_event():
 	if is_running():
@@ -240,8 +244,7 @@ func set_var(var_name: String, value):
 	return null
 
 func say(character, text:String, parameters: Dictionary = {}) -> void:
-	if is_active():
-		Rakugo.call_deferred('say', character, text, parameters)
+	Rakugo.call_deferred('say', character, text, parameters)
 
 func ask(default_answer:String, parameters: Dictionary = {}):
 	if is_active():

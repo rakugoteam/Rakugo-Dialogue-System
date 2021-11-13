@@ -23,9 +23,7 @@ var skipping := false
 onready var auto_timer := $AutoTimer
 onready var skip_timer := $SkipTimer
 
-onready var SceneLoader: = $SceneLoader
 onready var StoreManager: = $StoreManager
-onready var ShowableManager: = $ShowableManager
 onready var History: = $History
 onready var TextParser: RakugoTextParser = $TextParser
 onready var StepBlocker = $StepBlocker
@@ -46,7 +44,6 @@ signal loading(progress) ## Progress is to be either NaN or [0,1], loading(1) me
 func _ready():
 	self.scene_anchor = get_tree().get_root()
 	StoreManager.init()
-	ShowableManager.init()
 	History.init()
 	var version = Settings.get(SettingsList.game_version)
 	var title = Settings.get(SettingsList.game_title)
@@ -82,12 +79,7 @@ func prepare_quitting():
 	if current_dialogue:
 		current_dialogue.exit()
 
-func load_scene(scene_id:String, force_reload:bool = false):
-	return SceneLoader.load_scene(scene_id, force_reload)
-
 func reset_game():
-	var s = Settings.get(SettingsList.main_scene)
-	SceneLoader.load_scene(s)
 	started = false
 	emit_signal("game_ended")
 
@@ -205,14 +197,6 @@ func menu(choices:Array, parameters:Dictionary):
 	Menu.exec(choices, parameters)
 func menu_return(result):
 	Menu.return(result)
-
-# it show nodes tagged with "showable <space separated tag>" depending of the tagging rules
-func show(showable_tag:String, parameters := {}):
-	ShowableManager.show(showable_tag, parameters)
-
-# statement of type hide
-func hide(showable_tag:String):
-	ShowableManager.hide(showable_tag)
 
 func notify(text:String, parameters:Dictionary):
 	emit_signal('notify', text, parameters)
