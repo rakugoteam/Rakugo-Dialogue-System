@@ -18,6 +18,8 @@ var thread:Thread
 var step_semaphore:Semaphore
 var return_lock:Semaphore
 
+var ask_return:String
+
 func _store(save):
 	if save == null:
 		print("[Rakugo] Dialogue: Cannot save, no save object provided")
@@ -255,26 +257,22 @@ func ask(default_answer:String, parameters: Dictionary = {}):
 	if thread and thread.is_alive():
 		if !step_semaphore:
 			step_semaphore = Semaphore.new()
-			
-	
+				
 		Rakugo.ask(default_answer, parameters)
-		
-		#not work, but close
-		var ret = _ask_yield()
+
+		_ask_yield()
 		
 		step_semaphore.wait()
 		
-		return ret
+		return ask_return
 
 	return null
 
-func _ask_yield() -> String:
-	var ret = yield(Rakugo, "ask_return")
+func _ask_yield():
+	ask_return = yield(Rakugo, "ask_return")
 
 	if thread and step_semaphore:
-		step_semaphore.post()
-		
-	return ret;
+		step_semaphore.post();
 
 func menu(choices:Array, parameters: Dictionary = {}):
 	if is_active():

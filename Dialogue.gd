@@ -1,32 +1,27 @@
 extends Dialogue
 
-var onStep := false
-
-var onAsk := false
+var player_name:String
 
 func _ready():
-	Rakugo.connect("step", self, "_on_step")
 	Rakugo.connect("say", self, "_on_say")
+	Rakugo.connect("step", self, "_on_step")
 	Rakugo.connect("ask", self, "_on_ask")
-
-func _on_step():
-	onStep = true
 
 func _on_say(character, text, parameters):
 	printt("say", character, text, parameters)
 
+func _on_step():
+	printt("step")
+
 func _on_ask(default_answer, parameters):
-	onAsk = true
 	printt("ask", default_answer, parameters)
 
 func _process(delta):
-	if onStep and Input.is_action_just_pressed("ui_accept"):
-		Rakugo.story_step()
-		onStep = false
+	if Rakugo.is_waiting_step and Input.is_action_just_pressed("ui_accept"):
+		Rakugo.do_step()
 		
-	if onAsk and Input.is_action_just_pressed("ui_down"):
+	if Rakugo.is_waiting_ask_return and Input.is_action_just_pressed("ui_down"):
 		Rakugo.ask_return("Bob")
-		onAsk = false
 
 func hello_world():
 	say(null, "Hello, World !")
@@ -35,6 +30,6 @@ func hello_world():
 	
 	say(null, "What is your name ?")
 	
-	var name = ask("Paul")
+	player_name = ask("Paul")
 
-	printt("name", name)
+	say(null, "Your name is " + player_name + " !")

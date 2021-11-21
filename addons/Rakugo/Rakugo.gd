@@ -19,6 +19,9 @@ var started := false
 var auto_stepping := false
 var skipping := false
 
+var is_waiting_step:=false
+var is_waiting_ask_return:=false
+
 # timers use by rakugo
 onready var auto_timer := $AutoTimer
 onready var skip_timer := $SkipTimer
@@ -86,13 +89,13 @@ func reset_game():
 
 ## Dialogue flow control
 
-func story_step(_unblock=false):
+func do_step(_unblock=false):
+	is_waiting_step = false
 	if _unblock or not StepBlocker.is_blocking():
 		StoreManager.stack_next_store()
 		# print("Emitting _step")
 		get_tree().root.propagate_call('_step')
 		StoreManager.next_store_id()
-
 	else:
 		# print("Emitting _blocked_step")
 		get_tree().root.propagate_call('_blocked_step')
@@ -180,6 +183,7 @@ func debug(some_text = []):
 ## Statements
 
 func step():
+	is_waiting_step = true
 	emit_signal("step")
 
 # statement of type say
@@ -192,9 +196,11 @@ func say(character, text:String, parameters:Dictionary):
 # statement of type ask
 # with keywords: placeholder
 func ask(default_answer:String, parameters:Dictionary):
+	is_waiting_ask_return = true
 	Ask.exec(default_answer, parameters)
 	
 func ask_return(result:String):
+	is_waiting_ask_return = false
 	Ask.return(result)
 
 # statement of type menu
