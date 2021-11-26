@@ -61,14 +61,17 @@ func _ready():
 	if has_method(default_starting_event):
 		Rakugo.set_current_dialogue(self)
 		thread = Thread.new()
+		step_semaphore = Semaphore.new()
 		thread.start(self, default_starting_event)
 
 func _exit_tree():
-	if thread and thread.is_active():
-		if step_semaphore:
+	if thread:
+		if thread.is_alive():
+			printt("Dial", "exit")
+		if thread.is_active():
 			step_semaphore.post()
 		
-		thread.wait_to_finish()
+			thread.wait_to_finish()
 
 ## Dialogue life cycle state
 
@@ -176,11 +179,8 @@ func cond(condition):
 	return condition
 
 func step():
-	Rakugo.step()
-	
 	if thread and thread.is_active():
-		if not step_semaphore:
-			step_semaphore = Semaphore.new()
+		Rakugo.step()
 
 		step_semaphore.wait()
 
@@ -255,9 +255,6 @@ func say(character, text:String, parameters: Dictionary = {}) -> void:
 
 func ask(default_answer:String, parameters: Dictionary = {}):
 	if thread and thread.is_alive():
-		if !step_semaphore:
-			step_semaphore = Semaphore.new()
-				
 		Rakugo.ask(default_answer, parameters)
 
 		_ask_yield()
@@ -271,7 +268,7 @@ func ask(default_answer:String, parameters: Dictionary = {}):
 func _ask_yield():
 	ask_return = yield(Rakugo, "ask_return")
 
-	if thread and step_semaphore:
+	if thread:
 		step_semaphore.post();
 
 func menu(choices:Array, parameters: Dictionary = {}):
