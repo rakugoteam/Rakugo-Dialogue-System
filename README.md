@@ -14,8 +14,8 @@ Inspired by [Ren'Py](https://www.renpy.org), Rakugo is a project aiming to provi
 Support this project here [itch.io](https://rakugoteam.github.io/donations/).
 
 [Showcase](#Showcase) -
-[Installation](#installation) -
-[Rakugo Addons](#Rakugo Addons) -
+[Installation](#Installation) -
+[Rakugo Addons](#Rakugo-Addons) -
 [Roadmap](#Roadmap) -
 [FAQ](#faq) -
 [Infos](#Infos)
