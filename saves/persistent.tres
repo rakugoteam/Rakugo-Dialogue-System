@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://addons/Rakugo/lib/resources/Store.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+game_version = "0.0.1"
+rakugo_version = "3.3"
+properties = {
+"settings": {
+}
+}
