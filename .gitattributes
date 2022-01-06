@@ -1,0 +1,5 @@
+*.inc linguist-vendored
+*.gd text eol=lf diff=gdscript
+*.tscn text eol=lf diff=toml
+*.tres text eol=lf diff=toml
+*.cfg text eol=lf diff=toml

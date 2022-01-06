@@ -8,10 +8,77 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Resource",
+"class": "Character",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/Character.gd"
+}, {
+"base": "Node",
+"class": "Dialogue",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/nodes/Dialogue.gd"
+}, {
+"base": "Resource",
+"class": "HistoryEntry",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/HistoryEntry.gd"
+}, {
+"base": "Reference",
+"class": "ProjectTools",
+"language": "GDScript",
+"path": "res://addons/project-settings-helpers/ProjectTools.gd"
+}, {
+"base": "Reference",
+"class": "PropertyInfo",
+"language": "GDScript",
+"path": "res://addons/project-settings-helpers/PropertyInfo.gd"
+}, {
+"base": "Resource",
+"class": "SceneLinks",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/SceneLinks.gd"
+}, {
+"base": "Object",
+"class": "SettingsList",
+"language": "GDScript",
+"path": "res://addons/Rakugo/SettingsList.gd"
+}, {
+"base": "Resource",
+"class": "Store",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/Store.gd"
+}, {
+"base": "Resource",
+"class": "StoreStack",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/resources/StoreStack.gd"
+} ]
+_global_script_class_icons={
+"Character": "",
+"Dialogue": "res://addons/Rakugo/icons/Dialogue.svg",
+"HistoryEntry": "",
+"ProjectTools": "",
+"PropertyInfo": "",
+"SceneLinks": "",
+"SettingsList": "",
+"Store": "",
+"StoreStack": ""
+}
+
 [application]
 
-config/name="Empty"
+config/name="Rakugo.Core"
 config/icon="res://icon.png"
+
+[autoload]
+
+Rakugo="*res://addons/Rakugo/Rakugo.tscn"
+Settings="*res://addons/Rakugo/Settings.gd"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/Rakugo/plugin.cfg" )
 
 [physics]
 
