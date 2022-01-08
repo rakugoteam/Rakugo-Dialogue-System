@@ -28,7 +28,6 @@ onready var skip_timer := $SkipTimer
 
 onready var StoreManager: = $StoreManager
 onready var History: = $History
-onready var TextParser: RakugoTextParser = $TextParser
 onready var StepBlocker = $StepBlocker
 onready var Say = $Statements/Say
 onready var Ask = $Statements/Ask
@@ -130,11 +129,6 @@ func clean_scene_anchor():
 	if self.scene_anchor != get_tree().get_root():
 		for c in self.scene_anchor.get_children():
 			self.scene_anchor.remove_child(c)
-
-# parse rich text markups to bbcode for RichTextLabel
-# defaults to project setting if null
-func parse_rich_text(text:String, markup = null):
-	return TextParser.parse(text, markup)
 
 # create new character, store it into current store using its tag, then return it
 func define_character(character_name:String, character_tag:String, color=null) -> Character:
