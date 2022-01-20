@@ -21,6 +21,7 @@ var skipping := false
 
 var is_waiting_step:=false
 var is_waiting_ask_return:=false
+var is_waiting_menu_return:=false
 
 # timers use by rakugo
 onready var auto_timer := $AutoTimer
@@ -199,8 +200,11 @@ func ask_return(result:String):
 
 # statement of type menu
 func menu(choices:Array, parameters:Dictionary):
+	is_waiting_menu_return = true
 	Menu.exec(choices, parameters)
-func menu_return(result):
+	
+func menu_return(result:int):
+	is_waiting_menu_return = false
 	Menu.return(result)
 
 func notify(text:String, parameters:Dictionary):
