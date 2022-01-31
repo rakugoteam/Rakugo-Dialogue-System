@@ -20,6 +20,8 @@ var return_lock:Semaphore
 
 var ask_return:String
 
+var menu_return:int
+
 func _store(save):
 	if save == null:
 		print("[Rakugo] Dialogue: Cannot save, no save object provided")
@@ -271,22 +273,23 @@ func _ask_yield():
 	if thread:
 		step_semaphore.post();
 
-func menu(choices:Array, parameters: Dictionary = {}):
-	if is_active():
-		return_lock = Semaphore.new()
-		var returns = [null]
-		_menu_yield(returns)
-		Rakugo.call_deferred('menu', choices, parameters)
-		return_lock.wait()
-		return_lock = null
-		return returns[0]
+func menu(choices:Array, parameters: Dictionary = {}) -> int:
+	if thread and thread.is_alive():
+		Rakugo.menu(choices, parameters)
 
-	return null
+		_menu_yield()
+		
+		step_semaphore.wait()
 
-func _menu_yield(returns:Array):
-	returns[0] = yield(Rakugo, "menu_return")
-	if return_lock:
-		return_lock.post()
+		return menu_return
+
+	return 0
+
+func _menu_yield():
+	menu_return = yield(Rakugo, "menu_return")
+	
+	if thread:
+		step_semaphore.post();
 
 func show(node_id: String, parameters := {}):
 	if is_active():
@@ -297,7 +300,7 @@ func hide(node_id: String) -> void:
 		Rakugo.call_deferred('hide', node_id)
 
 func notify(text: String, parameters:Dictionary = {}) -> void:
-	if is_active():
+	if thread and thread.is_alive():
 		Rakugo.call_deferred('notify', text, parameters)
 
 func call_ext(object, func_name:String, args := []) -> void:
