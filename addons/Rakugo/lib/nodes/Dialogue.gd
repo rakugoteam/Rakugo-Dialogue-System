@@ -252,8 +252,8 @@ func set_var(var_name: String, value):
 
 	return null
 
-func say(character, text:String, parameters: Dictionary = {}) -> void:
-	Rakugo.call_deferred('say', character, text, parameters)
+func say(character, text:String) -> void:
+	Rakugo.call_deferred('say', character, text)
 
 func ask(default_answer:String, parameters: Dictionary = {}):
 	if thread and thread.is_alive():

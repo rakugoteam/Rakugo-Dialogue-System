@@ -35,7 +35,7 @@ onready var Ask = $Statements/Ask
 onready var Menu = $Statements/Menu
 
 signal step()
-signal say(character, text, parameters)
+signal say(character, text)
 signal notify(text, parameters)
 signal ask(default_answer, parameters)
 signal ask_return(result)
@@ -185,8 +185,8 @@ func step():
 # its make given 'character' say 'text'
 # 'parameters' keywords:typing, type_speed, avatar, avatar_state, add
 # speed is time to show next letter
-func say(character, text:String, parameters:Dictionary):
-	Say.exec(character, text, parameters)
+func say(character, text:String):
+	Say.exec(character, text)
 
 # statement of type ask
 # with keywords: placeholder

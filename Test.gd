@@ -7,8 +7,8 @@ func _ready():
 	Rakugo.connect("menu", self, "_on_menu")
 	Rakugo.connect("notify", self, "_on_notify")
 
-func _on_say(character, text, parameters):
-	printt("say", character, text, parameters)
+func _on_say(character, text):
+	printt("say", character, text)
 
 func _on_step():
 	printt("\nPress 'Enter' to continue...\n")
