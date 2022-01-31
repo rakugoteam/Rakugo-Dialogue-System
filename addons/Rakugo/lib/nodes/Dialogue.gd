@@ -300,7 +300,7 @@ func hide(node_id: String) -> void:
 		Rakugo.call_deferred('hide', node_id)
 
 func notify(text: String, parameters:Dictionary = {}) -> void:
-	if is_active():
+	if thread and thread.is_alive():
 		Rakugo.call_deferred('notify', text, parameters)
 
 func call_ext(object, func_name:String, args := []) -> void:

@@ -20,6 +20,8 @@ func hello_world():
 		["B", "b", {}]
 		])
 
+	notify("This choice have consequences !")
+
 	match(choice):
 		1:
 			say(null, "B")

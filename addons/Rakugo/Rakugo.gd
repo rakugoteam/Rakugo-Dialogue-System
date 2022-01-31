@@ -208,7 +208,7 @@ func menu_return(result:int):
 	Menu.return(result)
 
 func notify(text:String, parameters:Dictionary):
-	emit_signal('notify', text, parameters)
+	emit_signal("notify", text, parameters)
 
 # use this to change/assign current scene and dialogue
 # id_of_current_scene is id to scene defined in scene_links or full path to scene
