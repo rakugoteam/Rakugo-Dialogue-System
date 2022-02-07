@@ -13,14 +13,14 @@ func _on_say(character, text):
 func _on_step():
 	printt("\nPress 'Enter' to continue...\n")
 
-func _on_ask(default_answer, parameters):
-	printt("ask", default_answer, parameters)
+func _on_ask(default_answer):
+	printt("ask", default_answer)
 	
-func _on_menu(choices, parameters):
-	printt("menu", choices, parameters)
+func _on_menu(choices):
+	printt("menu", choices)
 	
-func _on_notify(text:String, parameters:Dictionary):
-	printt("notify", text, parameters)
+func _on_notify(text:String):
+	printt("notify", text)
 
 func _process(delta):
 	if Rakugo.is_waiting_step and Input.is_action_just_pressed("ui_accept"):

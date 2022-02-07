@@ -1,12 +1,7 @@
 extends Node
 
-var default_parameters = {}
-
-func _ready():
-	default_parameters = Settings.get(SettingsList.default_menu_parameters, {}, false)
-
-func exec(choices:Array, parameters = {}) -> void:
-	Rakugo.emit_signal("menu", choices, parameters)
+func exec(choices:Array) -> void:
+	Rakugo.emit_signal("menu", choices)
 
 func return(result):
 	Rakugo.emit_signal('menu_return', result)
