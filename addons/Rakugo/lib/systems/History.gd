@@ -12,8 +12,8 @@ func init():
 		 global_history = Rakugo.persistent.get("global_history")
 
 
-func _on_say(character, text, parameters):
-	last_say_hash = hash_say(character, text, parameters)
+func _on_say(character, text):
+	last_say_hash = hash_say(character, text)
 	if not last_say_hash in global_history:
 		step_has_unseen = true
 	if log_step:
@@ -21,7 +21,7 @@ func _on_say(character, text, parameters):
 		var tag = ""
 		if character:
 			tag = character.tag
-		entry.init(tag, text, parameters)
+		entry.init(tag, text)
 		Rakugo.store.history.push_front(entry)
 		global_history[last_say_hash] = true #Using Dictionary as a python Set to benefit from the lookup table
 
@@ -71,7 +71,7 @@ func hash_event(dialogue_name:String, event_name:String):
 	return output.hash()
 
 
-func hash_say(character:Character, text:String, parameters:Dictionary):
+func hash_say(character:Character, text:String):
 	if not Rakugo.current_dialogue:
 		return null
 	
@@ -80,7 +80,5 @@ func hash_say(character:Character, text:String, parameters:Dictionary):
 		output += character.name + character.tag
 	else:
 		output += Rakugo.Say.get_narrator().name
-	if parameters and parameters.get("hash_parameters_in_history"):
-		output += str(parameters.hash())
 	
 	return output.hash()

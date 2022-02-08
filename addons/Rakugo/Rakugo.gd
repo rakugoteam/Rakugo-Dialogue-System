@@ -21,6 +21,7 @@ var skipping := false
 
 var is_waiting_step:=false
 var is_waiting_ask_return:=false
+var is_waiting_menu_return:=false
 
 # timers use by rakugo
 onready var auto_timer := $AutoTimer
@@ -34,11 +35,11 @@ onready var Ask = $Statements/Ask
 onready var Menu = $Statements/Menu
 
 signal step()
-signal say(character, text, parameters)
-signal notify(text, parameters)
-signal ask(default_answer, parameters)
+signal say(character, text)
+signal notify(text)
+signal ask(default_answer)
 signal ask_return(result)
-signal menu(choices, parameters)
+signal menu(choices)
 signal menu_return(result)
 signal started()
 signal game_ended()
@@ -184,27 +185,30 @@ func step():
 # its make given 'character' say 'text'
 # 'parameters' keywords:typing, type_speed, avatar, avatar_state, add
 # speed is time to show next letter
-func say(character, text:String, parameters:Dictionary):
-	Say.exec(character, text, parameters)
+func say(character, text:String):
+	Say.exec(character, text)
 
 # statement of type ask
 # with keywords: placeholder
-func ask(default_answer:String, parameters:Dictionary):
+func ask(default_answer:String):
 	is_waiting_ask_return = true
-	Ask.exec(default_answer, parameters)
+	Ask.exec(default_answer)
 	
 func ask_return(result:String):
 	is_waiting_ask_return = false
 	Ask.return(result)
 
 # statement of type menu
-func menu(choices:Array, parameters:Dictionary):
-	Menu.exec(choices, parameters)
-func menu_return(result):
+func menu(choices:Array):
+	is_waiting_menu_return = true
+	Menu.exec(choices)
+	
+func menu_return(result:int):
+	is_waiting_menu_return = false
 	Menu.return(result)
 
-func notify(text:String, parameters:Dictionary):
-	emit_signal('notify', text, parameters)
+func notify(text:String):
+	emit_signal("notify", text)
 
 # use this to change/assign current scene and dialogue
 # id_of_current_scene is id to scene defined in scene_links or full path to scene

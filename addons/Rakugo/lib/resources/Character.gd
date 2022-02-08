@@ -84,8 +84,8 @@ func get_composite_name(_markup_override="", _affixes=true) -> String:
 
 ## Dialogue shorts (to be shielded behind a getter in Dialogue)
 
-func say(text:String, parameters:Dictionary = {}) -> void:
-	Rakugo.say(self, text, parameters)
+func say(text:String) -> void:
+	Rakugo.say(self, text)
 
 
 func show(parameters:Dictionary = {}) -> void:

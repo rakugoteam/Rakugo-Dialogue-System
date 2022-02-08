@@ -1,6 +1,5 @@
 extends Node
 
-var default_parameters = {}
 var default_narrator = null
 
 func _ready():
@@ -8,19 +7,11 @@ func _ready():
 	default_narrator.init(
 		Settings.get(SettingsList.narrator_name), 
 		"", Settings.get(SettingsList.narrator_color))
-	default_parameters = Settings.get(SettingsList.default_say_parameters, {}, false)
 
-
-func exec(character, text:String, parameters := {}) -> void:
+func exec(character, text:String) -> void:
 	character = _get_character(character)
 
-	# parameters > character default parameters > project parameters
-	if character:
-		parameters = _apply_default(parameters, character.say_parameters)
-	
-	parameters = _apply_default(parameters, default_parameters)
-	Rakugo.emit_signal("say", character, text, parameters)
-
+	Rakugo.emit_signal("say", character, text)
 
 #Utils functions
 func _get_character(character):
