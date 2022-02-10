@@ -34,11 +34,6 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/project-settings-helpers/PropertyInfo.gd"
 }, {
-"base": "Resource",
-"class": "SceneLinks",
-"language": "GDScript",
-"path": "res://addons/Rakugo/lib/resources/SceneLinks.gd"
-}, {
 "base": "Object",
 "class": "SettingsList",
 "language": "GDScript",
@@ -60,7 +55,6 @@ _global_script_class_icons={
 "HistoryEntry": "",
 "ProjectTools": "",
 "PropertyInfo": "",
-"SceneLinks": "",
 "SettingsList": "",
 "Store": "",
 "StoreStack": ""

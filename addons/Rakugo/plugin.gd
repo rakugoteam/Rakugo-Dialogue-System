@@ -12,7 +12,8 @@ func init_project_settings():
 		var property_value = default_property_list[property_key]
 		ProjectTools.set_setting(property_key, property_value[0], property_value[1])
 	
-	ProjectSettings.set_order("rakugo/game/info/version", 1)
+	# move setting to the top of the list
+	ProjectSettings.set_order(default_property_list.keys()[0], 1)
 
 func _enter_tree():
 	# Initialization of the plugin goes here
@@ -20,8 +21,6 @@ func _enter_tree():
 	add_autoload_singleton("Settings", "res://addons/Rakugo/Settings.gd")
 	
 	init_project_settings()
-	init_tools()
-
 	print("Rakugo is enabled")
 
 func remove_tools():
