@@ -104,7 +104,9 @@ func _ready():
 		prints(k, test[k])
 
 func parse_script(script:String) -> Dictionary:
-	var dialogues: Dictionary = { "_init":[] }
+	var current_dialogue_name: = "_init"
+	
+	var dialogues: Dictionary = { current_dialogue_name:[] }
 	# var known_translations = {}
 	# var errors: Array = []
 	# var parent_stack: Array = []
@@ -113,7 +115,7 @@ func parse_script(script:String) -> Dictionary:
 	
 	# Find all dialogue first
 	var current_dialogue: = []
-	var current_dialogue_name: = "_init"
+	
 	for line in lines:
 		var result = regex_cache["DIALOGUE"].search(line)
 		if result:
