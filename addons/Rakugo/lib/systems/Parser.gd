@@ -52,7 +52,7 @@ var Regex := {
 	GDSCRIPT_BLOCK = "^gdscript:",
 	
 	# dialogue Regex
-	DIALOGUE = "^dialogue (?<dialogue_name>{VALID_VARIABLE}):",
+	DIALOGUE = "^(?<dialogue_name>{VALID_VARIABLE}):",
 	# character tag = "character_name"
 	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<character_name>.*)\"",
 	# character_tag? say STRING|MULTILINE_STRING
@@ -73,7 +73,7 @@ var regex_cache := {}
 var test_script := """
 character test_ch "Test Character"
 
-dialogue test_dialogue:
+test_dialogue:
 	"Here is narration text"
 	test_ch "Here is dialogue text"
 """
