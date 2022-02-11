@@ -6,7 +6,7 @@ func _ready():
 	default_narrator = Character.new()
 	default_narrator.init(
 		Settings.get(SettingsList.narrator_name), 
-		"", Settings.get(SettingsList.narrator_color))
+		"", Color.transparent)
 
 func exec(character, text:String) -> void:
 	character = _get_character(character)
