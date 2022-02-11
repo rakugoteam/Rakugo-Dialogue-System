@@ -105,6 +105,7 @@ func _ready():
 
 func parse_script(script:String) -> Dictionary:
 	# Find all dialogue first
+	# this comment is only to force commit.
 	var init := [] 
 	var current_dialogue: = init
 	var current_dialogue_name: = "_init"
