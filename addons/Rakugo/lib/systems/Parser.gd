@@ -116,7 +116,16 @@ func parse_script(script:String) -> Dictionary:
 	var lines := script.split("\n")
 	
 	for line in lines:
-		var result = regex_cache["DIALOGUE"].search(line)
+		if line.empty():
+			continue
+		
+		var result
+		
+		result = regex_cache["CHARACTER_DEF"].search(line)
+		if result:
+			continue
+		
+		result = regex_cache["DIALOGUE"].search(line)
 		if result:
 			current_dialogue_name = result.get_string("dialogue_name")
 			current_dialogue = []
