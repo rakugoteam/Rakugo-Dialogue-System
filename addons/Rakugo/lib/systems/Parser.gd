@@ -36,7 +36,7 @@ var Tokens := {
 # Regex in this language can be extended by the other addons
 
 var Regex := {
-	VALID_VARIABLE = "^[a-zA-Z_][a-zA-Z_0-9]+$",
+	VALID_VARIABLE = "[a-zA-Z_][a-zA-Z_0-9]+",
 #	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
 	CONDITION = "(if|elif) (?<condition>.*)",
 	STRING = "\"(?<string>.*)\"",
@@ -123,8 +123,8 @@ func parse_script(script:String) -> Dictionary:
 		else:
 			current_dialogue.append(line)
 
-	for dialogue_name in dialogues.keys():
-		dialogues[dialogue_name] = parse_dialogue(dialogues[dialogue_name])
+#	for dialogue_name in dialogues.keys():
+#		dialogues[dialogue_name] = parse_dialogue(dialogues[dialogue_name])
 	
 	return dialogues
 
