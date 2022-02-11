@@ -105,9 +105,9 @@ func _ready():
 
 func parse_script(script:String) -> Dictionary:
 	# Find all dialogue first
-	var current_dialogue: = []
+	var init := [] 
+	var current_dialogue: = init
 	var current_dialogue_name: = "_init"
-	
 	var dialogues: Dictionary = { current_dialogue_name:[] }
 	# var known_translations = {}
 	# var errors: Array = []
@@ -123,7 +123,15 @@ func parse_script(script:String) -> Dictionary:
 		
 		result = regex_cache["CHARACTER_DEF"].search(line)
 		if result:
-			continue
+			init.append(line)
+
+		result = regex_cache["GDSCRIPT_BLOCK"].search(line)
+		if result:
+			init.append(line)
+
+		result = regex_cache["IN_LINE_GDSCRIPT"].search(line)
+		if result:
+			init.append(line)
 		
 		result = regex_cache["DIALOGUE"].search(line)
 		if result:
@@ -132,9 +140,6 @@ func parse_script(script:String) -> Dictionary:
 			dialogues[current_dialogue_name] = current_dialogue
 		else:
 			current_dialogue.append(line)
-
-#	for dialogue_name in dialogues.keys():
-#		dialogues[dialogue_name] = parse_dialogue(dialogues[dialogue_name])
 	
 	return dialogues
 
