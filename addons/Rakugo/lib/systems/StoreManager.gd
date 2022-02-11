@@ -9,7 +9,6 @@ var save_folder_path = ""
 signal saved
 
 func init():
-	print("hello")
 	self.init_save_folder()
 	self.init_persistent_store()
 	self.init_store_stack()

@@ -63,7 +63,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Rakugo.Core"
-run/main_scene="res://Test/TestPrint/TestPrint.tscn"
+run/main_scene="res://Test/TestParser/TestParser.tscn"
 config/icon="res://icon.png"
 
 [autoload]

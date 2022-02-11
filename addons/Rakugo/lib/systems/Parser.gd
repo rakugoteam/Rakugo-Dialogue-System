@@ -52,8 +52,7 @@ var Regex := {
 	GDSCRIPT_BLOCK = "^gdscript:",
 	
 	# dialogue Regex
-#	DIALOGUE = "^dialogue (?<dialogue_name>{VALID_VARIABLE}):",
-	DIALOGUE = "^dialogue:",
+	DIALOGUE = "^dialogue (?<dialogue_name>{VALID_VARIABLE}):",
 	# character tag = "character_name"
 	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<character_name>.*)\"",
 	# character_tag? say STRING|MULTILINE_STRING
@@ -80,24 +79,25 @@ dialogue test_dialogue:
 """
 
 func _ready():
-#	var reg = RegEx.new().compile(Tokens["TOKEN_PARENS_CLOSE"])
-	
 	for t in Tokens.keys():
 		Tokens[t] = Tokens[t].format(Regex)
 		# prints(t, Tokens[t])
+		
+		var reg := RegEx.new()
+		reg.compile(Tokens[t])
+		
+		regex_cache[t] = reg
 
 	for r in Regex.keys():
 		Regex[r] = Regex[r].format(Tokens)
+		
 		Regex[r] = Regex[r].format(Regex)
 		# prints(r, Regex[r])
 
-	for t in Tokens.keys():
-		var re:= RegEx.new()
-		regex_cache[t] = re.compile(Tokens[t])
-
-	for r in Regex.keys():
-		var re:= RegEx.new()
-		regex_cache[r] = re.compile(Regex[r])
+		var reg := RegEx.new()
+		reg.compile(Regex[r])
+		
+		regex_cache[r] = reg
 
 	var test := parse_script(test_script)
 	for k in test.keys():
