@@ -6,10 +6,19 @@ extends Object
 # Parser for RenScript
 # language is based on Ren'Py and GDScript
 
+# _init dialogue is used for code outside other dialogues
+const init_dialogue_name = "_init"
+
+var dialogues := {}
+var current_dialogue_name = init_dialogue_name
+var current_dialogue : Array setget , _get_current_dialogue
+
+func _get_current_dialogue() -> Array:
+	return dialogues[current_dialogue_name]
+
 # tokens for RenScript
 # tokens in this language can be extended by the other addons
 
-# tokens
 var Tokens := {
 	TOKEN_FUNCTION = "^{VALID_VARIABLE}\\(",
 	TOKEN_DICTIONARY_REFERENCE = "^{VALID_VARIABLE}\\[",
@@ -104,12 +113,10 @@ func _ready():
 		prints(k, test[k])
 
 func parse_script(script:String) -> Dictionary:
-	# Find all dialogue first
-	# this comment is only to force commit.
-	var init := [] 
-	var current_dialogue: = init
-	var current_dialogue_name: = "_init"
-	var dialogues: Dictionary = { current_dialogue_name:[] }
+	#init
+	current_dialogue_name = init_dialogue_name
+	dialogues = { current_dialogue_name:[] }
+	
 	# var known_translations = {}
 	# var errors: Array = []
 	# var parent_stack: Array = []
@@ -119,26 +126,25 @@ func parse_script(script:String) -> Dictionary:
 	for line in lines:
 		if line.empty():
 			continue
-		
-		var result
-		
+			
+		var result	
 		result = regex_cache["CHARACTER_DEF"].search(line)
 		if result:
-			init.append(line)
-
+			current_dialogue.append(line)
+			
 		result = regex_cache["GDSCRIPT_BLOCK"].search(line)
 		if result:
-			init.append(line)
-
+			current_dialogue.append(line)
+			
 		result = regex_cache["IN_LINE_GDSCRIPT"].search(line)
 		if result:
-			init.append(line)
-		
+			current_dialogue.append(line)
+	
 		result = regex_cache["DIALOGUE"].search(line)
 		if result:
 			current_dialogue_name = result.get_string("dialogue_name")
-			current_dialogue = []
-			dialogues[current_dialogue_name] = current_dialogue
+			dialogues[current_dialogue_name] = []
+
 		else:
 			current_dialogue.append(line)
 	
