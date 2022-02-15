@@ -97,12 +97,8 @@ func _init():
 		regex_cache[r] = reg
 
 func parse_script(file:File) -> Dictionary:
-	# Find all dialogue first
-	var current_dialogue: = []
-	var current_dialogue_name: = "_init"
-	
-	var dialogues: Dictionary = { current_dialogue_name:[] }
-	var current_dialogue = dialogues[current_dialogue_name]
+	var dialogues: Dictionary = { init_dialogue_name:[] }
+	var current_dialogue = dialogues[init_dialogue_name]
 
 	# var known_translations = {}
 	# var errors: Array = []
@@ -129,10 +125,12 @@ func parse_script(file:File) -> Dictionary:
 
 		result = regex_cache["DIALOGUE"].search(line)
 		if result:
-			current_dialogue_name = result.get_string("dialogue_name")
-			current_dialogue = []
-			dialogues[current_dialogue_name] = current_dialogue
-
+			var dialogue_name = result.get_string("dialogue_name")
+			
+			if !dialogues.has(dialogue_name):
+				dialogues[dialogue_name] = []
+			
+			current_dialogue = dialogues[dialogue_name]
 		else:
 			current_dialogue.append(line)
 
