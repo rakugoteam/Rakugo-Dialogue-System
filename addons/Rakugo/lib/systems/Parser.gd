@@ -31,6 +31,7 @@ var Tokens := {
 	TOKEN_STRING = "^\".*?\"",
 	TOKEN_VARIABLE = "^[a-zA-Z_][a-zA-Z_0-9]+",
 	TOKEN_TAB = "^\\t",
+	TOKEN_NUMERIC = "-?[1-9][0-9.]*"
 }
 
 # Regex for RenScript
@@ -45,7 +46,7 @@ var Regex := {
 	COMMENT = "^#.*",
 
 	# for setting Rakugo variables
-	SET_VARIABLE = "^(?<variable>.*) {TOKEN_OPERATOR} (?<value>.*)",
+	SET_VARIABLE = "^(?<variable>{VALID_VARIABLE}) = (?<value>{TOKEN_NUMERIC})$",
 
 	# $ some_gd_script_code
 	IN_LINE_GDSCRIPT = "^\\$.*",
