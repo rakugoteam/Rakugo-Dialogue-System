@@ -9,13 +9,6 @@ extends Object
 # _init dialogue is used for code outside other dialogues
 const init_dialogue_name = "_init"
 
-var dialogues := {}
-var current_dialogue_name = init_dialogue_name
-var current_dialogue : Array setget , _get_current_dialogue
-
-func _get_current_dialogue() -> Array:
-	return dialogues[current_dialogue_name]
-
 # tokens for RenScript
 # tokens in this language can be extended by the other addons
 
@@ -114,8 +107,9 @@ func _ready():
 
 func parse_script(script:String) -> Dictionary:
 	#init
-	current_dialogue_name = init_dialogue_name
-	dialogues = { current_dialogue_name:[] }
+	var current_dialogue_name = init_dialogue_name
+	var dialogues: Dictionary = { current_dialogue_name:[] }
+	var current_dialogue = dialogues[current_dialogue_name]
 	
 	# var known_translations = {}
 	# var errors: Array = []
@@ -143,8 +137,9 @@ func parse_script(script:String) -> Dictionary:
 		result = regex_cache["DIALOGUE"].search(line)
 		if result:
 			current_dialogue_name = result.get_string("dialogue_name")
-			dialogues[current_dialogue_name] = []
-
+			current_dialogue = []
+			dialogues[current_dialogue_name] = current_dialogue
+			
 		else:
 			current_dialogue.append(line)
 	
