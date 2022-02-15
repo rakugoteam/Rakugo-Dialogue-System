@@ -1,4 +1,5 @@
 extends Object
+class_name Parser
 
 # this code base on code from:
 # https://github.com/nathanhoad/godot_dialogue_manager 
@@ -70,15 +71,7 @@ var Regex := {
 
 var regex_cache := {}
 
-var test_script := """
-character test_ch "Test Character"
-
-test_dialogue:
-	"Here is narration text"
-	test_ch "Here is dialogue text"
-"""
-
-func _ready():
+func _init():
 	for t in Tokens.keys():
 		Tokens[t] = Tokens[t].format(Regex)
 		# prints(t, Tokens[t])
@@ -99,11 +92,7 @@ func _ready():
 		
 		regex_cache[r] = reg
 
-	var test := parse_script(test_script)
-	for k in test.keys():
-		prints(k, test[k])
-
-func parse_script(script:String) -> Dictionary:
+func parse_script(file:File) -> Dictionary:
 	# Find all dialogue first
 	var current_dialogue: = []
 	var current_dialogue_name: = "_init"
@@ -113,9 +102,9 @@ func parse_script(script:String) -> Dictionary:
 	# var errors: Array = []
 	# var parent_stack: Array = []
 	
-	var lines := script.split("\n")
-	
-	for line in lines:
+	while not file.eof_reached():
+		var line = file.get_line()
+		
 		if line.empty():
 			continue
 		
@@ -127,9 +116,7 @@ func parse_script(script:String) -> Dictionary:
 		
 		result = regex_cache["DIALOGUE"].search(line)
 		if result:
-			current_dialogue_name = result.get_string("dialogue_name")
-			current_dialogue = []
-			dialogues[current_dialogue_name] = current_dialogue
+			dialogues[result.get_string("dialogue_name")] = []
 		else:
 			current_dialogue.append(line)
 

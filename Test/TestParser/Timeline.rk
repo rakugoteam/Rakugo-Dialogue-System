@@ -1,0 +1,5 @@
+character test_ch "Test Character"
+
+test_dialogue:
+	"Here is narration text"
+	test_ch "Here is dialogue text"
