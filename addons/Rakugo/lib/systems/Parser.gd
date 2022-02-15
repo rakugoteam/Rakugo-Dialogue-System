@@ -7,6 +7,9 @@ class_name Parser
 # Parser for RenScript
 # language is based on Ren'Py and GDScript
 
+# _init dialogue is used for code outside other dialogues
+const init_dialogue_name = "_init"
+
 # tokens for RenScript
 # tokens in this language can be extended by the other addons
 
@@ -99,25 +102,37 @@ func parse_script(file:File) -> Dictionary:
 	var current_dialogue_name: = "_init"
 	
 	var dialogues: Dictionary = { current_dialogue_name:[] }
+	var current_dialogue = dialogues[current_dialogue_name]
+
 	# var known_translations = {}
 	# var errors: Array = []
 	# var parent_stack: Array = []
 	
 	while not file.eof_reached():
 		var line = file.get_line()
-		
+
 		if line.empty():
 			continue
-		
+
 		var result
-		
 		result = regex_cache["CHARACTER_DEF"].search(line)
 		if result:
-			continue
-		
+			current_dialogue.append(line)
+
+		result = regex_cache["GDSCRIPT_BLOCK"].search(line)
+		if result:
+			current_dialogue.append(line)
+
+		result = regex_cache["IN_LINE_GDSCRIPT"].search(line)
+		if result:
+			current_dialogue.append(line)
+
 		result = regex_cache["DIALOGUE"].search(line)
 		if result:
-			dialogues[result.get_string("dialogue_name")] = []
+			current_dialogue_name = result.get_string("dialogue_name")
+			current_dialogue = []
+			dialogues[current_dialogue_name] = current_dialogue
+
 		else:
 			current_dialogue.append(line)
 
