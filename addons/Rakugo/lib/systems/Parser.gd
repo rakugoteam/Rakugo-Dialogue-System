@@ -75,6 +75,11 @@ var Regex := {
 
 var regex_cache := {}
 
+var thread:Thread
+var step_semaphore:Semaphore
+
+var stop_thread := false
+
 func _init():
 	for t in Tokens.keys():
 		Tokens[t] = Tokens[t].format(Regex)
@@ -99,6 +104,13 @@ func _init():
 		regex_cache[r] = reg
 
 func parse_script(file_name:String):
+	thread = Thread.new()
+	
+	step_semaphore = Semaphore.new()
+	
+	thread.start(self, "do_parse_script", file_name)
+
+func do_parse_script(file_name:String):
 	# var known_translations = {}
 	# var errors: Array = []
 	# var parent_stack: Array = []
@@ -109,7 +121,7 @@ func parse_script(file_name:String):
 		prints("Parser", "can't open file : " + file_name)
 		return
 	
-	while not file.eof_reached():
+	while !stop_thread and !file.eof_reached():
 		var line = file.get_line()
 
 		if line.empty():
@@ -150,6 +162,8 @@ func parse_script(file_name:String):
 				prints(" ", key, result.get_string(key))
 
 			Rakugo.say(result.get_string("character_tag"), result.get_string("string"))
+			
+			step_semaphore.wait()
 			continue
 
 #		result = regex_cache["DIALOGUE"].search(line)

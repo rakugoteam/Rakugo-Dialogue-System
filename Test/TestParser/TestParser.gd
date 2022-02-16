@@ -7,19 +7,24 @@ extends Node
 
 const file_name = "res://Test/TestParser/Timeline.rk"
 
-var thread:Thread
+var parser:Parser
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	Rakugo.connect("say", self, "_on_say")
 	
-	var parser = Parser.new()
+	parser = Parser.new()
 	
-	thread = Thread.new()
-	thread.start(parser, "parse_script", file_name)
+	parser.parse_script(file_name)
 
 func _exit_tree():
-	if thread and thread.is_active():
+	var thread = parser.thread
+	
+	if thread:
+		parser.stop_thread = true
+		
+		parser.step_semaphore.post()
+		
 		thread.wait_to_finish()
 
 func _on_say(character:Character, text):
