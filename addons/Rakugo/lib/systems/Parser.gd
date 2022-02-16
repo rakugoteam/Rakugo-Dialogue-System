@@ -115,26 +115,32 @@ func parse_script(file:File) -> Dictionary:
 		var result
 		result = regex_cache["CHARACTER_DEF"].search(line)
 		if result:
+			prints("Parser", "parse_script", "CHARACTER_DEF")
 			current_dialogue.append(line)
+			continue
 
 		result = regex_cache["GDSCRIPT_BLOCK"].search(line)
 		if result:
+			prints("Parser", "parse_script", "GDSCRIPT_BLOCK")
 			current_dialogue.append(line)
+			continue
 
 		result = regex_cache["IN_LINE_GDSCRIPT"].search(line)
 		if result:
+			prints("Parser", "parse_script", "IN_LINE_GDSCRIPT")
 			current_dialogue.append(line)
+			continue
 
 		result = regex_cache["DIALOGUE"].search(line)
 		if result:
+			prints("Parser", "parse_script", "DIALOGUE")
 			var dialogue_name = result.get_string("dialogue_name")
 			
 			if !dialogues.has(dialogue_name):
 				dialogues[dialogue_name] = []
 			
 			current_dialogue = dialogues[dialogue_name]
-		else:
-			current_dialogue.append(line)
+			continue
 
 #	for dialogue_name in dialogues.keys():
 #		dialogues[dialogue_name] = parse_dialogue(dialogues[dialogue_name])
