@@ -42,7 +42,7 @@ var Tokens := {
 
 var Regex := {
 	VALID_VARIABLE = "[a-zA-Z_][a-zA-Z_0-9]+",
-#	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
+	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
 	CONDITION = "(if|elif) (?<condition>.*)",
 	STRING = "\"(?<string>.*)\"",
 	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
@@ -81,7 +81,8 @@ func _init():
 		# prints(t, Tokens[t])
 		
 		var reg := RegEx.new()
-		reg.compile(Tokens[t])
+		if reg.compile(Tokens[t]) != OK:
+			prints("Parser", "_init", "failed", t)
 		
 		regex_cache[t] = reg
 
@@ -92,7 +93,8 @@ func _init():
 		# prints(r, Regex[r])
 
 		var reg := RegEx.new()
-		reg.compile(Regex[r])
+		if reg.compile(Regex[r]) != OK:
+			prints("Parser", "_init", "failed", r)
 		
 		regex_cache[r] = reg
 
