@@ -61,7 +61,7 @@ var Regex := {
 	# character tag = "character_name"
 	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<character_name>.*)\"",
 	# character_tag? say STRING|MULTILINE_STRING
-	SAY = "^(?<character_tag>{VALID_VARIABLE})? (?<text>{STRING|MULTILINE_STRING})",
+	SAY = "(?<character_tag>{VALID_VARIABLE}) ?{STRING}",
 	# var_name = ask "please enter text" 
 	ASK = "^(?<var_name>{VALID_VARIABLE}) (?<assignment_type>{TOKEN_ASSIGNMENT} ask (?<text>{STRING}))",
 	# menu menu_name? :
@@ -113,12 +113,6 @@ func parse_script(file:File) -> Dictionary:
 			continue
 
 		var result
-		result = regex_cache["CHARACTER_DEF"].search(line)
-		if result:
-			prints("Parser", "parse_script", "CHARACTER_DEF")
-			current_dialogue.append(line)
-			continue
-
 		result = regex_cache["GDSCRIPT_BLOCK"].search(line)
 		if result:
 			prints("Parser", "parse_script", "GDSCRIPT_BLOCK")
@@ -128,6 +122,18 @@ func parse_script(file:File) -> Dictionary:
 		result = regex_cache["IN_LINE_GDSCRIPT"].search(line)
 		if result:
 			prints("Parser", "parse_script", "IN_LINE_GDSCRIPT")
+			current_dialogue.append(line)
+			continue
+
+		result = regex_cache["CHARACTER_DEF"].search(line)
+		if result:
+			prints("Parser", "parse_script", "CHARACTER_DEF")
+			current_dialogue.append(line)
+			continue
+
+		result = regex_cache["SAY"].search(line)
+		if result:
+			prints("Parser", "parse_script", "SAY")
 			current_dialogue.append(line)
 			continue
 
