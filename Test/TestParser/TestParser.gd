@@ -27,8 +27,8 @@ func _ready():
 	
 	pass # Replace with function body.
 
-func _on_say(character, text):
-	prints("TestParser", "say", character, text)
+func _on_say(character:Character, text):
+	prints("TestParser", "say", character.name if character else "null", text)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

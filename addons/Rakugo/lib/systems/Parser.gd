@@ -59,7 +59,7 @@ var Regex := {
 	# dialogue Regex
 	DIALOGUE = "^(?<dialogue_name>{VALID_VARIABLE}):",
 	# character tag = "character_name"
-	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<character_name>.*)\"",
+	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<name>.*)\"",
 	# character_tag? say STRING|MULTILINE_STRING
 	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?{STRING}$",
 	# var_name = ask "please enter text" 
@@ -132,7 +132,11 @@ func parse_script(file:File) -> Dictionary:
 		result = regex_cache["CHARACTER_DEF"].search(line)
 		if result:
 			prints("Parser", "parse_script", "CHARACTER_DEF")
-			current_dialogue.append(line)
+			
+			for key in result.names:
+				prints(" ", key, result.get_string(key))
+
+			Rakugo.define_character(result.get_string("name"), result.get_string("tag"))
 			continue
 
 		result = regex_cache["SAY"].search(line)
