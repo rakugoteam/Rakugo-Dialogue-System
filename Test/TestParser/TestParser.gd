@@ -9,6 +9,8 @@ const file_name = "res://Test/TestParser/Timeline.rk"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	Rakugo.connect("say", self, "_on_say")
+	
 	var parser = Parser.new()
 	
 	var file = File.new()
@@ -25,6 +27,8 @@ func _ready():
 	
 	pass # Replace with function body.
 
+func _on_say(character, text):
+	prints("TestParser", "say", character, text)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

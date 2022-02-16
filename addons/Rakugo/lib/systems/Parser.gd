@@ -116,7 +116,7 @@ func parse_script(file:File) -> Dictionary:
 		#todo handle indentation levels
 		line = line.strip_escapes()
 
-		var result
+		var result:RegExMatch
 		result = regex_cache["GDSCRIPT_BLOCK"].search(line)
 		if result:
 			prints("Parser", "parse_script", "GDSCRIPT_BLOCK")
@@ -138,7 +138,11 @@ func parse_script(file:File) -> Dictionary:
 		result = regex_cache["SAY"].search(line)
 		if result:
 			prints("Parser", "parse_script", "SAY")
-			current_dialogue.append(line)
+			
+			for key in result.names:
+				prints(" ", key, result.get_string(key))
+				
+			Rakugo.say(result.get_string("character_tag"), result.get_string("string"))
 			continue
 
 		result = regex_cache["DIALOGUE"].search(line)
