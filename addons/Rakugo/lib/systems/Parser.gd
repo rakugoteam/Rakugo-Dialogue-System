@@ -98,20 +98,23 @@ func _init():
 		
 		regex_cache[r] = reg
 
-func parse_script(file:File) -> Dictionary:
-	var dialogues: Dictionary = { init_dialogue_name:[] }
-	var current_dialogue = dialogues[init_dialogue_name]
-
+func parse_script(file_name:String):
 	# var known_translations = {}
 	# var errors: Array = []
 	# var parent_stack: Array = []
 	
+	var file = File.new()
+	
+	if file.open(file_name, File.READ) != OK:
+		prints("Parser", "can't open file : " + file_name)
+		return
+	
 	while not file.eof_reached():
-		var line := file.get_line()
+		var line = file.get_line()
 
 		if line.empty():
 			continue
-		
+
 		#erase tabulations
 		#todo handle indentation levels
 		line = line.strip_escapes()
@@ -120,19 +123,19 @@ func parse_script(file:File) -> Dictionary:
 		result = regex_cache["GDSCRIPT_BLOCK"].search(line)
 		if result:
 			prints("Parser", "parse_script", "GDSCRIPT_BLOCK")
-			current_dialogue.append(line)
+#			current_dialogue.append(line)
 			continue
 
 		result = regex_cache["IN_LINE_GDSCRIPT"].search(line)
 		if result:
 			prints("Parser", "parse_script", "IN_LINE_GDSCRIPT")
-			current_dialogue.append(line)
+#			current_dialogue.append(line)
 			continue
 
 		result = regex_cache["CHARACTER_DEF"].search(line)
 		if result:
 			prints("Parser", "parse_script", "CHARACTER_DEF")
-			
+
 			for key in result.names:
 				prints(" ", key, result.get_string(key))
 
@@ -142,28 +145,25 @@ func parse_script(file:File) -> Dictionary:
 		result = regex_cache["SAY"].search(line)
 		if result:
 			prints("Parser", "parse_script", "SAY")
-			
+
 			for key in result.names:
 				prints(" ", key, result.get_string(key))
-				
+
 			Rakugo.say(result.get_string("character_tag"), result.get_string("string"))
 			continue
 
-		result = regex_cache["DIALOGUE"].search(line)
-		if result:
-			prints("Parser", "parse_script", "DIALOGUE")
-			var dialogue_name = result.get_string("dialogue_name")
-			
-			if !dialogues.has(dialogue_name):
-				dialogues[dialogue_name] = []
-			
-			current_dialogue = dialogues[dialogue_name]
-			continue
+#		result = regex_cache["DIALOGUE"].search(line)
+#		if result:
+#			prints("Parser", "parse_script", "DIALOGUE")
+#			var dialogue_name = result.get_string("dialogue_name")
+#
+#			if !dialogues.has(dialogue_name):
+#				dialogues[dialogue_name] = []
+#
+#			current_dialogue = dialogues[dialogue_name]
+#			continue
 
-#	for dialogue_name in dialogues.keys():
-#		dialogues[dialogue_name] = parse_dialogue(dialogues[dialogue_name])
-	
-	return dialogues
+	file.close()
 
 func parse_dialogue(lines:PoolStringArray) -> Array:
 	var dialogue := []
