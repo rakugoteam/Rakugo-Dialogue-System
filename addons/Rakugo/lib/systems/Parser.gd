@@ -61,7 +61,7 @@ var Regex := {
 	# character tag = "character_name"
 	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<character_name>.*)\"",
 	# character_tag? say STRING|MULTILINE_STRING
-	SAY = "(?<character_tag>{VALID_VARIABLE}) ?{STRING}",
+	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?{STRING}$",
 	# var_name = ask "please enter text" 
 	ASK = "^(?<var_name>{VALID_VARIABLE}) (?<assignment_type>{TOKEN_ASSIGNMENT} ask (?<text>{STRING}))",
 	# menu menu_name? :
@@ -107,10 +107,14 @@ func parse_script(file:File) -> Dictionary:
 	# var parent_stack: Array = []
 	
 	while not file.eof_reached():
-		var line = file.get_line()
+		var line := file.get_line()
 
 		if line.empty():
 			continue
+		
+		#erase tabulations
+		#todo handle indentation levels
+		line = line.strip_escapes()
 
 		var result
 		result = regex_cache["GDSCRIPT_BLOCK"].search(line)
