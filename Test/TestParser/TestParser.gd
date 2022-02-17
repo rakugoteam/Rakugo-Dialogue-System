@@ -13,6 +13,7 @@ func _ready():
 	Rakugo.connect("say", self, "_on_say")
 	Rakugo.connect("step", self, "_on_step")
 	Rakugo.connect("ask", self, "_on_ask")
+	Rakugo.connect("menu", self, "_on_menu")
 	
 	parser = Parser.new()
 	
@@ -38,6 +39,9 @@ func _on_step():
 func _on_ask(character:Character, question:String, default_answer:String):
 	is_waiting_ask = true
 	prints("TestParser", "ask", character.name if character else "null", question, default_answer)
+
+func _on_menu(choices):
+	prints("menu", choices)
 
 func _process(delta):
 	if is_waiting_step and Input.is_action_just_pressed("ui_accept"):

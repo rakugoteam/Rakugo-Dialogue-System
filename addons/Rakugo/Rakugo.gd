@@ -206,9 +206,8 @@ func ask_return(result):
 	Rakugo.get_current_store().set(variable_ask_name, result)
 
 # statement of type menu
-func menu(choices:Array):
-	is_waiting_menu_return = true
-	Menu.exec(choices)
+func menu(choices:PoolStringArray):
+	Rakugo.emit_signal("menu", choices)
 	
 func menu_return(result:int):
 	is_waiting_menu_return = false

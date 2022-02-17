@@ -69,7 +69,7 @@ var Regex := {
 	#     say "text"
 	MENU = "^menu( (?<menu_name>{VALID_VARIABLE}))?:$",
 	#   choice1 "label":
-	CHOICE = "^(?<choice>{VALID_VARIABLE}) (?<label>{STRING}):",
+	CHOICE = "^(?<text>{STRING}):$",
 	JUMP = "jump (?<jump_to_title>.*)",
 }
 
@@ -141,6 +141,8 @@ func do_parse_script(file_name:String):
 	
 	var indent_count:int
 	
+	var menu_array:PoolStringArray
+	
 	while !stop_thread and !file.eof_reached():
 		var line = file.get_line()
 
@@ -153,9 +155,10 @@ func do_parse_script(file_name:String):
 		
 		line = line.lstrip('	')
 
+		var result:RegExMatch
+
 		match(state):
 			State.Normal:
-				var result:RegExMatch
 				result = regex_cache["GDSCRIPT_BLOCK"].search(line)
 				if result:
 					prints("Parser", "parse_script", "GDSCRIPT_BLOCK")
@@ -212,6 +215,9 @@ func do_parse_script(file_name:String):
 						prints(" ", key, result.get_string(key))
 				
 					state = State.Menu
+					
+					menu_array.resize(0)
+					
 					prints("Parser", "parse_script", "mod Menu")
 					continue
 			
@@ -221,8 +227,20 @@ func do_parse_script(file_name:String):
 				
 					prints("Parser", "parse_script", "mod Normal")
 					
+					if !menu_array.empty():
+						Rakugo.menu(menu_array)
+						
 					continue
-		
+					
+				result = regex_cache["CHOICE"].search(line)
+				if result:
+					prints("Parser", "parse_script", "CHOICE")
+					
+					for key in result.names:
+						prints(" ", key, result.get_string(key))
+					
+					menu_array.push_back(result.get_string("text"))
+					continue
 
 #		result = regex_cache["DIALOGUE"].search(line)
 #		if result:
