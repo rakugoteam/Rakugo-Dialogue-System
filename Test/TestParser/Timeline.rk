@@ -1,5 +1,9 @@
 character test_ch "Test Character"
 
+menu:
+	"Talk with emily":
+	"Wait":
+
 test_dialogue:
 	"Here is narration text"
 	test_ch "Here is dialogue text"

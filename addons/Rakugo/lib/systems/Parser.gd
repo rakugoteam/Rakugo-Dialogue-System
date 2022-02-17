@@ -67,7 +67,7 @@ var Regex := {
 	# menu menu_name? :
 	#   choice1 "label":
 	#     say "text"
-	MENU = "^menu (?<menu_name>{VALID_VARIABLE})?:",
+	MENU = "^menu( (?<menu_name>{VALID_VARIABLE}))?:$",
 	#   choice1 "label":
 	CHOICE = "^(?<choice>{VALID_VARIABLE}) (?<label>{STRING}):",
 	JUMP = "jump (?<jump_to_title>.*)",
@@ -79,6 +79,10 @@ var thread:Thread
 var step_semaphore:Semaphore
 
 var stop_thread := false
+
+enum State {Normal = 0, Menu}
+
+var state = State.Normal
 
 func _init():
 	for t in Tokens.keys():
@@ -131,54 +135,73 @@ func do_parse_script(file_name:String):
 		#todo handle indentation levels
 		line = line.strip_escapes()
 
-		var result:RegExMatch
-		result = regex_cache["GDSCRIPT_BLOCK"].search(line)
-		if result:
-			prints("Parser", "parse_script", "GDSCRIPT_BLOCK")
-#			current_dialogue.append(line)
-			continue
+		match(state):
+			State.Normal:
+				var result:RegExMatch
+				result = regex_cache["GDSCRIPT_BLOCK"].search(line)
+				if result:
+					prints("Parser", "parse_script", "GDSCRIPT_BLOCK")
+					#current_dialogue.append(line)
+					continue
 
-		result = regex_cache["IN_LINE_GDSCRIPT"].search(line)
-		if result:
-			prints("Parser", "parse_script", "IN_LINE_GDSCRIPT")
-#			current_dialogue.append(line)
-			continue
+				result = regex_cache["IN_LINE_GDSCRIPT"].search(line)
+				if result:
+					prints("Parser", "parse_script", "IN_LINE_GDSCRIPT")
+					#current_dialogue.append(line)
+					continue
 
-		result = regex_cache["CHARACTER_DEF"].search(line)
-		if result:
-			prints("Parser", "parse_script", "CHARACTER_DEF")
+				result = regex_cache["CHARACTER_DEF"].search(line)
+				if result:
+					prints("Parser", "parse_script", "CHARACTER_DEF")
 
-			for key in result.names:
-				prints(" ", key, result.get_string(key))
+					for key in result.names:
+						prints(" ", key, result.get_string(key))
 
-			Rakugo.define_character(result.get_string("name"), result.get_string("tag"))
-			continue
+					Rakugo.define_character(result.get_string("name"), result.get_string("tag"))
+					continue
 
-		result = regex_cache["SAY"].search(line)
-		if result:
-			prints("Parser", "parse_script", "SAY")
+				result = regex_cache["SAY"].search(line)
+				if result:
+					prints("Parser", "parse_script", "SAY")
 
-			for key in result.names:
-				prints(" ", key, result.get_string(key))
+					for key in result.names:
+						prints(" ", key, result.get_string(key))
 
-			Rakugo.say(result.get_string("character_tag"), result.get_string("string"))
-			
-			Rakugo.step()
-			
-			step_semaphore.wait()
-			continue
+					Rakugo.say(result.get_string("character_tag"), result.get_string("string"))
+					
+					Rakugo.step()
+					
+					step_semaphore.wait()
+					continue
 
-		result = regex_cache["ASK"].search(line)
-		if result:
-			prints("Parser", "parse_script", "ASK")
-			
-			for key in result.names:
-				prints(" ", key, result.get_string(key))
+				result = regex_cache["ASK"].search(line)
+				if result:
+					prints("Parser", "parse_script", "ASK")
+					
+					for key in result.names:
+						prints(" ", key, result.get_string(key))
+						
+					Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), result.get_string("question"), result.get_string("default_answer"))
+
+					step_semaphore.wait()
+					continue
+
+				result = regex_cache["MENU"].search(line)
+				if result:
+					prints("Parser", "parse_script", "MENU")
+					
+					for key in result.names:
+						prints(" ", key, result.get_string(key))
 				
-			Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), result.get_string("question"), result.get_string("default_answer"))
-
-			step_semaphore.wait()
-			continue
+					state = State.Menu
+					prints("Parser", "parse_script", "mod Menu")
+					continue
+			
+			State.Menu:
+				state = State.Normal
+				
+				prints("Parser", "parse_script", "mod Normal")
+		
 
 #		result = regex_cache["DIALOGUE"].search(line)
 #		if result:
