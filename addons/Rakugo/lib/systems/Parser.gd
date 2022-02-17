@@ -44,7 +44,7 @@ var Regex := {
 	VALID_VARIABLE = "[a-zA-Z_][a-zA-Z_0-9]+",
 	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
 	CONDITION = "(if|elif) (?<condition>.*)",
-	STRING = "\"(?<string>.*)\"",
+	STRING = "\".*\"",
 	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
 	COMMENT = "^#.*",
 
@@ -61,9 +61,9 @@ var Regex := {
 	# character tag = "character_name"
 	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<name>.*)\"",
 	# character_tag? say STRING|MULTILINE_STRING
-	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?{STRING}$",
+	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?(?<text>{STRING})$",
 	# var_name = ask "please enter text" 
-	ASK = "^(?<var_name>{VALID_VARIABLE}) (?<assignment_type>{TOKEN_ASSIGNMENT} ask (?<text>{STRING}))",
+	ASK = "^(?<variable>{VALID_VARIABLE}) = ((?<character_tag>{VALID_VARIABLE}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})$",
 	# menu menu_name? :
 	#   choice1 "label":
 	#     say "text"
@@ -165,6 +165,18 @@ func do_parse_script(file_name:String):
 			
 			Rakugo.step()
 			
+			step_semaphore.wait()
+			continue
+
+		result = regex_cache["ASK"].search(line)
+		if result:
+			prints("Parser", "parse_script", "ASK")
+			
+			for key in result.names:
+				prints(" ", key, result.get_string(key))
+				
+			Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), result.get_string("question"), result.get_string("default_answer"))
+
 			step_semaphore.wait()
 			continue
 

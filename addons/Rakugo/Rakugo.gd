@@ -20,7 +20,10 @@ var auto_stepping := false
 var skipping := false
 
 var is_waiting_step:=false
+
+var variable_ask_name:String
 var is_waiting_ask_return:=false
+
 var is_waiting_menu_return:=false
 
 # timers use by rakugo
@@ -37,7 +40,7 @@ onready var Menu = $Statements/Menu
 signal step()
 signal say(character, text)
 signal notify(text)
-signal ask(default_answer)
+signal ask(character, question, default_answer)
 signal ask_return(result)
 signal menu(choices)
 signal menu_return(result)
@@ -181,22 +184,26 @@ func step():
 	is_waiting_step = true
 	emit_signal("step")
 
+#Utils functions
+func get_character(character_tag:String) -> Character:
+	return Rakugo.get_current_store().get(character_tag)
+
 # statement of type say
 # its make given 'character' say 'text'
 # 'parameters' keywords:typing, type_speed, avatar, avatar_state, add
 # speed is time to show next letter
-func say(character, text:String):
-	Say.exec(character, text)
+func say(character_tag:String, text:String):
+	Rakugo.emit_signal("say", get_character(character_tag), text)
 
 # statement of type ask
 # with keywords: placeholder
-func ask(default_answer:String):
-	is_waiting_ask_return = true
-	Ask.exec(default_answer)
+func ask(variable_name:String, character_tag:String, question:String, default_answer:String):
+	variable_ask_name = variable_name
 	
-func ask_return(result:String):
-	is_waiting_ask_return = false
-	Ask.return(result)
+	Rakugo.emit_signal("ask", get_character(character_tag), question, default_answer)
+	
+func ask_return(result):
+	Rakugo.get_current_store().set(variable_ask_name, result)
 
 # statement of type menu
 func menu(choices:Array):
