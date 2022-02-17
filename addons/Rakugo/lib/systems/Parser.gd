@@ -103,12 +103,12 @@ func _init():
 		
 		regex_cache[r] = reg
 
-func parse_script(file_name:String):
+func parse_script(file_name:String) -> int:
 	thread = Thread.new()
 	
 	step_semaphore = Semaphore.new()
 	
-	thread.start(self, "do_parse_script", file_name)
+	return thread.start(self, "do_parse_script", file_name)
 
 func do_parse_script(file_name:String):
 	# var known_translations = {}
@@ -163,6 +163,8 @@ func do_parse_script(file_name:String):
 
 			Rakugo.say(result.get_string("character_tag"), result.get_string("string"))
 			
+			Rakugo.step()
+			
 			step_semaphore.wait()
 			continue
 
@@ -178,6 +180,8 @@ func do_parse_script(file_name:String):
 #			continue
 
 	file.close()
+	
+	prints("Parser", "do_parse_script", "end")
 
 func parse_dialogue(lines:PoolStringArray) -> Array:
 	var dialogue := []
