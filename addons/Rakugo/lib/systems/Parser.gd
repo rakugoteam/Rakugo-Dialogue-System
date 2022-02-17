@@ -114,6 +114,20 @@ func parse_script(file_name:String) -> int:
 	
 	return thread.start(self, "do_parse_script", file_name)
 
+func count_indent(s:String) -> int:
+	var ret := 0
+	
+	if s[0] == '	':
+		for i in s.length():
+			var c = s[i]
+		
+			if c == '	':
+				ret += 1
+			else:
+				break
+	
+	return ret
+
 func do_parse_script(file_name:String):
 	# var known_translations = {}
 	# var errors: Array = []
@@ -125,6 +139,8 @@ func do_parse_script(file_name:String):
 		prints("Parser", "can't open file : " + file_name)
 		return
 	
+	var indent_count:int
+	
 	while !stop_thread and !file.eof_reached():
 		var line = file.get_line()
 
@@ -133,7 +149,9 @@ func do_parse_script(file_name:String):
 
 		#erase tabulations
 		#todo handle indentation levels
-		line = line.strip_escapes()
+		indent_count = count_indent(line)
+		
+		line = line.lstrip('	')
 
 		match(state):
 			State.Normal:
@@ -198,9 +216,12 @@ func do_parse_script(file_name:String):
 					continue
 			
 			State.Menu:
-				state = State.Normal
+				if indent_count == 0:
+					state = State.Normal
 				
-				prints("Parser", "parse_script", "mod Normal")
+					prints("Parser", "parse_script", "mod Normal")
+					
+					continue
 		
 
 #		result = regex_cache["DIALOGUE"].search(line)
