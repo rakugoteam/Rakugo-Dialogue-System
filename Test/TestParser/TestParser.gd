@@ -8,6 +8,8 @@ var is_waiting_step := false
 
 var is_waiting_ask := false
 
+var is_waiting_menu := false
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	Rakugo.connect("say", self, "_on_say")
@@ -41,7 +43,8 @@ func _on_ask(character:Character, question:String, default_answer:String):
 	prints("TestParser", "ask", character.name if character else "null", question, default_answer)
 
 func _on_menu(choices):
-	prints("menu", choices)
+	is_waiting_menu = true
+	prints("TestParser", "menu", choices)
 
 func _process(delta):
 	if is_waiting_step and Input.is_action_just_pressed("ui_accept"):
@@ -53,3 +56,8 @@ func _process(delta):
 		is_waiting_ask = false
 		
 		Rakugo.ask_return("Bob")
+		
+	if is_waiting_menu and Input.is_action_just_pressed("ui_down"):
+		is_waiting_menu = false
+		
+		Rakugo.menu_return(0)

@@ -209,9 +209,8 @@ func ask_return(result):
 func menu(choices:PoolStringArray):
 	Rakugo.emit_signal("menu", choices)
 	
-func menu_return(result:int):
-	is_waiting_menu_return = false
-	Menu.return(result)
+func menu_return(index:int):
+	Rakugo.emit_signal('menu_return', index)
 
 func notify(text:String):
 	emit_signal("notify", text)

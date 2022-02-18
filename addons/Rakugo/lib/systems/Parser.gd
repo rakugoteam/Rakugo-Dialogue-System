@@ -69,7 +69,7 @@ var Regex := {
 	#     say "text"
 	MENU = "^menu( (?<menu_name>{VALID_VARIABLE}))?:$",
 	#   choice1 "label":
-	CHOICE = "^(?<text>{STRING}):$",
+	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?$",
 	JUMP = "jump (?<jump_to_title>.*)",
 }
 
@@ -84,7 +84,11 @@ enum State {Normal = 0, Menu}
 
 var state = State.Normal
 
+var menu_index:int
+
 func _init():
+	Rakugo.connect("menu_return", self, "_on_menu_return")
+	
 	for t in Tokens.keys():
 		Tokens[t] = Tokens[t].format(Regex)
 		# prints(t, Tokens[t])
@@ -141,7 +145,8 @@ func do_parse_script(file_name:String):
 	
 	var indent_count:int
 	
-	var menu_array:PoolStringArray
+	var menu_choices:PoolStringArray
+	var menu_jumps:PoolStringArray
 	
 	while !stop_thread and !file.eof_reached():
 		var line = file.get_line()
@@ -205,6 +210,8 @@ func do_parse_script(file_name:String):
 					Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), result.get_string("question"), result.get_string("default_answer"))
 
 					step_semaphore.wait()
+					
+					
 					continue
 
 				result = regex_cache["MENU"].search(line)
@@ -216,7 +223,7 @@ func do_parse_script(file_name:String):
 				
 					state = State.Menu
 					
-					menu_array.resize(0)
+					menu_choices.resize(0)
 					
 					prints("Parser", "parse_script", "mod Menu")
 					continue
@@ -227,8 +234,10 @@ func do_parse_script(file_name:String):
 				
 					prints("Parser", "parse_script", "mod Normal")
 					
-					if !menu_array.empty():
-						Rakugo.menu(menu_array)
+					if !menu_choices.empty():
+						Rakugo.menu(menu_choices)
+						
+						step_semaphore.wait()
 						
 					continue
 					
@@ -239,7 +248,7 @@ func do_parse_script(file_name:String):
 					for key in result.names:
 						prints(" ", key, result.get_string(key))
 					
-					menu_array.push_back(result.get_string("text"))
+					menu_choices.push_back(result.get_string("text"))
 					continue
 
 #		result = regex_cache["DIALOGUE"].search(line)
@@ -256,6 +265,11 @@ func do_parse_script(file_name:String):
 	file.close()
 	
 	prints("Parser", "do_parse_script", "end")
+
+func _on_menu_return(index:int):
+	menu_index = index
+	
+	step_semaphore.post()
 
 func parse_dialogue(lines:PoolStringArray) -> Array:
 	var dialogue := []
