@@ -204,6 +204,8 @@ func ask(variable_name:String, character_tag:String, question:String, default_an
 	
 func ask_return(result):
 	Rakugo.get_current_store().set(variable_ask_name, result)
+	
+	Rakugo.emit_signal("ask_return", result)
 
 # statement of type menu
 func menu(choices:PoolStringArray):

@@ -88,6 +88,7 @@ var menu_jump_index:int
 
 func _init():
 	Rakugo.connect("menu_return", self, "_on_menu_return")
+	Rakugo.connect("ask_return", self, "_on_ask_return")
 	
 	for t in Tokens.keys():
 		Tokens[t] = Tokens[t].format(Regex)
@@ -333,6 +334,9 @@ func do_parse_script(file_name:String):
 func _on_menu_return(index:int):
 	menu_jump_index = index
 	
+	step_semaphore.post()
+
+func _on_ask_return(result):
 	step_semaphore.post()
 
 func parse_dialogue(lines:PoolStringArray) -> Array:
