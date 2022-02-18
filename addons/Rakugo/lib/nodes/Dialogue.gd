@@ -252,12 +252,12 @@ func set_var(var_name: String, value):
 
 	return null
 
-func say(character, text:String, parameters: Dictionary = {}) -> void:
-	Rakugo.call_deferred('say', character, text, parameters)
+func say(character, text:String) -> void:
+	Rakugo.say(character, text)
 
-func ask(default_answer:String, parameters: Dictionary = {}):
+func ask(default_answer:String):
 	if thread and thread.is_alive():
-		Rakugo.ask(default_answer, parameters)
+		Rakugo.ask(default_answer)
 
 		_ask_yield()
 		
@@ -273,9 +273,9 @@ func _ask_yield():
 	if thread:
 		step_semaphore.post();
 
-func menu(choices:Array, parameters: Dictionary = {}) -> int:
+func menu(choices:Array) -> int:
 	if thread and thread.is_alive():
-		Rakugo.menu(choices, parameters)
+		Rakugo.menu(choices)
 
 		_menu_yield()
 		
@@ -299,9 +299,9 @@ func hide(node_id: String) -> void:
 	if is_active():
 		Rakugo.call_deferred('hide', node_id)
 
-func notify(text: String, parameters:Dictionary = {}) -> void:
+func notify(text: String) -> void:
 	if thread and thread.is_alive():
-		Rakugo.call_deferred('notify', text, parameters)
+		Rakugo.call_deferred('notify', text)
 
 func call_ext(object, func_name:String, args := []) -> void:
 	if is_active():

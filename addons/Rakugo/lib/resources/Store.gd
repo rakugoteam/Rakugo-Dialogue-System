@@ -24,6 +24,7 @@ func _get(property):
 
 
 func _set(property, value):
+	prints("Store", "_set", property, value)
 	if property in self.get_property_list():
 		self[property] = value
 	else:

@@ -9,11 +9,13 @@ func invoke(scene_id: String, dialogue_name: String, event_name: String, force_r
 			Rakugo.load_scene(scene_id)
 	
 	var dialogue_node
+
+	var current_scene_node = get_tree().current_scene
 	if dialogue_name:
 		#print("Looking for Dialogue '%s' to start"%dialogue_name)
-		dialogue_node = get_dialogue(Rakugo.SceneLoader.current_scene_node, dialogue_name)
+		dialogue_node = get_dialogue(current_scene_node, dialogue_name)
 	else:
-		dialogue_node = get_first_autostart_dialogue(Rakugo.SceneLoader.current_scene_node)
+		dialogue_node = get_first_autostart_dialogue(current_scene_node)
 	if dialogue_node:
 		#print("Dialogue found, starting ...")
 		if event_name:

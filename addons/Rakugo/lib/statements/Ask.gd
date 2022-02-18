@@ -1,12 +1,7 @@
 extends Node
 
-var default_parameters = {}
-
-func _ready():
-	default_parameters = Settings.get(SettingsList.default_ask_parameters, {}, false)
-
-func exec(default_answer:String, parameters = {}) -> void:
-	Rakugo.emit_signal("ask", default_answer, parameters)
+func exec(default_answer:String) -> void:
+	Rakugo.emit_signal("ask", default_answer)
 
 func return(result:String):
 	Rakugo.emit_signal('ask_return', result)
