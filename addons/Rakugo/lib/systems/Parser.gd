@@ -57,7 +57,7 @@ var Regex := {
 	GDSCRIPT_BLOCK = "^gdscript:",
 	
 	# dialogue Regex
-	DIALOGUE = "^(?<dialogue_name>{VALID_VARIABLE}):",
+	DIALOGUE = "^(?<label>{VALID_VARIABLE}):$",
 	# character tag = "character_name"
 	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<name>.*)\"",
 	# character_tag? say STRING|MULTILINE_STRING
@@ -67,10 +67,10 @@ var Regex := {
 	# menu menu_name? :
 	#   choice1 "label":
 	#     say "text"
-	MENU = "^menu( (?<menu_name>{VALID_VARIABLE}))?:$",
+	MENU = "^menu( (?<label>{VALID_VARIABLE}))?:$",
 	#   choice1 "label":
 	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?$",
-	JUMP = "jump (?<jump_to_title>.*)",
+	JUMP = "^jump (?<label>{VALID_VARIABLE})$",
 }
 
 var regex_cache := {}
@@ -80,7 +80,7 @@ var step_semaphore:Semaphore
 
 var stop_thread := false
 
-enum State {Normal = 0, Menu}
+enum State {Normal = 0, Menu, Jump}
 
 var state = State.Normal
 
@@ -147,6 +147,8 @@ func do_parse_script(file_name:String):
 	
 	var menu_choices:PoolStringArray
 	var menu_jumps:Dictionary
+	
+	var jump_label:String
 	
 	while !stop_thread and !file.eof_reached():
 		var line = file.get_line()
@@ -217,16 +219,38 @@ func do_parse_script(file_name:String):
 				result = regex_cache["MENU"].search(line)
 				if result:
 					prints("Parser", "parse_script", "MENU")
+
+					for key in result.names:
+						prints(" ", key, result.get_string(key))
+
+					state = State.Menu
+
+					menu_choices.resize(0)
+
+					prints("Parser", "parse_script", "mod Menu")
+					continue
+				
+				result = regex_cache["JUMP"].search(line)
+				if result:
+					prints("Parser", "parse_script", "JUMP")
 					
 					for key in result.names:
 						prints(" ", key, result.get_string(key))
-				
-					state = State.Menu
 					
-					menu_choices.resize(0)
+					state = State.Jump
 					
-					prints("Parser", "parse_script", "mod Menu")
 					continue
+			
+#				result = regex_cache["DIALOGUE"].search(line)
+#				if result:
+#					prints("Parser", "parse_script", "DIALOGUE")
+#					var dialogue_name = result.get_string("dialogue_name")
+#
+#					if !dialogues.has(dialogue_name):
+#						dialogues[dialogue_name] = []
+#
+#					current_dialogue = dialogues[dialogue_name]
+#					continue
 			
 			State.Menu:
 				if indent_count == 0:
@@ -257,16 +281,13 @@ func do_parse_script(file_name:String):
 					menu_choices.push_back(result.get_string("text"))
 					continue
 
-#		result = regex_cache["DIALOGUE"].search(line)
-#		if result:
-#			prints("Parser", "parse_script", "DIALOGUE")
-#			var dialogue_name = result.get_string("dialogue_name")
-#
-#			if !dialogues.has(dialogue_name):
-#				dialogues[dialogue_name] = []
-#
-#			current_dialogue = dialogues[dialogue_name]
-#			continue
+			State.Jump:
+				result = regex_cache["DIALOGUE"].search(line)
+				if result:
+					prints("Parser", "parse_script", "jump", result.get_string("label"))
+					
+					state = State.Normal
+					continue
 
 	file.close()
 	
