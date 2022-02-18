@@ -145,6 +145,9 @@ func do_parse_script(file_name:String):
 	
 	var indent_count:int
 	
+	#contain label : file_cursor_position
+	var labels:Dictionary
+	
 	var menu_choices:PoolStringArray
 	var menu_jumps:Dictionary
 	
@@ -223,11 +226,23 @@ func do_parse_script(file_name:String):
 					for key in result.names:
 						prints(" ", key, result.get_string(key))
 
+					labels[result.get_string("label")] = file.get_position()
+
 					state = State.Menu
 
 					menu_choices.resize(0)
 
 					prints("Parser", "parse_script", "mod Menu")
+					continue
+				
+				result = regex_cache["DIALOGUE"].search(line)
+				if result:
+					prints("Parser", "parse_script", "DIALOGUE")
+					
+					for key in result.names:
+						prints(" ", key, result.get_string(key))
+
+					labels[result.get_string("label")] = file.get_position()
 					continue
 				
 				result = regex_cache["JUMP"].search(line)
@@ -239,20 +254,11 @@ func do_parse_script(file_name:String):
 					
 					jump_label = result.get_string("label")
 					
-					state = State.Jump
-					
+					if labels.has(jump_label):
+						file.seek(labels[jump_label])
+					else:
+						state = State.Jump
 					continue
-			
-#				result = regex_cache["DIALOGUE"].search(line)
-#				if result:
-#					prints("Parser", "parse_script", "DIALOGUE")
-#					var dialogue_name = result.get_string("dialogue_name")
-#
-#					if !dialogues.has(dialogue_name):
-#						dialogues[dialogue_name] = []
-#
-#					current_dialogue = dialogues[dialogue_name]
-#					continue
 			
 			State.Menu:
 				if indent_count == 0:
@@ -266,7 +272,16 @@ func do_parse_script(file_name:String):
 						step_semaphore.wait()
 						
 						if menu_jumps.has(menu_jump_index):
-							prints("Parser", "parse_script", "menu_jump", menu_jumps[menu_jump_index])
+							var label = menu_jumps[menu_jump_index]
+							
+							prints("Parser", "parse_script", "menu_jump", label)
+					
+							jump_label = label
+					
+							if labels.has(jump_label):
+								file.seek(labels[jump_label])
+							else:
+								state = State.Jump
 					continue
 					
 				result = regex_cache["CHOICE"].search(line)
@@ -288,22 +303,27 @@ func do_parse_script(file_name:String):
 				if result:
 					var label = result.get_string("label")
 					
-					if !label.empty() and label == jump_label:
-						prints("Parser", "parse_script", "jump", label)
+					if !label.empty():
+						labels[label] = file.get_position()
 						
-						state = State.Menu
+						if label == jump_label:
+							prints("Parser", "parse_script", "jump", label)
+							
+							state = State.Menu
 
-						menu_choices.resize(0)
-					
+							menu_choices.resize(0)
 					continue
 				
 				result = regex_cache["DIALOGUE"].search(line)
 				if result:
-					if result.get_string("label") == jump_label:
+					var label = result.get_string("label")
+					
+					labels[label] = file.get_position()
+					
+					if label == jump_label:
 						prints("Parser", "parse_script", "jump", result.get_string("label"))
 						
 						state = State.Normal
-					
 					continue
 
 	file.close()

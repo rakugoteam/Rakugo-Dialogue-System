@@ -1,8 +1,11 @@
 character test_ch "Test Character"
 
+first_dialogue:
+	"Hello, world !"
+
 jump menu_emily
 
-"test"
+"test jump"
 
 menu menu_emily:
 	"Talk with emily" > emily_talk
