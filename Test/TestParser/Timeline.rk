@@ -1,8 +1,10 @@
 character test_ch "Test Character"
 
-jump emily_talk
+jump menu_emily
 
-menu:
+"test"
+
+menu menu_emily:
 	"Talk with emily" > emily_talk
 	"Wait"
 	"Blop" > test_dialog

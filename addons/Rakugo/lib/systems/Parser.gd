@@ -237,6 +237,8 @@ func do_parse_script(file_name:String):
 					for key in result.names:
 						prints(" ", key, result.get_string(key))
 					
+					jump_label = result.get_string("label")
+					
 					state = State.Jump
 					
 					continue
@@ -282,11 +284,26 @@ func do_parse_script(file_name:String):
 					continue
 
 			State.Jump:
+				result = regex_cache["MENU"].search(line)
+				if result:
+					var label = result.get_string("label")
+					
+					if !label.empty() and label == jump_label:
+						prints("Parser", "parse_script", "jump", label)
+						
+						state = State.Menu
+
+						menu_choices.resize(0)
+					
+					continue
+				
 				result = regex_cache["DIALOGUE"].search(line)
 				if result:
-					prints("Parser", "parse_script", "jump", result.get_string("label"))
+					if result.get_string("label") == jump_label:
+						prints("Parser", "parse_script", "jump", result.get_string("label"))
+						
+						state = State.Normal
 					
-					state = State.Normal
 					continue
 
 	file.close()
