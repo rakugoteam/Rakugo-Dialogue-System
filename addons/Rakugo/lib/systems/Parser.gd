@@ -146,7 +146,7 @@ func do_parse_script(file_name:String):
 	var indent_count:int
 	
 	var menu_choices:PoolStringArray
-	var menu_jumps:PoolStringArray
+	var menu_jumps:Dictionary
 	
 	while !stop_thread and !file.eof_reached():
 		var line = file.get_line()
@@ -248,6 +248,10 @@ func do_parse_script(file_name:String):
 					for key in result.names:
 						prints(" ", key, result.get_string(key))
 					
+					var label = result.get_string("label")
+					if !label.empty():
+						menu_jumps[menu_choices.size()] = label
+				
 					menu_choices.push_back(result.get_string("text"))
 					continue
 
