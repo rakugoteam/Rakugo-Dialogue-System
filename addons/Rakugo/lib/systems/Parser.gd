@@ -84,7 +84,7 @@ enum State {Normal = 0, Menu}
 
 var state = State.Normal
 
-var menu_index:int
+var menu_jump_index:int
 
 func _init():
 	Rakugo.connect("menu_return", self, "_on_menu_return")
@@ -239,6 +239,8 @@ func do_parse_script(file_name:String):
 						
 						step_semaphore.wait()
 						
+						if menu_jumps.has(menu_jump_index):
+							prints("Parser", "parse_script", "menu_jump", menu_jumps[menu_jump_index])
 					continue
 					
 				result = regex_cache["CHOICE"].search(line)
@@ -271,7 +273,7 @@ func do_parse_script(file_name:String):
 	prints("Parser", "do_parse_script", "end")
 
 func _on_menu_return(index:int):
-	menu_index = index
+	menu_jump_index = index
 	
 	step_semaphore.post()
 
