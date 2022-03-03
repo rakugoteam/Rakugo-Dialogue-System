@@ -19,13 +19,11 @@ func _init():
 	say_parameters = {}
 	variables = {}
 
-
 func init(_name:String, _tag:String, _color="ffffff"):
 	name = _name
 	tag = _tag
 	color = _color
 	return self
-
 
 func _get(property):
 	if property in self.get_property_list():
@@ -38,7 +36,6 @@ func _get(property):
 			return false
 	return null
 
-
 func _set(property, value):
 	if property in self.get_property_list():
 		self[property] = value
@@ -46,19 +43,16 @@ func _set(property, value):
 		self.variables[property] = value
 	return true
 
-
 func duplicate(_deep:bool=true) -> Resource:##Store duplication should always be deep
 	var output = .duplicate(true)
 	output.script = self.script
 	return output
-
 
 func _set_color(_color) -> void:## That setter is to convert potential color given in string or int
 	if _color is Color:
 		color = Color(_color.r, _color.g, _color.b, _color.a)
 	else:
 		color = Color(_color)
-
 
 func apply_default(input:Dictionary, default:Dictionary):
 	var output = input.duplicate()
@@ -82,16 +76,9 @@ func get_composite_name(_markup_override="", _affixes=true) -> String:
 
 	return composite_name
 
-## Dialogue shorts (to be shielded behind a getter in Dialogue)
-
-func say(text:String) -> void:
-	Rakugo.say(self, text)
-
-
 func show(parameters:Dictionary = {}) -> void:
 	apply_default(parameters, self.show_parameters)
-	Rakugo.show(self.tag, parameters)#TODO will have to take a look at how it should work with the rules of showing. Maybe add some functionality.
-
+	Rakugo.show(self.tag, parameters)# TODO will have to take a look at how it should work with the rules of showing. Maybe add some functionality.
 
 func hide() -> void:
-	Rakugo.hide(self.tag) #TODO, will have to take a look at how it should work with the rules of hiding
+	Rakugo.hide(self.tag) # TODO, will have to take a look at how it should work with the rules of hiding
