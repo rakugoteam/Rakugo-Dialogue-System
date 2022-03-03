@@ -1,7 +1,6 @@
 extends Node
 
 func invoke(scene_id: String, dialogue_name: String, event_name: String, force_reload = null) -> void:
-	Rakugo.exit_dialogue()
 	if scene_id:
 		if force_reload != null:
 			Rakugo.load_scene(scene_id, force_reload)

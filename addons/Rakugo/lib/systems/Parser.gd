@@ -42,14 +42,14 @@ var Tokens := {
 
 var Regex := {
 	VALID_VARIABLE = "[a-zA-Z_][a-zA-Z_0-9]+",
-	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
+	# TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
 	CONDITION = "(if|elif) (?<condition>.*)",
 	STRING = "\".*\"",
 	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
 	COMMENT = "^#.*",
 
 	# for setting Rakugo variables
-	SET_VARIABLE = "^(?<variable>{VALID_VARIABLE}) = (?<value>{TOKEN_NUMERIC})$",
+	SET_VARIABLE = "^(?<variable>{VALID_VARIABLE}) = (?<value>{TOKEN_NUMERIC})",
 
 	# $ some_gd_script_code
 	IN_LINE_GDSCRIPT = "^\\$.*",
@@ -61,16 +61,16 @@ var Regex := {
 	# character tag = "character_name"
 	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<name>.*)\"",
 	# character_tag? say STRING|MULTILINE_STRING
-	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?(?<text>{STRING})$",
+	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?(?<text>{STRING})",
 	# var_name = ask "please enter text" 
-	ASK = "^(?<variable>{VALID_VARIABLE}) = ((?<character_tag>{VALID_VARIABLE}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})$",
+	ASK = "^(?<variable>{VALID_VARIABLE}) = ((?<character_tag>{VALID_VARIABLE}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})",
 	# menu menu_name? :
 	#   choice1 "label":
 	#     say "text"
-	MENU = "^menu( (?<label>{VALID_VARIABLE}))?:$",
+	MENU = "^menu( (?<label>{VALID_VARIABLE}))?:",
 	#   choice1 "label":
-	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?$",
-	JUMP = "^jump (?<label>{VALID_VARIABLE})$",
+	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?",
+	JUMP = "^jump (?<label>{VALID_VARIABLE})",
 }
 
 var regex_cache := {}
@@ -104,7 +104,7 @@ func _init():
 		Regex[r] = Regex[r].format(Tokens)
 		
 		Regex[r] = Regex[r].format(Regex)
-		# prints(r, Regex[r])
+		prints(r, Regex[r])
 
 		var reg := RegEx.new()
 		if reg.compile(Regex[r]) != OK:
@@ -161,7 +161,7 @@ func do_parse_script(file_name:String):
 			continue
 
 		#erase tabulations
-		#todo handle indentation levels
+		# TODO handle indentation levels
 		indent_count = count_indent(line)
 		
 		line = line.lstrip('	')

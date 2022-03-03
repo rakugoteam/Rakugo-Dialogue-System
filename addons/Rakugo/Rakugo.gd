@@ -5,7 +5,7 @@ const rakugo_version := "3.3"
 var current_scene_name := ""
 var current_scene_path := ""
 var current_scene_node: Node = null
-var current_dialogue:Dialogue = null setget set_current_dialogue
+var current_parser: Parser = null
 
 var store = null setget , get_current_store
 var persistent = null setget , get_persistent_store
@@ -19,12 +19,11 @@ var started := false
 var auto_stepping := false
 var skipping := false
 
-var is_waiting_step:=false
+var is_waiting_step := false
 
-var variable_ask_name:String
-var is_waiting_ask_return:=false
-
-var is_waiting_menu_return:=false
+var variable_ask_name: String
+var is_waiting_ask_return := false
+var is_waiting_menu_return := false
 
 # timers use by rakugo
 onready var auto_timer := $AutoTimer
@@ -63,7 +62,7 @@ func start(after_load:bool = false):
 	started = true
 	if not after_load:
 		emit_signal("started")
-	jump("", "", "")# Engage the auto-start
+#	jump("", "", "")# Engage the auto-start
 
 func save_game(save_name:String = "quick"):
 	StoreManager.save_persistent_store()
@@ -82,9 +81,10 @@ func prepare_quitting():
 		self.save_game("auto")
 	
 	Settings.save_property_list()
-	
-	if current_dialogue:
-		current_dialogue.exit()
+		
+	# TODO: remove in future 
+	# if current_dialogue:
+	# 	current_dialogue.exit()
 
 func reset_game():
 	started = false
@@ -103,16 +103,17 @@ func do_step(_unblock=false):
 		# print("Emitting _blocked_step")
 		get_tree().root.propagate_call('_blocked_step')
 
-func exit_dialogue():
-	self.set_current_dialogue(null)
+# TODO: remove in future
+# func exit_dialogue():
+# 	self.set_current_dialogue(null)
 
-func set_current_dialogue(new_dialogue:Dialogue):
-	if current_dialogue != new_dialogue:
-		if self.current_dialogue \
-		and self.current_dialogue.is_running():
-			self.current_dialogue.exit()
+# func set_current_dialogue(new_dialogue:Dialogue):
+# 	if current_dialogue != new_dialogue:
+# 		if self.current_dialogue \
+# 		and self.current_dialogue.is_running():
+# 			self.current_dialogue.exit()
 
-		current_dialogue = new_dialogue
+# 		current_dialogue = new_dialogue
 
 func activate_skipping():
 	self.skipping = true
