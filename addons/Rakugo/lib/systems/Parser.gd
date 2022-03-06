@@ -199,7 +199,7 @@ func do_parse_script(file_name:String):
 					for key in result.names:
 						prints(" ", key, result.get_string(key))
 
-					Rakugo.say(result.get_string("character_tag"), result.get_string("string"))
+					Rakugo.say(result.get_string("character_tag"), result.get_string("text"))
 					
 					Rakugo.step()
 					
