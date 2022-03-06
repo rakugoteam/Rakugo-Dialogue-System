@@ -25,11 +25,6 @@ _global_script_classes=[ {
 "path": "res://addons/TwitchChat/util/cmd_info.gd"
 }, {
 "base": "Node",
-"class": "Dialogue",
-"language": "GDScript",
-"path": "res://addons/Rakugo/lib/nodes/Dialogue.gd"
-}, {
-"base": "Node",
 "class": "Gift",
 "language": "GDScript",
 "path": "res://addons/TwitchChat/gift_node.gd"
@@ -59,6 +54,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/project-settings-helpers/PropertyInfo.gd"
 }, {
+"base": "Node",
+"class": "RakuScriptDialogue",
+"language": "GDScript",
+"path": "res://addons/Rakugo/lib/nodes/RakuScriptDialogue.gd"
+}, {
 "base": "Reference",
 "class": "SenderData",
 "language": "GDScript",
@@ -83,13 +83,13 @@ _global_script_class_icons={
 "Character": "",
 "CommandData": "",
 "CommandInfo": "",
-"Dialogue": "res://addons/Rakugo/icons/Dialogue.svg",
 "Gift": "",
 "HistoryEntry": "",
 "ImageCache": "",
 "Parser": "",
 "ProjectTools": "",
 "PropertyInfo": "",
+"RakuScriptDialogue": "",
 "SenderData": "",
 "SettingsList": "",
 "Store": "",
@@ -109,7 +109,7 @@ Settings="*res://addons/Rakugo/Settings.gd"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/Rakugo/plugin.cfg", "res://addons/TwitchChat/plugin.cfg" )
+enabled=PoolStringArray( "res://addons/Rakugo/plugin.cfg" )
 
 [physics]
 

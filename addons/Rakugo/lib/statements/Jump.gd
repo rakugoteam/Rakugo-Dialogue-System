@@ -24,25 +24,27 @@ func invoke(scene_id: String, dialogue_name: String, event_name: String, force_r
 	elif dialogue_name:
 		push_warning("No Dialogue named '%s' found." % dialogue_name)
 
+# TODO
 func get_dialogue(node, dialogue_name):
-	if node.name == dialogue_name and node is Dialogue:
-		return node
-
-	for c in node.get_children():
-		var out = get_dialogue(c, dialogue_name)
-		if out:
-			return out
+#	if node.name == dialogue_name and node is Dialogue:
+#		return node
+#
+#	for c in node.get_children():
+#		var out = get_dialogue(c, dialogue_name)
+#		if out:
+#			return out
 
 	return null
 
+# TODO
 func get_first_autostart_dialogue(node):
-	if node is Dialogue and node.auto_start:
-		return node
-
-	for c in node.get_children():
-		var out = get_first_autostart_dialogue(c)
-		
-		if out:
-			return out
+#	if node is Dialogue and node.auto_start:
+#		return node
+#
+#	for c in node.get_children():
+#		var out = get_first_autostart_dialogue(c)
+#
+#		if out:
+#			return out
 
 	return null
