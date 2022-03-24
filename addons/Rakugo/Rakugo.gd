@@ -5,6 +5,8 @@ const rakugo_version := "3.3"
 var current_scene_name := ""
 var current_scene_path := ""
 var current_scene_node: Node = null
+
+#Parser
 var current_parser: Parser = null
 
 var store = null setget , get_current_store
@@ -19,11 +21,12 @@ var started := false
 var auto_stepping := false
 var skipping := false
 
-var is_waiting_step := false
+var waiting_step := false setget , is_waiting_step
 
 var variable_ask_name: String
-var is_waiting_ask_return := false
-var is_waiting_menu_return := false
+var waiting_ask_return := false setget , is_waiting_ask_return
+
+var waiting_menu_return := false setget , is_waiting_menu_return
 
 # timers use by rakugo
 onready var auto_timer := $AutoTimer
@@ -90,18 +93,17 @@ func reset_game():
 	started = false
 	emit_signal("game_ended")
 
-## Dialogue flow control
+# Parser
+func parse_script(file_name:String):
+	current_parser = Parser.new()
+	
+	current_parser.parse_script(file_name)
 
-func do_step(_unblock=false):
-	is_waiting_step = false
-	if _unblock or not StepBlocker.is_blocking():
-		StoreManager.stack_next_store()
-		# print("Emitting _step")
-		get_tree().root.propagate_call('_step')
-		StoreManager.next_store_id()
-	else:
-		# print("Emitting _blocked_step")
-		get_tree().root.propagate_call('_blocked_step')
+func _exit_tree() -> void:
+	if current_parser:
+		current_parser.close()
+
+## Dialogue flow control
 
 # TODO: remove in future
 # func exit_dialogue():
@@ -180,10 +182,18 @@ func debug(some_text = []):
 	print(some_text)
 
 ## Statements
-
 func step():
-	is_waiting_step = true
+	waiting_step = true
+	
 	emit_signal("step")
+	
+func is_waiting_step():
+	return waiting_step
+
+func do_step():
+	waiting_step = false
+
+	current_parser.step_semaphore.post()
 
 #Utils functions
 func get_character(character_tag:String) -> Character:
@@ -199,20 +209,34 @@ func say(character_tag:String, text:String):
 # statement of type ask
 # with keywords: placeholder
 func ask(variable_name:String, character_tag:String, question:String, default_answer:String):
+	waiting_ask_return = true
+	
 	variable_ask_name = variable_name
 	
 	Rakugo.emit_signal("ask", get_character(character_tag), question, default_answer)
-	
+
+func is_waiting_ask_return():
+	return waiting_ask_return
+
 func ask_return(result):
+	waiting_ask_return = false
+	
 	Rakugo.get_current_store().set(variable_ask_name, result)
 	
 	Rakugo.emit_signal("ask_return", result)
 
 # statement of type menu
 func menu(choices:PoolStringArray):
+	waiting_menu_return = true
+	
 	Rakugo.emit_signal("menu", choices)
 	
+func is_waiting_menu_return():
+	return waiting_menu_return
+	
 func menu_return(index:int):
+	waiting_menu_return = false
+	
 	Rakugo.emit_signal('menu_return', index)
 
 func notify(text:String):
