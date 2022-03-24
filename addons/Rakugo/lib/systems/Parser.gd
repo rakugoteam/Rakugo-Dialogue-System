@@ -119,6 +119,14 @@ func parse_script(file_name:String) -> int:
 	
 	return thread.start(self, "do_parse_script", file_name)
 
+func close():
+	if thread:
+		stop_thread = true
+		
+		step_semaphore.post()
+		
+		thread.wait_to_finish()
+
 func count_indent(s:String) -> int:
 	var ret := 0
 	
