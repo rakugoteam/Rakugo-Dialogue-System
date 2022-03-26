@@ -20,7 +20,7 @@ func _on_say(character, text):
 	if log_step:
 		var entry = HistoryEntry.new()
 		var tag = ""
-		
+
 		if character:
 			tag = character.tag
 
@@ -76,8 +76,10 @@ func hash_event(dialogue_name:String, event_name:String):
 	return output.hash()
 
 
-func hash_say(character:Character, text:String):	
-	var output = str(text.hash()) + Rakugo.current_dialogue.get_event_name()
+func hash_say(character:Character, text:String):
+	# maybe there will be need to name of current dialogue or something like that
+
+	var output = str(text.hash())
 	if character:
 		output += character.name + character.tag
 	else:
