@@ -9,18 +9,21 @@ var event_played = {}
 
 func init():
 	if Rakugo.persistent.get("global_history"):
-		 global_history = Rakugo.persistent.get("global_history")
+		global_history = Rakugo.persistent.get("global_history")
 
 
 func _on_say(character, text):
 	last_say_hash = hash_say(character, text)
 	if not last_say_hash in global_history:
 		step_has_unseen = true
+
 	if log_step:
 		var entry = HistoryEntry.new()
 		var tag = ""
+		
 		if character:
 			tag = character.tag
+
 		entry.init(tag, text)
 		Rakugo.store.history.push_front(entry)
 		global_history[last_say_hash] = true #Using Dictionary as a python Set to benefit from the lookup table
@@ -39,7 +42,8 @@ func _restore(store):
 	step_has_unseen = false
 	last_say_hash = 0
 	if Rakugo.persistent.get("global_history"):
-		 global_history = Rakugo.persistent.get("global_history")
+		global_history = Rakugo.persistent.get("global_history")
+
 	if store.get("event_played"):
 		event_played = store.get("event_played").duplicate()
 
@@ -56,6 +60,7 @@ func log_event(dialogue_name:String, event_name:String):
 	var event_hash = hash_event(dialogue_name, event_name)
 	if event_hash in event_played:
 		event_played[event_hash] += 1# Counting because why not ?
+
 	else: 
 		event_played[event_hash] = 1
 	
@@ -71,10 +76,7 @@ func hash_event(dialogue_name:String, event_name:String):
 	return output.hash()
 
 
-func hash_say(character:Character, text:String):
-	if not Rakugo.current_dialogue:
-		return null
-	
+func hash_say(character:Character, text:String):	
 	var output = str(text.hash()) + Rakugo.current_dialogue.get_event_name()
 	if character:
 		output += character.name + character.tag
