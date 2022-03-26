@@ -5,6 +5,7 @@ class_name SettingsList
 const game_version := "addons/rakugo/game_version"
 const force_reload := "addons/rakugo/force_reload"
 const auto_mode_delay := "addons/rakugo/auto_mode_delay"
+const typing_effect_delay := "addons/rakugo/typing_effect_delay"
 const skip_delay := "addons/rakugo/skip_delay"
 const rollback_steps := "addons/rakugo/rollback_steps"
 const history_length := "addons/rakugo/history_length"
@@ -22,10 +23,10 @@ const fullscreen := "display/window/size/fullscreen"
 const maximized := "display/window/size/maximized"
 
 func crate_property(type:int, value) -> Array:
-		return [value, PropertyInfo.new(
-			"", type, PROPERTY_HINT_NONE, 
-			"", PROPERTY_USAGE_EDITOR
-		)]
+	return [value, PropertyInfo.new(
+		"", type, PROPERTY_HINT_NONE, 
+		"", PROPERTY_USAGE_EDITOR
+	)]
 
 var default_property_list:Dictionary = {
 	game_version: crate_property(TYPE_STRING, "1.0.0"), 
