@@ -3,7 +3,7 @@ character test_ch "Test Character"
 first_dialogue:
 	"Hello, world !"
 
-jump test_dialogue
+jump menu_emily
 
 "test jump"
 

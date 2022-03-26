@@ -109,7 +109,7 @@ Settings="*res://addons/Rakugo/Settings.gd"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/Rakugo/plugin.cfg" )
+enabled=PoolStringArray( "res://addons/Rakugo/plugin.cfg", "res://addons/TwitchChat/plugin.cfg" )
 
 [physics]
 
