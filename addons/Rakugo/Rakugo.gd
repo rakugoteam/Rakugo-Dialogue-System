@@ -51,6 +51,8 @@ var waiting_ask_return := false setget , is_waiting_ask_return
 
 var waiting_menu_return := false setget , is_waiting_menu_return
 
+var narrator:Character = null setget, get_narrator
+
 # timers use by rakugo
 onready var auto_timer := $AutoTimer
 onready var skip_timer := $SkipTimer
@@ -58,7 +60,6 @@ onready var skip_timer := $SkipTimer
 onready var StoreManager: = $StoreManager
 onready var History: = $History
 onready var StepBlocker = $StepBlocker
-onready var Say = $Statements/Say
 onready var Ask = $Statements/Ask
 onready var Menu = $Statements/Menu
 
@@ -80,6 +81,12 @@ func _ready():
 	var version = ProjectSettings.get(Rakugo.game_version)
 	var title = ProjectSettings.get(Rakugo.game_title)
 	OS.set_window_title(title + " " + version)
+	
+	narrator = Character.new()
+	narrator.init(ProjectSettings.get(Rakugo.narrator_name), "", Color.transparent)
+
+func get_narrator():
+	return narrator
 
 ## Rakugo flow control
 
