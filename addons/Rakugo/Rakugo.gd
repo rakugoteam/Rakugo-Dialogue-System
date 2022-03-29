@@ -59,7 +59,6 @@ onready var skip_timer := $SkipTimer
 
 onready var StoreManager: = $StoreManager
 onready var History: = $History
-onready var StepBlocker = $StepBlocker
 onready var Ask = $Statements/Ask
 
 signal step()
