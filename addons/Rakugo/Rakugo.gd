@@ -1,5 +1,28 @@
 extends Node
 
+# Rakugo
+## Setting's strings
+const game_version = "addons/rakugo/game_version"
+const force_reload = "addons/rakugo/force_reload"
+const auto_mode_delay = "addons/rakugo/auto_mode_delay"
+const typing_effect_delay = "addons/rakugo/typing_effect_delay"
+const skip_delay = "addons/rakugo/skip_delay"
+const rollback_steps = "addons/rakugo/rollback_steps"
+const history_length = "addons/rakugo/history_length"
+const narrator_name = "addons/rakugo/narrator/name"
+const debug = "addons/rakugo/debug"
+const save_folder = "addons/rakugo/save_folder"
+const test_mode = "addons/rakugo/test_mode"
+
+#Godot
+## Setting's strings
+const game_title = "application/config/name"
+const main_scene = "application/run/main_scene"
+const width = "display/window/size/width"
+const height = "display/window/size/height"
+const fullscreen = "display/window/size/fullscreen"
+const maximized = "display/window/size/maximized"
+
 const rakugo_version := "3.3"
 
 var current_scene_name := ""
@@ -28,16 +51,14 @@ var waiting_ask_return := false setget , is_waiting_ask_return
 
 var waiting_menu_return := false setget , is_waiting_menu_return
 
+var narrator:Character = null setget, get_narrator
+
 # timers use by rakugo
 onready var auto_timer := $AutoTimer
 onready var skip_timer := $SkipTimer
 
 onready var StoreManager: = $StoreManager
 onready var History: = $History
-onready var StepBlocker = $StepBlocker
-onready var Say = $Statements/Say
-onready var Ask = $Statements/Ask
-onready var Menu = $Statements/Menu
 
 signal step()
 signal say(character, text)
@@ -54,9 +75,15 @@ func _ready():
 	self.scene_anchor = get_tree().get_root()
 	StoreManager.init()
 	History.init()
-	var version = Settings.get(SettingsList.game_version)
-	var title = Settings.get(SettingsList.game_title)
+	var version = ProjectSettings.get(Rakugo.game_version)
+	var title = ProjectSettings.get(Rakugo.game_title)
 	OS.set_window_title(title + " " + version)
+	
+	narrator = Character.new()
+	narrator.init(ProjectSettings.get(Rakugo.narrator_name), "", Color.transparent)
+
+func get_narrator():
+	return narrator
 
 ## Rakugo flow control
 
@@ -83,7 +110,7 @@ func prepare_quitting():
 	if self.started:
 		self.save_game("auto")
 	
-	Settings.save_property_list()
+	ProjectSettings.save_property_list()
 		
 	# TODO: remove in future 
 	# if current_dialogue:
@@ -165,7 +192,7 @@ func debug_dict(parameters:Dictionary, parameters_names:Array = [], some_custom_
 # for printing debugs is only print if debug_on == true
 # put some string array or string as argument
 func debug(some_text = []):
-	if not Settings.get(SettingsList.debug):
+	if not ProjectSettings.get(Rakugo.debug):
 		return
 
 	if not started:

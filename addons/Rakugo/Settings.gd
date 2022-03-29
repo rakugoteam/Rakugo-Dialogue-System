@@ -8,6 +8,12 @@ var audio_buses := {}
 signal window_size_changed(prev, now)
 signal window_fullscreen_changed(value)
 
+func load_property_list():
+	if Rakugo.persistent.get('settings'):
+		property_list = Rakugo.persistent.get('settings')
+	else:
+		save_property_list()
+
 func _ready() -> void:
 	pause_mode = PAUSE_MODE_PROCESS
 	load_property_list()
@@ -30,34 +36,9 @@ func save_conf() -> void:
 		config.set_value("audio", bus_name + "_volume", volume)
 		audio_buses[bus_name] = {"mute":mute, "volume": volume}
 
-
-func load_property_list():
-	if Rakugo.persistent.get('settings'):
-		property_list = Rakugo.persistent.get('settings')
-	else:
-		save_property_list()
-
 func save_property_list():
 	Rakugo.persistent.settings = property_list
 	Rakugo.StoreManager.save_persistent_store()
-
-func get(property, default=null, set_default=true, project_setting_only=false):
-	if not project_setting_only and property in property_list:
-		return property_list[property]
-
-	if ProjectSettings.has_setting(property):
-		return ProjectSettings.get_setting(property)
-
-	if default_property_list.empty():
-		default_property_list = SettingsList.new().default_property_list
-
-	if property in default_property_list:
-		return default_property_list[property][0]
-
-	if default and set_default:
-		property_list[property] = default
-		
-	return default
 
 func set(property, value, save_changes=true):
 	property_list[property] = value

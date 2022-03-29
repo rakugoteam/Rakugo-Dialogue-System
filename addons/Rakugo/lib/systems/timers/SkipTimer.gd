@@ -3,7 +3,7 @@ extends Timer
 var skip_after_choices = false
 
 func _ready():
-	self.wait_time = Settings.get(SettingsList.skip_delay)
+	self.wait_time = ProjectSettings.get(Rakugo.skip_delay)
 
 func on_loop():
 	if can_skip():

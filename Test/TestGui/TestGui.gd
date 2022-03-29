@@ -13,6 +13,10 @@ func _ready():
 	Rakugo.connect("menu", self, "_on_menu")
 	Rakugo.connect("notify", self, "_on_notify")
 	
+	var narrator_name = ProjectSettings.get_setting(Rakugo.narrator_name)
+	
+	prints(name, narrator_name)
+	
 	Rakugo.parse_script(file_name)
 
 func _on_say(character:Character, text:String):

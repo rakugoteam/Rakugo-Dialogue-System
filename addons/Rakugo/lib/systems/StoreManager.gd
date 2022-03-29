@@ -14,8 +14,8 @@ func init():
 	self.init_store_stack()
 
 func init_save_folder():
-	save_folder_path = Settings.get(SettingsList.save_folder)
-	if not Settings.get(SettingsList.test_mode):
+	save_folder_path = ProjectSettings.get(Rakugo.save_folder)
+	if not ProjectSettings.get(Rakugo.test_mode):
 		save_folder_path = save_folder_path.replace("res://", "user://")
 	Directory.new().make_dir_recursive(save_folder_path)
 	save_folder_path = save_folder_path.trim_suffix("/") + "/"
@@ -31,7 +31,7 @@ func get_save_path(save_name, no_ext=false):
 	var savefile_path = save_folder_path.plus_file(save_name)
 
 	if not no_ext:
-		if Settings.get('rakugo/saves/test_mode'):
+		if ProjectSettings.get('rakugo/saves/test_mode'):
 			savefile_path += ".tres"
 
 		else:
@@ -87,9 +87,9 @@ func change_current_stack_index(index):
 ### Store Stack
 
 func init_store_stack():
-	store_stack_max_length = Settings.get(SettingsList.rollback_steps)
+	store_stack_max_length = ProjectSettings.get(Rakugo.rollback_steps)
 	var new_save := Store.new()
-	new_save.game_version = Settings.get(SettingsList.game_version)
+	new_save.game_version = ProjectSettings.get(Rakugo.game_version)
 	new_save.rakugo_version = Rakugo.rakugo_version
 	new_save.scene = Rakugo.current_scene_name
 	new_save.history = []
@@ -174,7 +174,7 @@ func init_persistent_store():
 		persistent_store = load(persistent_path)
 	else:
 		persistent_store = Store.new()
-	persistent_store.game_version = Settings.get(SettingsList.game_version)
+	persistent_store.game_version = ProjectSettings.get(Rakugo.game_version)
 	persistent_store.rakugo_version = Rakugo.rakugo_version
 
 func save_persistent_store():
