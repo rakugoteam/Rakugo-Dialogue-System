@@ -14,35 +14,45 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/Rakugo/lib/resources/Character.gd"
 }, {
+"base": "Reference",
+"class": "CommandData",
+"language": "GDScript",
+"path": "res://addons/TwitchChat/util/cmd_data.gd"
+}, {
+"base": "Reference",
+"class": "CommandInfo",
+"language": "GDScript",
+"path": "res://addons/TwitchChat/util/cmd_info.gd"
+}, {
+"base": "Node",
+"class": "Gift",
+"language": "GDScript",
+"path": "res://addons/TwitchChat/gift_node.gd"
+}, {
 "base": "Resource",
 "class": "HistoryEntry",
 "language": "GDScript",
 "path": "res://addons/Rakugo/lib/resources/HistoryEntry.gd"
+}, {
+"base": "Resource",
+"class": "ImageCache",
+"language": "GDScript",
+"path": "res://addons/TwitchChat/util/image_cache.gd"
 }, {
 "base": "Object",
 "class": "Parser",
 "language": "GDScript",
 "path": "res://addons/Rakugo/lib/systems/Parser.gd"
 }, {
-"base": "Reference",
-"class": "ProjectTools",
-"language": "GDScript",
-"path": "res://addons/project-settings-helpers/ProjectTools.gd"
-}, {
-"base": "Reference",
-"class": "PropertyInfo",
-"language": "GDScript",
-"path": "res://addons/project-settings-helpers/PropertyInfo.gd"
-}, {
 "base": "Node",
 "class": "RakuScriptDialogue",
 "language": "GDScript",
 "path": "res://addons/Rakugo/lib/nodes/RakuScriptDialogue.gd"
 }, {
-"base": "Object",
-"class": "SettingsList",
+"base": "Reference",
+"class": "SenderData",
 "language": "GDScript",
-"path": "res://addons/Rakugo/SettingsList.gd"
+"path": "res://addons/TwitchChat/util/sender_data.gd"
 }, {
 "base": "Resource",
 "class": "Store",
@@ -56,15 +66,31 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "Character": "",
+"CommandData": "",
+"CommandInfo": "",
+"Gift": "",
 "HistoryEntry": "",
+"ImageCache": "",
 "Parser": "",
-"ProjectTools": "",
-"PropertyInfo": "",
 "RakuScriptDialogue": "",
-"SettingsList": "",
+"SenderData": "",
 "Store": "",
 "StoreStack": ""
 }
+
+[addons]
+
+rakugo/spaghetti="bolognaise"
+rakugo/game_version="1.0.0"
+rakugo/force_reload=false
+rakugo/auto_mode_delay=3
+rakugo/skip_delay=0.5
+rakugo/rollback_steps=10
+rakugo/history_length=30
+rakugo/narrator/name="spaghetti"
+rakugo/debug=false
+rakugo/save_folder="res://saves"
+rakugo/test_mode=false
 
 [application]
 
@@ -79,7 +105,7 @@ Settings="*res://addons/Rakugo/Settings.gd"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/Rakugo/plugin.cfg" )
+enabled=PoolStringArray( "res://addons/Rakugo/plugin.cfg", "res://addons/TwitchChat/plugin.cfg" )
 
 [physics]
 

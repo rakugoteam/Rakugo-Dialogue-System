@@ -5,7 +5,7 @@ var default_narrator = null
 func _ready():
 	default_narrator = Character.new()
 	default_narrator.init(
-		Settings.get(SettingsList.narrator_name), 
+		ProjectSettings.get(Rakugo.narrator_name), 
 		"", Color.transparent)
 
 func exec(character, text:String) -> void:
