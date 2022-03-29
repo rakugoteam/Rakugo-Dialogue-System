@@ -61,7 +61,6 @@ onready var StoreManager: = $StoreManager
 onready var History: = $History
 onready var StepBlocker = $StepBlocker
 onready var Ask = $Statements/Ask
-onready var Menu = $Statements/Menu
 
 signal step()
 signal say(character, text)
