@@ -141,6 +141,9 @@ func count_indent(s:String) -> int:
 	
 	return ret
 
+func remove_double_quotes(s:String) -> String:
+	return s.substr(1, s.length()-2)
+
 func do_parse_script(file_name:String):
 	# var known_translations = {}
 	# var errors: Array = []
@@ -205,11 +208,9 @@ func do_parse_script(file_name:String):
 					prints("Parser", "parse_script", "SAY")
 
 					for key in result.names:
-						prints(" ", key, result.get_string(key))
+						prints(" ", key, result.get_string(key)) 
 
-					var text = result.get_string("text")
-
-					Rakugo.say(result.get_string("character_tag"), text.substr(1, text.length()-2))
+					Rakugo.say(result.get_string("character_tag"), remove_double_quotes(result.get_string("text")))
 					
 					Rakugo.step()
 					
@@ -223,10 +224,9 @@ func do_parse_script(file_name:String):
 					for key in result.names:
 						prints(" ", key, result.get_string(key))
 						
-					Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), result.get_string("question"), result.get_string("default_answer"))
+					Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), remove_double_quotes(result.get_string("question")), remove_double_quotes(result.get_string("default_answer")))
 
 					step_semaphore.wait()
-					
 					
 					continue
 
