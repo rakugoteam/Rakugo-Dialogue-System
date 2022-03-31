@@ -306,7 +306,7 @@ func do_parse_script(file_name:String):
 					if !label.empty():
 						menu_jumps[menu_choices.size()] = label
 				
-					menu_choices.push_back(result.get_string("text"))
+					menu_choices.push_back(remove_double_quotes(result.get_string("text")))
 					continue
 
 			State.Jump:
