@@ -149,6 +149,8 @@ func do_parse_script(file_name:String):
 	# var errors: Array = []
 	# var parent_stack: Array = []
 	
+	#TODO parse and save in dictionary first and read after
+	
 	var file = File.new()
 	
 	if file.open(file_name, File.READ) != OK:
@@ -165,7 +167,33 @@ func do_parse_script(file_name:String):
 	
 	var jump_label:String
 	
-	while !stop_thread and !file.eof_reached():
+	while !stop_thread:
+		if state == State.Menu and file.eof_reached():
+			state = State.Normal
+				
+			prints("Parser", "parse_script", "mod Normal")
+			
+			if !menu_choices.empty():
+				Rakugo.menu(menu_choices)
+				
+				step_semaphore.wait()
+				
+				if menu_jumps.has(menu_jump_index):
+					var label = menu_jumps[menu_jump_index]
+					
+					prints("Parser", "parse_script", "menu_jump", label)
+			
+					jump_label = label
+			
+					if labels.has(jump_label):
+						file.seek(labels[jump_label])
+					else:
+						break
+			else:
+				break
+		elif file.eof_reached():
+			break
+		
 		var line = file.get_line()
 
 		if line.empty():
@@ -178,6 +206,28 @@ func do_parse_script(file_name:String):
 		line = line.lstrip('	')
 
 		var result:RegExMatch
+
+		if state == State.Menu and indent_count == 0:
+			state = State.Normal
+				
+			prints("Parser", "parse_script", "mod Normal")
+			
+			if !menu_choices.empty():
+				Rakugo.menu(menu_choices)
+				
+				step_semaphore.wait()
+				
+				if menu_jumps.has(menu_jump_index):
+					var label = menu_jumps[menu_jump_index]
+					
+					prints("Parser", "parse_script", "menu_jump", label)
+			
+					jump_label = label
+			
+					if labels.has(jump_label):
+						file.seek(labels[jump_label])
+					else:
+						state = State.Jump
 
 		match(state):
 			State.Normal:
@@ -242,6 +292,8 @@ func do_parse_script(file_name:String):
 					state = State.Menu
 
 					menu_choices.resize(0)
+					
+					menu_jumps.clear()
 
 					prints("Parser", "parse_script", "mod Menu")
 					continue
@@ -272,29 +324,6 @@ func do_parse_script(file_name:String):
 					continue
 			
 			State.Menu:
-				if indent_count == 0:
-					state = State.Normal
-				
-					prints("Parser", "parse_script", "mod Normal")
-					
-					if !menu_choices.empty():
-						Rakugo.menu(menu_choices)
-						
-						step_semaphore.wait()
-						
-						if menu_jumps.has(menu_jump_index):
-							var label = menu_jumps[menu_jump_index]
-							
-							prints("Parser", "parse_script", "menu_jump", label)
-					
-							jump_label = label
-					
-							if labels.has(jump_label):
-								file.seek(labels[jump_label])
-							else:
-								state = State.Jump
-					continue
-					
 				result = regex_cache["CHOICE"].search(line)
 				if result:
 					prints("Parser", "parse_script", "CHOICE")
