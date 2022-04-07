@@ -42,7 +42,7 @@ var Tokens := {
 
 var Regex := {
 	VALID_VARIABLE = "[a-zA-Z_][a-zA-Z_0-9]+",
-	# TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
+	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
 	CONDITION = "(if|elif) (?<condition>.*)",
 	STRING = "\".*\"",
 	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
@@ -101,7 +101,7 @@ func _init():
 		
 		var reg := RegEx.new()
 		if reg.compile(Tokens[t]) != OK:
-			prints("Parser", "_init", "failed", t)
+			push_error("Parser, _init, failed " + t)
 		
 		regex_cache[t] = reg
 
@@ -109,11 +109,10 @@ func _init():
 		Regex[r] = Regex[r].format(Tokens)
 		
 		Regex[r] = Regex[r].format(Regex)
-		prints(r, Regex[r])
 
 		var reg := RegEx.new()
 		if reg.compile(Regex[r]) != OK:
-			prints("Parser", "_init", "failed", r)
+			push_error("Parser, _init, failed " + r)
 		
 		regex_cache[r] = reg
 
@@ -150,12 +149,6 @@ func remove_double_quotes(s:String) -> String:
 	return s.substr(1, s.length()-2)
 
 func do_parse_script(file_name:String):
-	# var known_translations = {}
-	# var errors: Array = []
-	# var parent_stack: Array = []
-	
-	#TODO parse and save in dictionary first and read after
-	
 	var file = File.new()
 	
 	if file.open(file_name, File.READ) != OK:
@@ -165,9 +158,6 @@ func do_parse_script(file_name:String):
 	var indent_count:int
 	
 	var menu_choices
-	var menu_jumps:Dictionary
-	
-	var jump_label:String
 	
 	var current_menu_result
 	
@@ -316,10 +306,10 @@ func do_execute_jump(jump_label:String) -> int:
 		index = labels[jump_label]
 		
 		if index >= parse_array.size():
-			printerr("Parser, do_execute_script, JUMP, index out of range")
+			push_error("Parser, do_execute_script, JUMP, index out of range")
 			index = -1
 	else:
-		printerr("Parser, do_execute_script, JUMP, unknow label")
+		push_error("Parser, do_execute_script, JUMP, unknow label")
 		
 	return index
 
