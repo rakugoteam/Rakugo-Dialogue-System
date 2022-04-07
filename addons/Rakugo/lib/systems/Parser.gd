@@ -265,7 +265,7 @@ func do_parse_script(file_name:String):
 					
 					state = State.Menu
 
-					labels[result.get_string("label")] = parse_array.size() - 1
+					labels[result.get_string("label")] = parse_array.size()
 
 #					prints("Parser", "parse_script", "mode Menu")
 					continue
@@ -279,7 +279,7 @@ func do_parse_script(file_name:String):
 
 					var dialogue_label = result.get_string("label")
 				
-					labels[dialogue_label] = parse_array.size() - 1
+					labels[dialogue_label] = parse_array.size()
 						
 					continue
 				
@@ -333,9 +333,9 @@ func do_execute_script():
 		
 		match(line[0]):
 			"JUMP":
-				index = do_execute_jump(result.get_string("label"))
+				index = do_execute_jump(result.get_string("label")) - 1
 				
-				if index == -1:
+				if index == -2:
 					break
 			
 			"SAY":
@@ -374,12 +374,12 @@ func do_execute_script():
 				if menu_jumps.has(menu_jump_index):
 					var jump_label = menu_jumps[menu_jump_index]
 
-					index = do_execute_jump(jump_label)
+					index = do_execute_jump(jump_label) - 1
 				
-					if index == -1:
+					if index == -2:
 						break
 						
-					prints("Parser", "parse_script", "menu_jump", jump_label)
+					prints("Parser", "do_execute_script", "menu_jump", jump_label)
 		
 		index += 1
 		
