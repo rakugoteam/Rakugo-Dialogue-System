@@ -88,6 +88,9 @@ var menu_jump_index:int
 
 var parse_array:Array
 
+#contain label : index
+var labels:Dictionary
+
 func _init():
 	Rakugo.connect("menu_return", self, "_on_menu_return")
 	Rakugo.connect("ask_return", self, "_on_ask_return")
@@ -161,36 +164,21 @@ func do_parse_script(file_name:String):
 	
 	var indent_count:int
 	
-	#contain label : file_cursor_position
-	var labels:Dictionary
-	
-	var menu_choices:PoolStringArray
+	var menu_choices
 	var menu_jumps:Dictionary
 	
 	var jump_label:String
+	
+	var current_menu_result
 	
 	while !stop_thread:
 		if state == State.Menu and file.eof_reached():
 			state = State.Normal
 				
-			prints("Parser", "parse_script", "mod Normal")
+#			prints("Parser", "parse_script", "mod Normal")
 			
 			if !menu_choices.empty():
-				Rakugo.menu(menu_choices)
-				
-				step_semaphore.wait()
-				
-				if menu_jumps.has(menu_jump_index):
-					var label = menu_jumps[menu_jump_index]
-					
-					prints("Parser", "parse_script", "menu_jump", label)
-			
-					jump_label = label
-			
-					if labels.has(jump_label):
-						file.seek(labels[jump_label])
-					else:
-						break
+				parse_array.push_back(["MENU", current_menu_result, menu_choices])
 			else:
 				break
 		elif file.eof_reached():
@@ -212,24 +200,10 @@ func do_parse_script(file_name:String):
 		if state == State.Menu and indent_count == 0:
 			state = State.Normal
 				
-			prints("Parser", "parse_script", "mod Normal")
+#			prints("Parser", "parse_script", "mod Normal")
 			
 			if !menu_choices.empty():
-				Rakugo.menu(menu_choices)
-				
-				step_semaphore.wait()
-				
-				if menu_jumps.has(menu_jump_index):
-					var label = menu_jumps[menu_jump_index]
-					
-					prints("Parser", "parse_script", "menu_jump", label)
-			
-					jump_label = label
-			
-					if labels.has(jump_label):
-						file.seek(labels[jump_label])
-					else:
-						state = State.Jump
+				parse_array.push_back(["MENU", current_menu_result, menu_choices])
 
 		match(state):
 			State.Normal:
@@ -247,10 +221,10 @@ func do_parse_script(file_name:String):
 
 				result = regex_cache["CHARACTER_DEF"].search(line)
 				if result:
-					prints("Parser", "parse_script", "CHARACTER_DEF")
-
-					for key in result.names:
-						prints(" ", key, result.get_string(key))
+#					prints("Parser", "parse_script", "CHARACTER_DEF")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
 
 					parse_array.push_back(["CHARACTER_DEF", result])
 
@@ -258,10 +232,10 @@ func do_parse_script(file_name:String):
 
 				result = regex_cache["SAY"].search(line)
 				if result:
-					prints("Parser", "parse_script", "SAY")
-
-					for key in result.names:
-						prints(" ", key, result.get_string(key)) 
+#					prints("Parser", "parse_script", "SAY")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key)) 
 
 					parse_array.push_back(["SAY", result])
 
@@ -269,106 +243,85 @@ func do_parse_script(file_name:String):
 
 				result = regex_cache["ASK"].search(line)
 				if result:
-					prints("Parser", "parse_script", "ASK")
-					
-					for key in result.names:
-						prints(" ", key, result.get_string(key))
+#					prints("Parser", "parse_script", "ASK")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
 					
 					parse_array.push_back(["ASK", result])
 
 					continue
 
-#				result = regex_cache["MENU"].search(line)
-#				if result:
+				result = regex_cache["MENU"].search(line)
+				if result:
 #					prints("Parser", "parse_script", "MENU")
 #
 #					for key in result.names:
 #						prints(" ", key, result.get_string(key))
-#
-#					labels[result.get_string("label")] = file.get_position()
-#
-#					state = State.Menu
-#
-#					menu_choices.resize(0)
-#
-#					menu_jumps.clear()
-#
-#					prints("Parser", "parse_script", "mod Menu")
-#					continue
-				
-#				result = regex_cache["DIALOGUE"].search(line)
-#				if result:
-#					prints("Parser", "parse_script", "DIALOGUE")
-#
-#					for key in result.names:
-#						prints(" ", key, result.get_string(key))
-#
-#					labels[result.get_string("label")] = file.get_position()
-#					continue
-				
-#				result = regex_cache["JUMP"].search(line)
-#				if result:
-#					prints("Parser", "parse_script", "JUMP")
-#
-#					for key in result.names:
-#						prints(" ", key, result.get_string(key))
-#
-#					parse_array.push_back(["JUMP", result])
-#
-#					jump_label = result.get_string("label")
-#
-#					if labels.has(jump_label):
-#						file.seek(labels[jump_label])
-#					else:
-#						state = State.Jump
-#					continue
-			
-			State.Menu:
-				result = regex_cache["CHOICE"].search(line)
-				if result:
-					prints("Parser", "parse_script", "CHOICE")
-					
-					for key in result.names:
-						prints(" ", key, result.get_string(key))
-					
-					var label = result.get_string("label")
-					if !label.empty():
-						menu_jumps[menu_choices.size()] = label
-				
-					menu_choices.push_back(remove_double_quotes(result.get_string("text")))
-					continue
 
-			State.Jump:
-				result = regex_cache["MENU"].search(line)
-				if result:
-					var label = result.get_string("label")
+					current_menu_result = result
 					
-					if !label.empty():
-						labels[label] = file.get_position()
-						
-						if label == jump_label:
-							prints("Parser", "parse_script", "jump", label)
-							
-							state = State.Menu
+					menu_choices = []
+					
+					state = State.Menu
 
-							menu_choices.resize(0)
+					labels[result.get_string("label")] = parse_array.size() - 1
+
+#					prints("Parser", "parse_script", "mode Menu")
 					continue
 				
 				result = regex_cache["DIALOGUE"].search(line)
 				if result:
-					var label = result.get_string("label")
-					
-					labels[label] = file.get_position()
-					
-					if label == jump_label:
-						prints("Parser", "parse_script", "jump", result.get_string("label"))
+#					prints("Parser", "parse_script", "DIALOGUE")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
+
+					var dialogue_label = result.get_string("label")
+				
+					labels[dialogue_label] = parse_array.size() - 1
 						
-						state = State.Normal
+					continue
+				
+				result = regex_cache["JUMP"].search(line)
+				if result:
+#					prints("Parser", "parse_script", "JUMP")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
+
+					parse_array.push_back(["JUMP", result])
+
+					continue
+			
+			State.Menu:
+				result = regex_cache["CHOICE"].search(line)
+				if result:
+#					prints("Parser", "parse_script", "CHOICE")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
+						
+					menu_choices.push_back(result)
+					
 					continue
 
 	file.close()
 	
 	prints("Parser", "do_parse_script", "end")
+
+func do_execute_jump(jump_label:String) -> int:
+	var index := -1
+	if labels.has(jump_label):
+		index = labels[jump_label]
+		
+		if index >= parse_array.size():
+			printerr("Parser, do_execute_script, JUMP, index out of range")
+			index = -1
+	else:
+		printerr("Parser, do_execute_script, JUMP, unknow label")
+		
+	return index
 
 func do_execute_script():
 	var index := 0
@@ -379,6 +332,12 @@ func do_execute_script():
 		var result = line[1]
 		
 		match(line[0]):
+			"JUMP":
+				index = do_execute_jump(result.get_string("label"))
+				
+				if index == -1:
+					break
+			
 			"SAY":
 				Rakugo.say(result.get_string("character_tag"), remove_double_quotes(result.get_string("text")))
 
@@ -393,6 +352,34 @@ func do_execute_script():
 				Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), remove_double_quotes(result.get_string("question")), remove_double_quotes(result.get_string("default_answer")))
 
 				step_semaphore.wait()
+				
+			"MENU":
+				var menu_choices:PoolStringArray
+				
+				var menu_jumps:Dictionary
+				
+				for i in line[2].size():
+					var menu_choice_result = line[2][i]
+					
+					menu_choices.push_back(remove_double_quotes(menu_choice_result.get_string("text")))
+					
+					var label = menu_choice_result.get_string("label")
+					if !label.empty():
+						menu_jumps[i] = label
+				
+				Rakugo.menu(menu_choices)
+
+				step_semaphore.wait()
+				
+				if menu_jumps.has(menu_jump_index):
+					var jump_label = menu_jumps[menu_jump_index]
+
+					index = do_execute_jump(jump_label)
+				
+					if index == -1:
+						break
+						
+					prints("Parser", "parse_script", "menu_jump", jump_label)
 		
 		index += 1
 		
