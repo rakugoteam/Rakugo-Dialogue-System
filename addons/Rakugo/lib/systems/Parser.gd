@@ -42,7 +42,7 @@ var Tokens := {
 
 var Regex := {
 	VALID_VARIABLE = "[a-zA-Z_][a-zA-Z_0-9]+",
-	# TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
+	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
 	CONDITION = "(if|elif) (?<condition>.*)",
 	STRING = "\".*\"",
 	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
@@ -59,18 +59,18 @@ var Regex := {
 	# dialogue Regex
 	DIALOGUE = "^(?<label>{VALID_VARIABLE}):$",
 	# character tag = "character_name"
-	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<name>.*)\"",
+	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<name>.*)\"$",
 	# character_tag? say STRING|MULTILINE_STRING
-	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?(?<text>{STRING})",
+	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?(?<text>{STRING})$",
 	# var_name = ask "please enter text" 
-	ASK = "^(?<variable>{VALID_VARIABLE}) = ((?<character_tag>{VALID_VARIABLE}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})",
+	ASK = "^(?<variable>{VALID_VARIABLE}) = ((?<character_tag>{VALID_VARIABLE}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})$",
 	# menu menu_name? :
 	#   choice1 "label":
 	#     say "text"
-	MENU = "^menu( (?<label>{VALID_VARIABLE}))?:",
+	MENU = "^menu( (?<label>{VALID_VARIABLE}))?:$",
 	#   choice1 "label":
-	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?",
-	JUMP = "^jump (?<label>{VALID_VARIABLE})",
+	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?$",
+	JUMP = "^jump (?<label>{VALID_VARIABLE})$",
 }
 
 var regex_cache := {}
@@ -86,6 +86,11 @@ var state = State.Normal
 
 var menu_jump_index:int
 
+var parse_array:Array
+
+#contain label : index
+var labels:Dictionary
+
 func _init():
 	Rakugo.connect("menu_return", self, "_on_menu_return")
 	Rakugo.connect("ask_return", self, "_on_ask_return")
@@ -96,7 +101,7 @@ func _init():
 		
 		var reg := RegEx.new()
 		if reg.compile(Tokens[t]) != OK:
-			prints("Parser", "_init", "failed", t)
+			push_error("Parser, _init, failed " + t)
 		
 		regex_cache[t] = reg
 
@@ -104,11 +109,10 @@ func _init():
 		Regex[r] = Regex[r].format(Tokens)
 		
 		Regex[r] = Regex[r].format(Regex)
-		prints(r, Regex[r])
 
 		var reg := RegEx.new()
 		if reg.compile(Regex[r]) != OK:
-			prints("Parser", "_init", "failed", r)
+			push_error("Parser, _init, failed " + r)
 		
 		regex_cache[r] = reg
 
@@ -117,7 +121,7 @@ func parse_script(file_name:String) -> int:
 	
 	step_semaphore = Semaphore.new()
 	
-	return thread.start(self, "do_parse_script", file_name)
+	return thread.start(self, "do_parse_and_execute", file_name)
 
 func close():
 	if thread:
@@ -141,16 +145,10 @@ func count_indent(s:String) -> int:
 	
 	return ret
 
-func treat_string(s:String) -> String:
-	return s.substr(1, s.length()-2).replace("\\n", "\n").replace("\\t", "\t")
+func remove_double_quotes(s:String) -> String:
+	return s.substr(1, s.length()-2)
 
 func do_parse_script(file_name:String):
-	# var known_translations = {}
-	# var errors: Array = []
-	# var parent_stack: Array = []
-	
-	#TODO parse and save in dictionary first and read after
-	
 	var file = File.new()
 	
 	if file.open(file_name, File.READ) != OK:
@@ -159,36 +157,18 @@ func do_parse_script(file_name:String):
 	
 	var indent_count:int
 	
-	#contain label : file_cursor_position
-	var labels:Dictionary
+	var menu_choices
 	
-	var menu_choices:PoolStringArray
-	var menu_jumps:Dictionary
-	
-	var jump_label:String
+	var current_menu_result
 	
 	while !stop_thread:
 		if state == State.Menu and file.eof_reached():
 			state = State.Normal
 				
-			prints("Parser", "parse_script", "mod Normal")
+#			prints("Parser", "parse_script", "mod Normal")
 			
 			if !menu_choices.empty():
-				Rakugo.menu(menu_choices)
-				
-				step_semaphore.wait()
-				
-				if menu_jumps.has(menu_jump_index):
-					var label = menu_jumps[menu_jump_index]
-					
-					prints("Parser", "parse_script", "menu_jump", label)
-			
-					jump_label = label
-			
-					if labels.has(jump_label):
-						file.seek(labels[jump_label])
-					else:
-						break
+				parse_array.push_back(["MENU", current_menu_result, menu_choices])
 			else:
 				break
 		elif file.eof_reached():
@@ -210,24 +190,10 @@ func do_parse_script(file_name:String):
 		if state == State.Menu and indent_count == 0:
 			state = State.Normal
 				
-			prints("Parser", "parse_script", "mod Normal")
+#			prints("Parser", "parse_script", "mod Normal")
 			
 			if !menu_choices.empty():
-				Rakugo.menu(menu_choices)
-				
-				step_semaphore.wait()
-				
-				if menu_jumps.has(menu_jump_index):
-					var label = menu_jumps[menu_jump_index]
-					
-					prints("Parser", "parse_script", "menu_jump", label)
-			
-					jump_label = label
-			
-					if labels.has(jump_label):
-						file.seek(labels[jump_label])
-					else:
-						state = State.Jump
+				parse_array.push_back(["MENU", current_menu_result, menu_choices])
 
 		match(state):
 			State.Normal:
@@ -245,130 +211,174 @@ func do_parse_script(file_name:String):
 
 				result = regex_cache["CHARACTER_DEF"].search(line)
 				if result:
-					prints("Parser", "parse_script", "CHARACTER_DEF")
+#					prints("Parser", "parse_script", "CHARACTER_DEF")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
 
-					for key in result.names:
-						prints(" ", key, result.get_string(key))
+					parse_array.push_back(["CHARACTER_DEF", result])
 
-					Rakugo.define_character(result.get_string("name"), result.get_string("tag"))
 					continue
 
 				result = regex_cache["SAY"].search(line)
 				if result:
-					prints("Parser", "parse_script", "SAY")
+#					prints("Parser", "parse_script", "SAY")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key)) 
 
-					for key in result.names:
-						prints(" ", key, result.get_string(key)) 
+					parse_array.push_back(["SAY", result])
 
-					Rakugo.say(result.get_string("character_tag"), treat_string(result.get_string("text")))
-					
-					Rakugo.step()
-					
-					step_semaphore.wait()
 					continue
 
 				result = regex_cache["ASK"].search(line)
 				if result:
-					prints("Parser", "parse_script", "ASK")
+#					prints("Parser", "parse_script", "ASK")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
 					
-					for key in result.names:
-						prints(" ", key, result.get_string(key))
-						
-					Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), treat_string(result.get_string("question")), treat_string(result.get_string("default_answer")))
+					parse_array.push_back(["ASK", result])
 
-					step_semaphore.wait()
-					
 					continue
 
 				result = regex_cache["MENU"].search(line)
 				if result:
-					prints("Parser", "parse_script", "MENU")
+#					prints("Parser", "parse_script", "MENU")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
 
-					for key in result.names:
-						prints(" ", key, result.get_string(key))
-
-					labels[result.get_string("label")] = file.get_position()
-
+					current_menu_result = result
+					
+					menu_choices = []
+					
 					state = State.Menu
 
-					menu_choices.resize(0)
-					
-					menu_jumps.clear()
+					labels[result.get_string("label")] = parse_array.size()
 
-					prints("Parser", "parse_script", "mod Menu")
+#					prints("Parser", "parse_script", "mode Menu")
 					continue
 				
 				result = regex_cache["DIALOGUE"].search(line)
 				if result:
-					prints("Parser", "parse_script", "DIALOGUE")
-					
-					for key in result.names:
-						prints(" ", key, result.get_string(key))
+#					prints("Parser", "parse_script", "DIALOGUE")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
 
-					labels[result.get_string("label")] = file.get_position()
+					var dialogue_label = result.get_string("label")
+				
+					labels[dialogue_label] = parse_array.size()
+						
 					continue
 				
 				result = regex_cache["JUMP"].search(line)
 				if result:
-					prints("Parser", "parse_script", "JUMP")
-					
-					for key in result.names:
-						prints(" ", key, result.get_string(key))
-					
-					jump_label = result.get_string("label")
-					
-					if labels.has(jump_label):
-						file.seek(labels[jump_label])
-					else:
-						state = State.Jump
+#					prints("Parser", "parse_script", "JUMP")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
+
+					parse_array.push_back(["JUMP", result])
+
 					continue
 			
 			State.Menu:
 				result = regex_cache["CHOICE"].search(line)
 				if result:
-					prints("Parser", "parse_script", "CHOICE")
-					
-					for key in result.names:
-						prints(" ", key, result.get_string(key))
-					
-					var label = result.get_string("label")
-					if !label.empty():
-						menu_jumps[menu_choices.size()] = label
-				
-					menu_choices.push_back(treat_string(result.get_string("text")))
-					continue
-
-			State.Jump:
-				result = regex_cache["MENU"].search(line)
-				if result:
-					var label = result.get_string("label")
-					
-					if !label.empty():
-						labels[label] = file.get_position()
+#					prints("Parser", "parse_script", "CHOICE")
+#
+#					for key in result.names:
+#						prints(" ", key, result.get_string(key))
 						
-						if label == jump_label:
-							prints("Parser", "parse_script", "jump", label)
-							
-							state = State.Menu
-
-							menu_choices.resize(0)
-					continue
-				
-				result = regex_cache["DIALOGUE"].search(line)
-				if result:
-					var label = result.get_string("label")
+					menu_choices.push_back(result)
 					
-					labels[label] = file.get_position()
-					
-					if label == jump_label:
-						prints("Parser", "parse_script", "jump", result.get_string("label"))
-						
-						state = State.Normal
 					continue
 
 	file.close()
 	
 	prints("Parser", "do_parse_script", "end")
+
+func do_execute_jump(jump_label:String) -> int:
+	var index := -1
+	if labels.has(jump_label):
+		index = labels[jump_label]
+		
+		if index >= parse_array.size():
+			push_error("Parser, do_execute_script, JUMP, index out of range")
+			index = -1
+	else:
+		push_error("Parser, do_execute_script, JUMP, unknow label")
+		
+	return index
+
+func do_execute_script():
+	var index := 0
+	
+	while !stop_thread and index < parse_array.size():
+		var line = parse_array[index]
+		
+		var result = line[1]
+		
+		match(line[0]):
+			"JUMP":
+				index = do_execute_jump(result.get_string("label")) - 1
+				
+				if index == -2:
+					break
+			
+			"SAY":
+				Rakugo.say(result.get_string("character_tag"), remove_double_quotes(result.get_string("text")))
+
+				Rakugo.step()
+
+				step_semaphore.wait()
+				
+			"CHARACTER_DEF":
+				Rakugo.define_character(result.get_string("name"), result.get_string("tag"))
+				
+			"ASK":
+				Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), remove_double_quotes(result.get_string("question")), remove_double_quotes(result.get_string("default_answer")))
+
+				step_semaphore.wait()
+				
+			"MENU":
+				var menu_choices:PoolStringArray
+				
+				var menu_jumps:Dictionary
+				
+				for i in line[2].size():
+					var menu_choice_result = line[2][i]
+					
+					menu_choices.push_back(remove_double_quotes(menu_choice_result.get_string("text")))
+					
+					var label = menu_choice_result.get_string("label")
+					if !label.empty():
+						menu_jumps[i] = label
+				
+				Rakugo.menu(menu_choices)
+
+				step_semaphore.wait()
+				
+				if menu_jumps.has(menu_jump_index):
+					var jump_label = menu_jumps[menu_jump_index]
+
+					index = do_execute_jump(jump_label) - 1
+				
+					if index == -2:
+						break
+						
+					prints("Parser", "do_execute_script", "menu_jump", jump_label)
+		
+		index += 1
+		
+	prints("Parser", "do_execute_script", "end")
+
+func do_parse_and_execute(file_name:String):
+	do_parse_script(file_name)
+	
+	do_execute_script()
 
 func _on_menu_return(index:int):
 	menu_jump_index = index
@@ -377,116 +387,3 @@ func _on_menu_return(index:int):
 
 func _on_ask_return(result):
 	step_semaphore.post()
-
-func parse_dialogue(lines:PoolStringArray) -> Array:
-	var dialogue := []
-	var current_menu := {}
-	var current_choice := []
-	var in_choice := false
-
-	for l in lines:
-		var result = regex_cache["CHARACTER_DEF"].search(l)
-		if result:
-			var character_tag = result.get_string("tag")
-			var character_name = result.get_string("character_name")
-			
-			var character: = {
-				"type": "character",
-				"tag": character_tag,
-				"name": character_name,
-			}
-
-			dialogue.append(character)
-			
-			continue
-
-		result = regex_cache["SAY"].search(l)
-		if result:
-			var character_tag = result.get_string("character_tag")
-			var text = result.get_string("text")
-
-			var say: = {
-				"type": "say",
-				"character_tag": character_tag,
-				"text": text,
-			}
-
-			if in_choice:
-				current_choice.append(say)
-			else:
-				dialogue.append(say)
-			
-			continue
-
-		result = regex_cache["ASK"].search(l)
-		if result:
-			var var_name = result.get_string("var_name")
-			var assignment_type = result.get_string("assignment_type")
-			var text = result.get_string("text")
-
-			var ask: = {
-				"type": "ask",
-				"var_name": var_name,
-				"assignment_type": assignment_type,
-				"text": text,
-			}
-
-			if in_choice:
-				current_choice.append(ask)
-			else:
-				dialogue.append(ask)
-
-			continue
-
-		result = regex_cache["MENU"].search(l)
-		if result:
-			var menu_name = result.get_string("menu_name")
-			
-			var menu: = {
-				"type": "menu",
-				"menu_name": menu_name,
-				"choices": {}
-			}
-
-			current_menu = menu["choices"]
-			dialogue.append(menu)
-
-			continue
-
-		result = regex_cache["CHOICE"].search(l)
-		if result:
-			var choice = result.get_string("choice")
-			var label = result.get_string("label")
-			
-			var _choice := {
-				"choice": choice,
-				"label": label,
-				"sub_dialogue": []
-			}
-
-			current_choice = choice["sub_dialogue"]
-			current_menu[choice] = _choice
-			in_choice = true
-
-			continue
-
-		result = regex_cache["JUMP"].search(l)
-		if result:
-			var jump_to_title = result.get_string("jump_to_title")
-			
-			var jump: = {
-				"type": "jump",
-				"jump_to_title": jump_to_title,
-			}
-
-			if in_choice:
-				current_choice.append(jump)
-			else:
-				dialogue.append(jump)
-
-			continue
-
-		
-	
-
-	return dialogue
