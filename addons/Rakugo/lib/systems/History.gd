@@ -83,6 +83,6 @@ func hash_say(character:Character, text:String):
 	if character:
 		output += character.name + character.tag
 	else:
-		output += Rakugo.Say.get_narrator().name
+		output += Rakugo.get_narrator().name
 	
 	return output.hash()
