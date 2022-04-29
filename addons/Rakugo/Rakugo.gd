@@ -29,9 +29,6 @@ var current_scene_name := ""
 var current_scene_path := ""
 var current_scene_node: Node = null
 
-#Parser
-var current_parser: Parser = null
-
 var store = null setget , get_current_store
 var persistent = null setget , get_persistent_store
 
@@ -53,6 +50,9 @@ var waiting_menu_return := false setget , is_waiting_menu_return
 
 var narrator:Character = null setget, get_narrator
 
+#Parser
+onready var current_parser: Parser = Parser.new()
+
 # timers use by rakugo
 onready var auto_timer := $AutoTimer
 onready var skip_timer := $SkipTimer
@@ -70,6 +70,7 @@ signal menu_return(result)
 signal started()
 signal game_ended()
 signal loading(progress) ## Progress is to be either NaN or [0,1], loading(1) meaning loading finished.
+signal parser_unhandled_regex(key, result)
 
 func _ready():
 	self.scene_anchor = get_tree().get_root()
@@ -122,13 +123,14 @@ func reset_game():
 
 # Parser
 func parse_script(file_name:String):
-	current_parser = Parser.new()
-	
 	current_parser.parse_script(file_name)
 
 func _exit_tree() -> void:
-	if current_parser:
-		current_parser.close()
+	current_parser.close()
+
+# Todo Handle Error
+func parser_add_regex_at_runtime(key:String, regex:String):
+	current_parser.add_regex_at_runtime(key, regex)
 
 ## Dialogue flow control
 

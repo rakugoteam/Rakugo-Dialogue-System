@@ -37,40 +37,38 @@ var Tokens := {
 	TOKEN_NUMERIC = "-?[1-9][0-9.]*"
 }
 
-# Regex for RenScript
-# Regex in this language can be extended by the other addons
-
 var Regex := {
 	VALID_VARIABLE = "[a-zA-Z_][a-zA-Z_0-9]+",
-	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
-	CONDITION = "(if|elif) (?<condition>.*)",
 	STRING = "\".*\"",
-	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
-	COMMENT = "^#.*",
+#	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
+}
 
-	# for setting Rakugo variables
-	SET_VARIABLE = "^(?<variable>{VALID_VARIABLE}) = (?<value>{TOKEN_NUMERIC})",
-
-	# $ some_gd_script_code
-	IN_LINE_GDSCRIPT = "^\\$.*",
-	# gdscript:
-	GDSCRIPT_BLOCK = "^gdscript:",
-	
-	# dialogue Regex
+# Regex for RenScript
+# Regex in this language can be extended by the other addons
+var parser_regex :={
+	# dialogue label_name:
 	DIALOGUE = "^(?<label>{VALID_VARIABLE}):$",
 	# character tag = "character_name"
 	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<name>.*)\"$",
-	# character_tag? say STRING|MULTILINE_STRING
+	# character_tag? "say"
 	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?(?<text>{STRING})$",
-	# var_name = ask "please enter text" 
+	# var_name = character_tag? "please enter text" 
 	ASK = "^(?<variable>{VALID_VARIABLE}) = ((?<character_tag>{VALID_VARIABLE}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})$",
-	# menu menu_name? :
-	#   choice1 "label":
-	#     say "text"
+	# menu label_name?:
 	MENU = "^menu( (?<label>{VALID_VARIABLE}))?:$",
-	#   choice1 "label":
+	# "like regex" (> label_name)?
 	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?$",
-	JUMP = "^jump (?<label>{VALID_VARIABLE})$",
+	# jump label
+	JUMP = "^jump (?<label>{VALID_VARIABLE})$"
+	# for setting Rakugo variables
+#	SET_VARIABLE = "^(?<variable>{VALID_VARIABLE}) = (?<value>{TOKEN_NUMERIC})",
+	# $ some_gd_script_code
+#	IN_LINE_GDSCRIPT = "^\\$.*",
+	# gdscript:
+#	GDSCRIPT_BLOCK = "^gdscript:",
+#	COMMENT = "^#.*",
+#	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
+#	CONDITION = "(if|elif) (?<condition>.*)",
 }
 
 var regex_cache := {}
@@ -95,26 +93,33 @@ func _init():
 	Rakugo.connect("menu_return", self, "_on_menu_return")
 	Rakugo.connect("ask_return", self, "_on_ask_return")
 	
-	for t in Tokens.keys():
-		Tokens[t] = Tokens[t].format(Regex)
-		# prints(t, Tokens[t])
-		
-		var reg := RegEx.new()
-		if reg.compile(Tokens[t]) != OK:
-			push_error("Parser, _init, failed " + t)
-		
-		regex_cache[t] = reg
+#	for t in Tokens.keys():
+#		Tokens[t] = Tokens[t].format(Regex)
+#		# prints(t, Tokens[t])
+#
+#		var reg := RegEx.new()
+#		if reg.compile(Tokens[t]) != OK:
+#			push_error("Parser, _init, failed " + t)
+#
+#		regex_cache[t] = reg
 
-	for r in Regex.keys():
-		Regex[r] = Regex[r].format(Tokens)
-		
-		Regex[r] = Regex[r].format(Regex)
+	for key in parser_regex:
+		parser_regex[key] = parser_regex[key].format(Regex)
 
 		var reg := RegEx.new()
-		if reg.compile(Regex[r]) != OK:
-			push_error("Parser, _init, failed " + r)
+		if reg.compile(parser_regex[key]) != OK:
+			push_error("Parser, _init, failed " + key)
 		
-		regex_cache[r] = reg
+		regex_cache[key] = reg
+
+func add_regex_at_runtime(key:String, regex:String):
+	regex.format(Regex)
+	
+	var reg := RegEx.new()
+	if reg.compile(regex) != OK:
+		push_error("Parser, add_regex_at_runtime, failed " + key)
+		
+	regex_cache[key] = reg
 
 func parse_script(file_name:String) -> int:
 	thread = Thread.new()
@@ -185,8 +190,6 @@ func do_parse_script(file_name:String):
 		
 		line = line.lstrip('	')
 
-		var result:RegExMatch
-
 		if state == State.Menu and indent_count == 0:
 			state = State.Normal
 				
@@ -197,95 +200,29 @@ func do_parse_script(file_name:String):
 
 		match(state):
 			State.Normal:
-				result = regex_cache["GDSCRIPT_BLOCK"].search(line)
-				if result:
-					prints("Parser", "parse_script", "GDSCRIPT_BLOCK")
-					#current_dialogue.append(line)
-					continue
-
-				result = regex_cache["IN_LINE_GDSCRIPT"].search(line)
-				if result:
-					prints("Parser", "parse_script", "IN_LINE_GDSCRIPT")
-					#current_dialogue.append(line)
-					continue
-
-				result = regex_cache["CHARACTER_DEF"].search(line)
-				if result:
-#					prints("Parser", "parse_script", "CHARACTER_DEF")
-#
-#					for key in result.names:
-#						prints(" ", key, result.get_string(key))
-
-					parse_array.push_back(["CHARACTER_DEF", result])
-
-					continue
-
-				result = regex_cache["SAY"].search(line)
-				if result:
-#					prints("Parser", "parse_script", "SAY")
-#
-#					for key in result.names:
-#						prints(" ", key, result.get_string(key)) 
-
-					parse_array.push_back(["SAY", result])
-
-					continue
-
-				result = regex_cache["ASK"].search(line)
-				if result:
-#					prints("Parser", "parse_script", "ASK")
-#
-#					for key in result.names:
-#						prints(" ", key, result.get_string(key))
+				for key in regex_cache:
+					var result = regex_cache[key].search(line)
 					
-					parse_array.push_back(["ASK", result])
-
-					continue
-
-				result = regex_cache["MENU"].search(line)
-				if result:
-#					prints("Parser", "parse_script", "MENU")
-#
-#					for key in result.names:
-#						prints(" ", key, result.get_string(key))
-
-					current_menu_result = result
+					if result:
+						match(key):
+							"MENU":
+								current_menu_result = result
 					
-					menu_choices = []
-					
-					state = State.Menu
+								menu_choices = []
+								
+								state = State.Menu
 
-					labels[result.get_string("label")] = parse_array.size()
-
-#					prints("Parser", "parse_script", "mode Menu")
-					continue
+								labels[result.get_string("label")] = parse_array.size()
+								
+							"DIALOGUE":
+								var dialogue_label = result.get_string("label")
 				
-				result = regex_cache["DIALOGUE"].search(line)
-				if result:
-#					prints("Parser", "parse_script", "DIALOGUE")
-#
-#					for key in result.names:
-#						prints(" ", key, result.get_string(key))
-
-					var dialogue_label = result.get_string("label")
-				
-					labels[dialogue_label] = parse_array.size()
-						
-					continue
-				
-				result = regex_cache["JUMP"].search(line)
-				if result:
-#					prints("Parser", "parse_script", "JUMP")
-#
-#					for key in result.names:
-#						prints(" ", key, result.get_string(key))
-
-					parse_array.push_back(["JUMP", result])
-
-					continue
-			
+								labels[dialogue_label] = parse_array.size()
+							
+							_:
+								parse_array.push_back([key, result])
 			State.Menu:
-				result = regex_cache["CHOICE"].search(line)
+				var result = regex_cache["CHOICE"].search(line)
 				if result:
 #					prints("Parser", "parse_script", "CHOICE")
 #
@@ -370,6 +307,9 @@ func do_execute_script():
 						break
 						
 					prints("Parser", "do_execute_script", "menu_jump", jump_label)
+		
+			_:
+				Rakugo.emit_signal("parser_unhandled_regex", line[0], result)
 		
 		index += 1
 		
