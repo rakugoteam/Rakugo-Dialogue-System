@@ -112,6 +112,15 @@ func _init():
 		
 		regex_cache[key] = reg
 
+func add_regex_at_runtime(key:String, regex:String):
+	regex.format(Regex)
+	
+	var reg := RegEx.new()
+	if reg.compile(regex) != OK:
+		push_error("Parser, add_regex_at_runtime, failed " + key)
+		
+	regex_cache[key] = reg
+
 func parse_script(file_name:String) -> int:
 	thread = Thread.new()
 	
@@ -298,6 +307,9 @@ func do_execute_script():
 						break
 						
 					prints("Parser", "do_execute_script", "menu_jump", jump_label)
+		
+			_:
+				Rakugo.emit_signal("parser_unhandled_regex", line[0], result)
 		
 		index += 1
 		
