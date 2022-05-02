@@ -37,6 +37,7 @@ func _process(delta):
 		
 	if Rakugo.is_waiting_ask_return() and Input.is_action_just_pressed("ui_up"):
 		Rakugo.ask_return("Bob")
+		prints(name, "ask_return answer", Rakugo.get_variable("answer"))
 		
 	if Rakugo.is_waiting_menu_return() and Input.is_action_just_pressed("ui_down"):
 		Rakugo.menu_return(0)

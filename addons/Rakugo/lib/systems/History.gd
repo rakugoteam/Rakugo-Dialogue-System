@@ -7,9 +7,11 @@ var log_step = true
 var global_history = {}
 var event_played = {}
 
+# TODO
 func init():
-	if Rakugo.persistent.get("global_history"):
-		global_history = Rakugo.persistent.get("global_history")
+#	if Rakugo.persistent.get("global_history"):
+#		global_history = Rakugo.persistent.get("global_history")
+	pass
 
 
 func _on_say(character, text):

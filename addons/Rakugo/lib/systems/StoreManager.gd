@@ -8,10 +8,69 @@ var save_folder_path = ""
 
 signal saved
 
-func init():
-	self.init_save_folder()
-	self.init_persistent_store()
-	self.init_store_stack()
+#store rakugo variables
+var variables:Dictionary
+
+#store rakugo characters
+var characters:Dictionary
+
+## JSON
+func load_json(path: String) -> Dictionary:
+	# An easy function to load json files and handle common errors.
+	var file := File.new()
+	if file.open(path, File.READ) != OK:
+		file.close()
+		return {}
+	var data_text: String = file.get_as_text()
+	file.close()
+	if data_text.empty():
+		return {}
+	var data_parse: JSONParseResult = JSON.parse(data_text)
+	if data_parse.error != OK:
+		return {}
+
+	var final_data = data_parse.result
+	if typeof(final_data) == TYPE_DICTIONARY:
+		return final_data
+	
+	# If everything else fails
+	return {}
+
+func save_json(path: String, data: Dictionary) -> int:
+	var file = File.new()
+	var err = file.open(path, File.WRITE)
+	if err == OK:
+		file.store_line(JSON.print(data, "\t", true))
+		file.close()
+	return err
+
+## Variables
+func load_variables(save_name:String = "quick"):
+	variables = load_json(ProjectSettings.get(Rakugo.save_folder) + "/" + save_name + "/variables.json")
+	
+func save_variables(save_name:String = "quick"):
+	save_json(ProjectSettings.get(Rakugo.save_folder) + "/" + save_name + "/variables.json", variables)
+
+## Characters
+# TODO
+func load_characters(save_name:String = "quick"):
+	pass
+	
+func save_characters(save_name:String = "quick"):
+	pass
+
+func save_game(save_name:String = "quick"):
+	var save_folder = ProjectSettings.get(Rakugo.save_folder) + "/" + save_name
+	
+	var directory = Directory.new()
+	
+	if !directory.dir_exists(save_folder):
+		directory.make_dir(save_folder)
+	
+	save_variables(save_name)
+	
+func load_game(save_name:String = "quick"):
+	load_variables(save_name)
 
 func init_save_folder():
 	save_folder_path = ProjectSettings.get(Rakugo.save_folder)
