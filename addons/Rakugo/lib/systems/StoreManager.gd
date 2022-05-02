@@ -57,7 +57,12 @@ func load_characters(save_name:String = "quick"):
 	pass
 	
 func save_characters(save_name:String = "quick"):
-	pass
+	var json_characters := {}
+	
+	for key in characters:
+		json_characters[key] = characters[key].to_dictionary()
+	
+	save_json(ProjectSettings.get(Rakugo.save_folder) + "/" + save_name + "/characters.json", json_characters)
 
 func save_game(save_name:String = "quick"):
 	var save_folder = ProjectSettings.get(Rakugo.save_folder) + "/" + save_name
@@ -68,6 +73,8 @@ func save_game(save_name:String = "quick"):
 		directory.make_dir(save_folder)
 	
 	save_variables(save_name)
+	
+	save_characters(save_name)
 	
 func load_game(save_name:String = "quick"):
 	load_variables(save_name)

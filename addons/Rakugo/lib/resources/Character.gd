@@ -82,3 +82,6 @@ func show(parameters:Dictionary = {}) -> void:
 
 func hide() -> void:
 	Rakugo.hide(self.tag) # TODO, will have to take a look at how it should work with the rules of hiding
+
+func to_dictionary() -> Dictionary:
+	return {"name":name, "tag":tag, "color":color, "prefix":prefix, "suffix":suffix}

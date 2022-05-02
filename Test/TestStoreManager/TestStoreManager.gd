@@ -17,6 +17,8 @@ func _ready() -> void:
 	
 	prints(name, "after set :", Rakugo.get_variable("hw"), Rakugo.get_variable("age"))
 	
+	Rakugo.define_character("Sylvie", "Sy", Color.blueviolet)
+	
 	Rakugo.save_game()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
