@@ -1,29 +1,108 @@
 extends Node
 
+const save_folder_path = "users://saves"
+
 var store_stack = []
 var store_stack_max_length = 5
 var current_store_id = 0
 var persistent_store = null
-var save_folder_path = ""
+
 
 signal saved
 
-func init():
-	self.init_save_folder()
-	self.init_persistent_store()
-	self.init_store_stack()
+#store rakugo variables
+var variables:Dictionary
 
-func init_save_folder():
-	save_folder_path = ProjectSettings.get(Rakugo.save_folder)
-	if not ProjectSettings.get(Rakugo.test_mode):
-		save_folder_path = save_folder_path.replace("res://", "user://")
-	Directory.new().make_dir_recursive(save_folder_path)
-	save_folder_path = save_folder_path.trim_suffix("/") + "/"
+#store rakugo characters
+var characters:Dictionary
 
-func get_save_folder_path():
-	if not save_folder_path:
-		init_save_folder()
-	return save_folder_path
+## JSON
+func load_json(path: String) -> Dictionary:
+	# An easy function to load json files and handle common errors.
+	var file := File.new()
+	if file.open(path, File.READ) != OK:
+		file.close()
+		return {}
+	var data_text: String = file.get_as_text()
+	file.close()
+	if data_text.empty():
+		return {}
+	var data_parse: JSONParseResult = JSON.parse(data_text)
+	if data_parse.error != OK:
+		return {}
+
+	var final_data = data_parse.result
+	if typeof(final_data) == TYPE_DICTIONARY:
+		return final_data
+	
+	# If everything else fails
+	return {}
+
+func save_json(path: String, data: Dictionary) -> int:
+	var file = File.new()
+	var err = file.open(path, File.WRITE)
+	if err == OK:
+		file.store_line(JSON.print(data, "\t", true))
+		file.close()
+	return err
+
+## Variables
+func load_variables(save_name:String = "quick"):
+	variables = load_json(save_folder_path + "/" + save_name + "/variables.json")
+	
+func save_variables(save_name:String = "quick"):
+	save_json(save_folder_path + "/" + save_name + "/variables.json", variables)
+
+## Characters
+# create new character, store it into current store using its tag, then return it
+func define_character(character_name:String, character_tag:String, color=null) -> Character:
+	var new_character = Character.new()
+	if color:
+		new_character.init(character_name, character_tag, color)
+	else:
+		new_character.init(character_name, character_tag)
+		
+	characters[character_tag] = new_character
+	return new_character
+
+# TODO
+func load_characters(save_name:String = "quick"):
+	var json_characters := load_json(save_folder_path + "/" + save_name + "/characters.json")
+	
+	for key in json_characters:
+		var json_character = json_characters[key] 
+		
+		define_character(json_character["name"], json_character["tag"], json_character["color"])
+	
+func save_characters(save_name:String = "quick"):
+	var json_characters := {}
+	
+	for key in characters:
+		json_characters[key] = characters[key].to_dictionary()
+	
+	save_json(save_folder_path + "/" + save_name + "/characters.json", json_characters)
+
+func save_game(save_name:String = "quick"):
+	var save_folder = save_folder_path + "/" + save_name
+	
+	var directory = Directory.new()
+	
+	if !directory.dir_exists(save_folder):
+		directory.make_dir_recursive(save_folder)
+	
+	save_variables(save_name)
+	
+	save_characters(save_name)
+	
+func load_game(save_name:String = "quick"):
+	var save_folder = save_folder_path + "/" + save_name
+	
+	var directory = Directory.new()
+	
+	if directory.dir_exists(save_folder):
+		load_variables(save_name)
+	
+		load_characters(save_name)
 
 func get_save_path(save_name, no_ext=false):
 	save_name = save_name.replace('.tres', '')

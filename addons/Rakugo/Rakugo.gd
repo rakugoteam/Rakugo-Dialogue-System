@@ -25,12 +25,11 @@ const maximized = "display/window/size/maximized"
 
 const rakugo_version := "3.3"
 
+const StoreManager = preload("res://addons/Rakugo/lib/systems/StoreManager.gd")
+
 var current_scene_name := ""
 var current_scene_path := ""
 var current_scene_node: Node = null
-
-var store = null setget , get_current_store
-var persistent = null setget , get_persistent_store
 
 # don't save this
 var scene_anchor:Node
@@ -57,7 +56,7 @@ onready var current_parser: Parser = Parser.new()
 onready var auto_timer := $AutoTimer
 onready var skip_timer := $SkipTimer
 
-onready var StoreManager: = $StoreManager
+onready var store_manager := StoreManager.new()
 onready var History: = $History
 
 signal step()
@@ -72,9 +71,15 @@ signal game_ended()
 signal loading(progress) ## Progress is to be either NaN or [0,1], loading(1) meaning loading finished.
 signal parser_unhandled_regex(key, result)
 
+## Variables
+func set_variable(var_name:String, value):
+	store_manager.variables[var_name] = value
+	
+func get_variable(var_name:String):
+	return store_manager.variables.get(var_name)
+
 func _ready():
 	self.scene_anchor = get_tree().get_root()
-	StoreManager.init()
 	History.init()
 	var version = ProjectSettings.get(Rakugo.game_version)
 	var title = ProjectSettings.get(Rakugo.game_title)
@@ -96,16 +101,14 @@ func start(after_load:bool = false):
 #	jump("", "", "")# Engage the auto-start
 
 func save_game(save_name:String = "quick"):
-	StoreManager.save_persistent_store()
-	debug(["save data to :", save_name])
-	return StoreManager.save_store_stack(save_name)
+	store_manager.save_game(save_name)
 
 func load_game(save_name := "quick"):
-	return StoreManager.load_store_stack(save_name)
+	store_manager.load_game(save_name)
 
-func rollback(amount:int = 1):
-	var next = self.StoreManager.current_store_id + amount
-	self.StoreManager.change_current_stack_index(next)
+#func rollback(amount:int = 1):
+#	var next = self.StoreManager.current_store_id + amount
+#	self.StoreManager.change_current_stack_index(next)
 
 func prepare_quitting():
 	if self.started:
@@ -168,15 +171,7 @@ func clean_scene_anchor():
 
 # create new character, store it into current store using its tag, then return it
 func define_character(character_name:String, character_tag:String, color=null) -> Character:
-	var new_character = Character.new()
-	if color:
-		new_character.init(character_name, character_tag, color)
-
-	else:
-		new_character.init(character_name, character_tag)
-		
-	StoreManager.get_current_store()[character_tag] = new_character
-	return new_character
+	return store_manager.define_character(character_name, character_tag, color)
 
 func debug_dict(parameters:Dictionary, parameters_names:Array = [], some_custom_text:String = "") -> String:
 	var dbg = ""
@@ -226,7 +221,7 @@ func do_step():
 
 #Utils functions
 func get_character(character_tag:String) -> Character:
-	return Rakugo.get_current_store().get(character_tag)
+	return store_manager.characters.get(character_tag)
 
 # statement of type say
 # its make given 'character' say 'text'
@@ -250,7 +245,7 @@ func is_waiting_ask_return():
 func ask_return(result):
 	waiting_ask_return = false
 	
-	Rakugo.get_current_store().set(variable_ask_name, result)
+	set_variable(variable_ask_name, result)
 	
 	Rakugo.emit_signal("ask_return", result)
 
@@ -283,12 +278,3 @@ func jump(scene_id:String, dialogue_name:String, event_name:="", force_reload = 
 
 	else:
 		$Statements/Jump.invoke(scene_id, dialogue_name, event_name)
-
-## Wrapper getters setters
-
-func get_current_store():
-	return StoreManager.get_current_store()
-
-func get_persistent_store():
-	return StoreManager.get_persistent_store()
-
