@@ -9,5 +9,5 @@ func _ready():
 		start_dialogue()
 
 func start_dialogue():
-	Rakugo.parse_script(file_name)
+	Rakugo.parse_script(raku_script)
 
