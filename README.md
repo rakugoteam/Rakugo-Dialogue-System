@@ -15,7 +15,7 @@ Support this project here [itch.io](https://rakugoteam.github.io/donations/).
 
 [Showcase](#Showcase) -
 [Installation](#Installation) -
-[Get Started0](#Get Started) -
+[Get Started](#Get-Started) -
 [Rakugo Addons](#Rakugo-Addons) -
 [Roadmap](#Roadmap) -
 [FAQ](#faq) -
@@ -83,6 +83,7 @@ Gd "I'm Godot !"
 - [Rakugo Core](https://github.com/rakugoteam/Rakugo)
 
 ## Rakugo Kits
+- [Visual Novel](https://github.com/rakugoteam/VisualNovelKit)
 - [Click & Point Adventures](https://github.com/rakugoteam/Adventure)
 - [RPG](https://github.com/rakugoteam/rakugo-open-rpg)
 
