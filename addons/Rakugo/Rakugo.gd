@@ -102,11 +102,9 @@ func start(after_load:bool = false):
 
 func save_game(save_name:String = "quick"):
 	store_manager.save_game(save_name)
-	prints(name, "save data to :", save_name)
 
 func load_game(save_name := "quick"):
 	store_manager.load_game(save_name)
-	prints(name, "load data from :", save_name)
 
 #func rollback(amount:int = 1):
 #	var next = self.StoreManager.current_store_id + amount
@@ -173,15 +171,7 @@ func clean_scene_anchor():
 
 # create new character, store it into current store using its tag, then return it
 func define_character(character_name:String, character_tag:String, color=null) -> Character:
-	var new_character = Character.new()
-	if color:
-		new_character.init(character_name, character_tag, color)
-
-	else:
-		new_character.init(character_name, character_tag)
-		
-	store_manager.characters[character_tag] = new_character
-	return new_character
+	return store_manager.define_character(character_name, character_tag, color)
 
 func debug_dict(parameters:Dictionary, parameters_names:Array = [], some_custom_text:String = "") -> String:
 	var dbg = ""
@@ -231,7 +221,7 @@ func do_step():
 
 #Utils functions
 func get_character(character_tag:String) -> Character:
-	return store_manager.characters[character_tag]
+	return store_manager.characters.get(character_tag)
 
 # statement of type say
 # its make given 'character' say 'text'

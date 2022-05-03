@@ -9,7 +9,9 @@ extends Node
 func _ready() -> void:
 	Rakugo.load_game()
 	
-	prints(name, "after load :", Rakugo.get_variable("hw"), Rakugo.get_variable("age"))
+	var chara = Rakugo.get_character("Sy")
+	
+	prints(name, "after load :", Rakugo.get_variable("hw"), Rakugo.get_variable("age"), chara.name if chara else "")
 	
 	Rakugo.set_variable("hw", "hello, world !")
 	

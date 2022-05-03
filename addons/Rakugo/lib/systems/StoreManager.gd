@@ -1,10 +1,12 @@
 extends Node
 
+const save_folder_path = "users://saves"
+
 var store_stack = []
 var store_stack_max_length = 5
 var current_store_id = 0
 var persistent_store = null
-var save_folder_path = ""
+
 
 signal saved
 
@@ -46,15 +48,31 @@ func save_json(path: String, data: Dictionary) -> int:
 
 ## Variables
 func load_variables(save_name:String = "quick"):
-	variables = load_json(ProjectSettings.get(Rakugo.save_folder) + "/" + save_name + "/variables.json")
+	variables = load_json(save_folder_path + "/" + save_name + "/variables.json")
 	
 func save_variables(save_name:String = "quick"):
-	save_json(ProjectSettings.get(Rakugo.save_folder) + "/" + save_name + "/variables.json", variables)
+	save_json(save_folder_path + "/" + save_name + "/variables.json", variables)
 
 ## Characters
+# create new character, store it into current store using its tag, then return it
+func define_character(character_name:String, character_tag:String, color=null) -> Character:
+	var new_character = Character.new()
+	if color:
+		new_character.init(character_name, character_tag, color)
+	else:
+		new_character.init(character_name, character_tag)
+		
+	characters[character_tag] = new_character
+	return new_character
+
 # TODO
 func load_characters(save_name:String = "quick"):
-	pass
+	var json_characters := load_json(save_folder_path + "/" + save_name + "/characters.json")
+	
+	for key in json_characters:
+		var json_character = json_characters[key] 
+		
+		define_character(json_character["name"], json_character["tag"], json_character["color"])
 	
 func save_characters(save_name:String = "quick"):
 	var json_characters := {}
@@ -62,34 +80,29 @@ func save_characters(save_name:String = "quick"):
 	for key in characters:
 		json_characters[key] = characters[key].to_dictionary()
 	
-	save_json(ProjectSettings.get(Rakugo.save_folder) + "/" + save_name + "/characters.json", json_characters)
+	save_json(save_folder_path + "/" + save_name + "/characters.json", json_characters)
 
 func save_game(save_name:String = "quick"):
-	var save_folder = ProjectSettings.get(Rakugo.save_folder) + "/" + save_name
+	var save_folder = save_folder_path + "/" + save_name
 	
 	var directory = Directory.new()
 	
 	if !directory.dir_exists(save_folder):
-		directory.make_dir(save_folder)
+		directory.make_dir_recursive(save_folder)
 	
 	save_variables(save_name)
 	
 	save_characters(save_name)
 	
 func load_game(save_name:String = "quick"):
-	load_variables(save_name)
-
-func init_save_folder():
-	save_folder_path = ProjectSettings.get(Rakugo.save_folder)
-	if not ProjectSettings.get(Rakugo.test_mode):
-		save_folder_path = save_folder_path.replace("res://", "user://")
-	Directory.new().make_dir_recursive(save_folder_path)
-	save_folder_path = save_folder_path.trim_suffix("/") + "/"
-
-func get_save_folder_path():
-	if not save_folder_path:
-		init_save_folder()
-	return save_folder_path
+	var save_folder = save_folder_path + "/" + save_name
+	
+	var directory = Directory.new()
+	
+	if directory.dir_exists(save_folder):
+		load_variables(save_name)
+	
+		load_characters(save_name)
 
 func get_save_path(save_name, no_ext=false):
 	save_name = save_name.replace('.tres', '')
