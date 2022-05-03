@@ -15,6 +15,7 @@ Support this project here [itch.io](https://rakugoteam.github.io/donations/).
 
 [Showcase](#Showcase) -
 [Installation](#Installation) -
+[Get Started0](#Get Started) -
 [Rakugo Addons](#Rakugo-Addons) -
 [Roadmap](#Roadmap) -
 [FAQ](#faq) -
@@ -35,6 +36,7 @@ Support this project here [itch.io](https://rakugoteam.github.io/donations/).
 
 - [**Space drive beats**](https://plopsis.itch.io/space-drive-beats)
 - [**Bot Saves Dream**](https://plopsis.itch.io/curator-bot)
+- [**Mon Dernier Jour**](https://theludovyc.itch.io/mondernierjour)
 
 If your game uses Rakugo, tell us on [Discord](https://discord.gg/K9gvjdg).
 
@@ -44,9 +46,43 @@ To install Rakugo plugin, download it as a [ZIP archive](). Extract the `addons/
 
 If you want to know more about installing plugins you can read the [official documentation page](https://docs.godotengine.org/en/stable/tutorials/plugins/editor/installing_plugins.html).
 
+## Get Started
+
+Basic GdScript :
+```gdscript
+extends Node
+
+const file_name = "res://Timeline.rk"
+
+func _ready():
+  Rakugo.connect("say", self, "_on_say")
+  Rakugo.connect("step", self, "_on_step")
+  
+  Rakugo.parse_script(file_name)
+  
+func _on_say(character:Character, text:String):
+  prints("say", character.name if character else "null", text)
+  
+func _on_step():
+  prints("Press 'Enter' to continue...")
+  
+func _process(delta):
+  if Rakugo.is_waiting_step() and Input.is_action_just_pressed("ui_accept"):
+    Rakugo.do_step()
+```
+
+Basic RkScript (Timeline.rk) :
+```
+character Gd "Godot"
+Gd "Hello, world !"
+Gd "I'm Godot !"
+```
+
 ## Rakugo Addons
 - [Advanced Text](https://github.com/rakugoteam/AdvancedText)
-- [Visual Novels Kit](https://github.com/rakugoteam/VisualNovelKit)
+- [Rakugo Core](https://github.com/rakugoteam/Rakugo)
+
+## Rakugo Kits
 - [Click & Point Adventures](https://github.com/rakugoteam/Adventure)
 - [RPG](https://github.com/rakugoteam/rakugo-open-rpg)
 
