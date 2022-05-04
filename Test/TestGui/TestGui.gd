@@ -12,11 +12,11 @@ func _ready():
 	Rakugo.connect("ask", self, "_on_ask")
 	Rakugo.connect("menu", self, "_on_menu")
 	Rakugo.connect("notify", self, "_on_notify")
-	
+
 	var narrator_name = ProjectSettings.get_setting(Rakugo.narrator_name)
-	
+
 	prints(name, narrator_name)
-	
+
 	Rakugo.parse_script(file_name)
 
 func _on_say(character:Character, text:String):
@@ -31,25 +31,25 @@ func _on_ask(character:Character, question:String, default_answer:String):
 #	prints("TestGui", "ask", character.name if character else "null", question, default_answer)
 	label.clear()
 	label.add_text(question)
-	
+
 	line_edit.visible = true
 	line_edit.text = default_answer
-	
+
 func _on_menu(choices):
 	label.visible = false
-	
+
 #	prints("TestGui", "menu", choices)
 	for node in menu_container.get_children():
 		node.queue_free()
-		
+
 	for choice in choices:
 		var button = Button.new()
 		button.text = choice
 		button.connect("pressed", self, "_on_menu_button_pressed", [button])
 		menu_container.add_child(button)
-		
+
 	menu_container.visible = true
-	
+
 func _on_notify(text:String):
 	printt("notify", text)
 
@@ -63,7 +63,7 @@ func _on_LineEdit_text_entered(new_text: String) -> void:
 
 func _on_menu_button_pressed(button:Button):
 	Rakugo.menu_return(button.get_index())
-	
+
 	menu_container.visible = false
-	
+
 	label.visible = true

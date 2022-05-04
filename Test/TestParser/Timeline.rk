@@ -6,7 +6,7 @@ jump menu_emily
 menu menu_emily:
 	"Talk with emily" > emily_talk
 	"Wait"
-	"Blop" > test_dialog
+	"Blop" > test_dialogue
 emily_talk:
 	"How are you ?"
 test_dialogue:

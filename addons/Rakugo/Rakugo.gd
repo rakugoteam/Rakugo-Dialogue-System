@@ -74,7 +74,7 @@ signal parser_unhandled_regex(key, result)
 ## Variables
 func set_variable(var_name:String, value):
 	store_manager.variables[var_name] = value
-	
+
 func get_variable(var_name:String):
 	return store_manager.variables.get(var_name)
 
@@ -84,7 +84,7 @@ func _ready():
 	var version = ProjectSettings.get(Rakugo.game_version)
 	var title = ProjectSettings.get(Rakugo.game_title)
 	OS.set_window_title(title + " " + version)
-	
+
 	narrator = Character.new()
 	narrator.init(ProjectSettings.get(Rakugo.narrator_name), "", Color.transparent)
 
@@ -113,10 +113,10 @@ func load_game(save_name := "quick"):
 func prepare_quitting():
 	if self.started:
 		self.save_game("auto")
-	
+
 	ProjectSettings.save_property_list()
-		
-	# TODO: remove in future 
+
+	# TODO: remove in future
 	# if current_dialogue:
 	# 	current_dialogue.exit()
 
@@ -208,9 +208,9 @@ func debug(some_text = []):
 ## Statements
 func step():
 	waiting_step = true
-	
+
 	emit_signal("step")
-	
+
 func is_waiting_step():
 	return waiting_step
 
@@ -234,9 +234,9 @@ func say(character_tag:String, text:String):
 # with keywords: placeholder
 func ask(variable_name:String, character_tag:String, question:String, default_answer:String):
 	waiting_ask_return = true
-	
+
 	variable_ask_name = variable_name
-	
+
 	Rakugo.emit_signal("ask", get_character(character_tag), question, default_answer)
 
 func is_waiting_ask_return():
@@ -244,23 +244,23 @@ func is_waiting_ask_return():
 
 func ask_return(result):
 	waiting_ask_return = false
-	
+
 	set_variable(variable_ask_name, result)
-	
+
 	Rakugo.emit_signal("ask_return", result)
 
 # statement of type menu
 func menu(choices:PoolStringArray):
 	waiting_menu_return = true
-	
+
 	Rakugo.emit_signal("menu", choices)
-	
+
 func is_waiting_menu_return():
 	return waiting_menu_return
-	
+
 func menu_return(index:int):
 	waiting_menu_return = false
-	
+
 	Rakugo.emit_signal('menu_return', index)
 
 func notify(text:String):

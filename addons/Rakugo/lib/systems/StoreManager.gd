@@ -34,7 +34,7 @@ func load_json(path: String) -> Dictionary:
 	var final_data = data_parse.result
 	if typeof(final_data) == TYPE_DICTIONARY:
 		return final_data
-	
+
 	# If everything else fails
 	return {}
 
@@ -49,7 +49,7 @@ func save_json(path: String, data: Dictionary) -> int:
 ## Variables
 func load_variables(save_name:String = "quick"):
 	variables = load_json(save_folder_path + "/" + save_name + "/variables.json")
-	
+
 func save_variables(save_name:String = "quick"):
 	save_json(save_folder_path + "/" + save_name + "/variables.json", variables)
 
@@ -61,47 +61,47 @@ func define_character(character_name:String, character_tag:String, color=null) -
 		new_character.init(character_name, character_tag, color)
 	else:
 		new_character.init(character_name, character_tag)
-		
+
 	characters[character_tag] = new_character
 	return new_character
 
 # TODO
 func load_characters(save_name:String = "quick"):
 	var json_characters := load_json(save_folder_path + "/" + save_name + "/characters.json")
-	
+
 	for key in json_characters:
-		var json_character = json_characters[key] 
-		
+		var json_character = json_characters[key]
+
 		define_character(json_character["name"], json_character["tag"], json_character["color"])
-	
+
 func save_characters(save_name:String = "quick"):
 	var json_characters := {}
-	
+
 	for key in characters:
 		json_characters[key] = characters[key].to_dictionary()
-	
+
 	save_json(save_folder_path + "/" + save_name + "/characters.json", json_characters)
 
 func save_game(save_name:String = "quick"):
 	var save_folder = save_folder_path + "/" + save_name
-	
+
 	var directory = Directory.new()
-	
+
 	if !directory.dir_exists(save_folder):
 		directory.make_dir_recursive(save_folder)
-	
+
 	save_variables(save_name)
-	
+
 	save_characters(save_name)
-	
+
 func load_game(save_name:String = "quick"):
 	var save_folder = save_folder_path + "/" + save_name
-	
+
 	var directory = Directory.new()
-	
+
 	if directory.dir_exists(save_folder):
 		load_variables(save_name)
-	
+
 		load_characters(save_name)
 
 func get_save_path(save_name, no_ext=false):
@@ -140,14 +140,14 @@ func get_current_store():
 
 func stack_next_store():
 	self.call_for_storing()
-	
+
 	prints("store_stack", store_stack)
 	var previous_store = store_stack[0].duplicate()
 	previous_store.replace_connections(store_stack[0])
 	store_stack.append(previous_store)
 	store_stack.invert()
 	prints("store_stack after changes", store_stack)
-	
+
 	self.prune_back_stack()
 
 func change_current_stack_index(index):
@@ -160,7 +160,7 @@ func change_current_stack_index(index):
 
 	store_stack[current_store_id].replace_connections(store_stack[index])
 	current_store_id = index
-	
+
 	self.call_for_restoring()
 
 ### Store Stack
@@ -183,7 +183,7 @@ func prune_back_stack():
 
 func save_store_stack(save_name: String) -> bool:
 	call_for_storing()
-	
+
 	var packed_stack = StoreStack.new()
 	packed_stack.stack = self.store_stack
 	packed_stack.current_id = self.current_store_id
@@ -217,7 +217,7 @@ func load_store_stack(save_name: String):
 	#Rakugo.load_scene(get_current_store().scene)
 
 	call_for_restoring()
-	
+
 	yield(Rakugo, "started")
 
 	Rakugo.loading_in_progress = false
@@ -227,7 +227,7 @@ func unpack_data(path:String) -> Store:
 	var packed_stack:StoreStack = load(path) as StoreStack
 
 	packed_stack = packed_stack.duplicate()
-	
+
 	self.store_stack = []
 
 	for s in packed_stack.stack:
@@ -237,7 +237,7 @@ func unpack_data(path:String) -> Store:
 
 	var save = get_current_store()
 	var game_version = save.game_version
-	
+
 	return save
 
 
@@ -260,7 +260,7 @@ func save_persistent_store():
 	var error = ResourceSaver.save(save_folder_path + "persistent.tres", persistent_store)
 	if error != OK:
 		print("Error writing persistent store %s to %s error_number: %s" % ["persistent.tres", save_folder_path, error])
-	
+
 	emit_signal("saved")
 
 
