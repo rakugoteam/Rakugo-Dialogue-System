@@ -155,7 +155,7 @@ func do_parse_script_from_string(source: String) -> void:
 					parse_array.push_back(["MENU", current_menu_result, menu_choices])
 					menu_choices = []
 			state = _parse_single_line(line, state, menu_choices, current_menu_result)
-		if state == State.Menu and indent_count == 0:
+		if state == State.Menu:
 			# the previous line was the last of a list of options in a menu
 			state = State.Normal
 			if !menu_choices.empty():
