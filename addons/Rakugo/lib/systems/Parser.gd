@@ -45,6 +45,7 @@ var Regex := {
 
 # Regex for RenScript
 # Regex in this language can be extended by the other addons
+# Order is matter !
 var parser_regex :={
 	# dialogue label_name:
 	DIALOGUE = "^(?<label>{VALID_VARIABLE}):$",
@@ -160,36 +161,25 @@ func do_parse_script(file_name:String):
 		prints("Parser", "can't open file : " + file_name)
 		return
 	
+	var lines = file.get_as_text().split("\n", false)
+	
+	file.close()
+	
 	var indent_count:int
 	
 	var menu_choices
 	
 	var current_menu_result
 	
-	while !stop_thread:
-		if state == State.Menu and file.eof_reached():
-			state = State.Normal
-				
-#			prints("Parser", "parse_script", "mod Normal")
-			
-			if !menu_choices.empty():
-				parse_array.push_back(["MENU", current_menu_result, menu_choices])
-			else:
-				break
-		elif file.eof_reached():
-			break
+	for i in lines.size():
+		var line = lines[i]
 		
-		var line = file.get_line()
-
-		if line.empty():
-			continue
-
-		#erase tabulations
 		# TODO handle indentation levels
 		indent_count = count_indent(line)
-		
+	
+		#erase tabulations
 		line = line.lstrip('	')
-
+	
 		if state == State.Menu and indent_count == 0:
 			state = State.Normal
 				
@@ -197,7 +187,7 @@ func do_parse_script(file_name:String):
 			
 			if !menu_choices.empty():
 				parse_array.push_back(["MENU", current_menu_result, menu_choices])
-
+	
 		match(state):
 			State.Normal:
 				for key in regex_cache:
@@ -232,8 +222,9 @@ func do_parse_script(file_name:String):
 					menu_choices.push_back(result)
 					
 					continue
-
-	file.close()
+					
+		if state == State.Menu and i == lines.size() - 1 and !menu_choices.empty():
+			parse_array.push_back(["MENU", current_menu_result, menu_choices])
 	
 	prints("Parser", "do_parse_script", "end")
 
