@@ -77,6 +77,9 @@ func set_variable(var_name:String, value):
 	
 func get_variable(var_name:String):
 	return store_manager.variables.get(var_name)
+	
+func has_variable(var_name:String) -> bool:
+	return store_manager.variables.has(var_name)
 
 func _ready():
 	self.scene_anchor = get_tree().get_root()
