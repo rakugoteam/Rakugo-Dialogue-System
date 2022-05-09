@@ -221,6 +221,7 @@ func do_parse_script(file_name:String):
 							
 							_:
 								parse_array.push_back([key, result])
+						break
 			State.Menu:
 				var result = regex_cache["CHOICE"].search(line)
 				if result:
