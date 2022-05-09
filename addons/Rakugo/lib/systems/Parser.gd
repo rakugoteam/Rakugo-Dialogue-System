@@ -39,6 +39,7 @@ var Tokens := {
 
 var Regex := {
 	VALID_VARIABLE = "[a-zA-Z_][a-zA-Z_0-9]+",
+	NUMERIC = "-?[1-9][0-9.]*",
 	STRING = "\".*\"",
 #	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
 }
@@ -59,9 +60,9 @@ var parser_regex :={
 	# "like regex" (> label_name)?
 	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?$",
 	# jump label
-	JUMP = "^jump (?<label>{VALID_VARIABLE})$"
+	JUMP = "^jump (?<label>{VALID_VARIABLE})$",
 	# for setting Rakugo variables
-#	SET_VARIABLE = "^(?<variable>{VALID_VARIABLE}) = (?<value>{TOKEN_NUMERIC})",
+	SET_VARIABLE = "(?<lvar_name>{VALID_VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VALID_VARIABLE}))",
 	# $ some_gd_script_code
 #	IN_LINE_GDSCRIPT = "^\\$.*",
 	# gdscript:
@@ -308,6 +309,24 @@ func do_execute_script():
 						
 					prints("Parser", "do_execute_script", "menu_jump", jump_label)
 		
+			"SET_VARIABLE":
+				var rvar_name = result.get_string("rvar_name")
+				var text = result.get_string("text")
+				
+				var value
+				
+				if !rvar_name.empty():
+					if Rakugo.has_variable(rvar_name):
+						value = Rakugo.get_variable(rvar_name)
+					else:
+						push_error("Parser::do_execute_script::SET_VARIABLE, variable " + rvar_name + " does not exist !")
+						break
+				elif !text.empty():
+					value = remove_double_quotes(text)
+				else:
+					value = result.get_string("number")
+				
+				Rakugo.set_variable(result.get_string("lvar_name"), value)
 			_:
 				Rakugo.emit_signal("parser_unhandled_regex", line[0], result)
 		
