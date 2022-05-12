@@ -27,15 +27,15 @@ func _on_say(character, text):
 			tag = character.tag
 
 		entry.init(tag, text)
-		Rakugo.store.history.push_front(entry)
-		global_history[last_say_hash] = true #Using Dictionary as a python Set to benefit from the lookup table
+		Rakugo.store_manager.get_current_store()["history"].push_front(entry)
+		global_history[last_say_hash] = true # Using Dictionary as a python Set to benefit from the lookup table
 
 
 func _store(store):
 	log_step = true
 	step_has_unseen = false
-	last_say_hash = 0 #Remember to empty the hash_say !
-	Rakugo.persistent.global_history =  global_history
+	last_say_hash = 0 # Remember to empty the hash_say !
+	Rakugo.persistent.global_history = global_history
 	store.event_played = event_played.duplicate()
 
 
