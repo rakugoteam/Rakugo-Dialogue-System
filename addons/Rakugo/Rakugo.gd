@@ -117,12 +117,8 @@ func prepare_quitting():
 	if self.started:
 		self.save_game("auto")
 	
-	ProjectSettings.save_property_list()
-		
-	# TODO: remove in future 
-	# if current_dialogue:
-	# 	current_dialogue.exit()
-
+	# Settings.save_property_list()
+	
 func reset_game():
 	started = false
 	emit_signal("game_ended")
@@ -137,20 +133,6 @@ func _exit_tree() -> void:
 # Todo Handle Error
 func parser_add_regex_at_runtime(key:String, regex:String):
 	current_parser.add_regex_at_runtime(key, regex)
-
-## Dialogue flow control
-
-# TODO: remove in future
-# func exit_dialogue():
-# 	self.set_current_dialogue(null)
-
-# func set_current_dialogue(new_dialogue:Dialogue):
-# 	if current_dialogue != new_dialogue:
-# 		if self.current_dialogue \
-# 		and self.current_dialogue.is_running():
-# 			self.current_dialogue.exit()
-
-# 		current_dialogue = new_dialogue
 
 func activate_skipping():
 	self.skipping = true
