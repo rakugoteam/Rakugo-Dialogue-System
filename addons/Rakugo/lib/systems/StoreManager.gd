@@ -1,6 +1,6 @@
 extends Node
 
-const save_folder_path = "users://saves"
+const save_folder_path = "usr://saves"
 
 var store_stack = []
 var store_stack_max_length = 5
@@ -166,9 +166,9 @@ func change_current_stack_index(index):
 ### Store Stack
 
 func init_store_stack():
-	store_stack_max_length = ProjectSettings.get(Rakugo.rollback_steps)
+	store_stack_max_length = ProjectSettings.get_setting(Rakugo.rollback_steps)
 	var new_save := Store.new()
-	new_save.game_version = ProjectSettings.get(Rakugo.game_version)
+	new_save.game_version = ProjectSettings.get_setting(Rakugo.game_version)
 	new_save.rakugo_version = Rakugo.rakugo_version
 	new_save.scene = Rakugo.current_scene_name
 	new_save.history = []
@@ -253,7 +253,7 @@ func init_persistent_store():
 		persistent_store = load(persistent_path)
 	else:
 		persistent_store = Store.new()
-	persistent_store.game_version = ProjectSettings.get(Rakugo.game_version)
+	persistent_store.game_version = ProjectSettings.get_setting(Rakugo.game_version)
 	persistent_store.rakugo_version = Rakugo.rakugo_version
 
 func save_persistent_store():
