@@ -84,12 +84,12 @@ func has_variable(var_name:String) -> bool:
 func _ready():
 	self.scene_anchor = get_tree().get_root()
 	History.init()
-	var version = ProjectSettings.get(Rakugo.game_version)
-	var title = ProjectSettings.get(Rakugo.game_title)
+	var version = ProjectSettings.get_setting(Rakugo.game_version)
+	var title = ProjectSettings.get_setting(Rakugo.game_title)
 	OS.set_window_title(title + " " + version)
 	
 	narrator = Character.new()
-	narrator.init(ProjectSettings.get(Rakugo.narrator_name), "", Color.transparent)
+	narrator.init(ProjectSettings.get_setting(Rakugo.narrator_name), "", Color.transparent)
 
 func get_narrator():
 	return narrator
@@ -117,8 +117,13 @@ func prepare_quitting():
 	if self.started:
 		self.save_game("auto")
 	
-	# Settings.save_property_list()
-	
+	# this don't exist in godot
+	# ProjectSettings.save_property_list()
+		
+	# TODO: remove in future 
+	# if current_dialogue:
+	# 	current_dialogue.exit()
+
 func reset_game():
 	started = false
 	emit_signal("game_ended")
@@ -133,6 +138,20 @@ func _exit_tree() -> void:
 # Todo Handle Error
 func parser_add_regex_at_runtime(key:String, regex:String):
 	current_parser.add_regex_at_runtime(key, regex)
+
+## Dialogue flow control
+
+# TODO: remove in future
+# func exit_dialogue():
+# 	self.set_current_dialogue(null)
+
+# func set_current_dialogue(new_dialogue:Dialogue):
+# 	if current_dialogue != new_dialogue:
+# 		if self.current_dialogue \
+# 		and self.current_dialogue.is_running():
+# 			self.current_dialogue.exit()
+
+# 		current_dialogue = new_dialogue
 
 func activate_skipping():
 	self.skipping = true
@@ -174,7 +193,7 @@ func debug_dict(parameters:Dictionary, parameters_names:Array = [], some_custom_
 # for printing debugs is only print if debug_on == true
 # put some string array or string as argument
 func debug(some_text = []):
-	if not ProjectSettings.get(Rakugo.debug):
+	if not ProjectSettings.get_setting(Rakugo.debug):
 		return
 
 	if not started:
