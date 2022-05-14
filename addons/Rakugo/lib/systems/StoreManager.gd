@@ -1,6 +1,6 @@
 extends Node
 
-const save_folder_path = "usr://saves"
+const save_folder_path = "user://saves"
 
 var store_stack = []
 var store_stack_max_length = 5
