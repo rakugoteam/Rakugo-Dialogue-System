@@ -24,6 +24,5 @@ script = ExtResource( 11 )
 [node name="SkipTimer" type="Timer" parent="."]
 script = ExtResource( 6 )
 
-[connection signal="say" from="." to="History" method="_on_say"]
 [connection signal="timeout" from="AutoTimer" to="AutoTimer" method="on_loop"]
 [connection signal="timeout" from="SkipTimer" to="SkipTimer" method="on_loop"]

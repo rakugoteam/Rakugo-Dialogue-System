@@ -14,14 +14,14 @@ func _ready():
 	
 	Rakugo.parse_script(file_name)
 
-func _on_say(character:Character, text:String):
-	prints("TestParser", "say", character.name if character else "null", text)
+func _on_say(character:Dictionary, text:String):
+	prints("TestParser", "say", character.get("name", "null"), text)
 
 func _on_step():
 	prints("TestParser", "\nPress 'Enter' to continue...\n")
 	
-func _on_ask(character:Character, question:String, default_answer:String):
-	prints("TestParser", "ask", character.name if character else "null", question, default_answer)
+func _on_ask(character:Dictionary, question:String, default_answer:String):
+	prints("TestParser", "ask", character.get("name", "null"), question, default_answer)
 
 func _on_menu(choices):
 	prints("TestParser", "menu", choices)

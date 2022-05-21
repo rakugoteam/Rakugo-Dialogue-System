@@ -43,7 +43,7 @@ func save_json(path: String, data: Dictionary) -> int:
 	var err = file.open(path, File.WRITE)
 	if err == OK:
 		file.store_line(JSON.print(data, "\t", true))
-		file.close()
+	file.close()
 	return err
 
 ## Variables
@@ -54,33 +54,11 @@ func save_variables(save_name:String = "quick"):
 	save_json(save_folder_path + "/" + save_name + "/variables.json", variables)
 
 ## Characters
-# create new character, store it into current store using its tag, then return it
-func define_character(character_name:String, character_tag:String, color=null) -> Character:
-	var new_character = Character.new()
-	if color:
-		new_character.init(character_name, character_tag, color)
-	else:
-		new_character.init(character_name, character_tag)
-		
-	characters[character_tag] = new_character
-	return new_character
-
-# TODO
 func load_characters(save_name:String = "quick"):
-	var json_characters := load_json(save_folder_path + "/" + save_name + "/characters.json")
-	
-	for key in json_characters:
-		var json_character = json_characters[key] 
-		
-		define_character(json_character["name"], json_character["tag"], json_character["color"])
+	characters = load_json(save_folder_path + "/" + save_name + "/characters.json")
 	
 func save_characters(save_name:String = "quick"):
-	var json_characters := {}
-	
-	for key in characters:
-		json_characters[key] = characters[key].to_dictionary()
-	
-	save_json(save_folder_path + "/" + save_name + "/characters.json", json_characters)
+	save_json(save_folder_path + "/" + save_name + "/characters.json", characters)
 
 func save_game(save_name:String = "quick"):
 	var save_folder = save_folder_path + "/" + save_name
