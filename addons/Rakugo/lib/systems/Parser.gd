@@ -266,7 +266,7 @@ func do_execute_script():
 				step_semaphore.wait()
 				
 			"CHARACTER_DEF":
-				Rakugo.define_character(result.get_string("name"), result.get_string("tag"))
+				Rakugo.define_character(result.get_string("tag"), result.get_string("name"))
 				
 			"ASK":
 				Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), remove_double_quotes(result.get_string("question")), remove_double_quotes(result.get_string("default_answer")))

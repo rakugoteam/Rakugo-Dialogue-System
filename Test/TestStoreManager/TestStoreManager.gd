@@ -9,17 +9,17 @@ extends Node
 func _ready() -> void:
 	Rakugo.load_game()
 	
-	var chara = Rakugo.get_character("Sy")
-	
-	prints(name, "after load :", Rakugo.get_variable("hw"), Rakugo.get_variable("age"), chara.name if chara else "")
+	prints(name, "after load :", Rakugo.get_variable("hw"), Rakugo.get_variable("age"), Rakugo.get_character_variable("Sy", "name"), Rakugo.get_character_variable("Sy", "friendship"))
 	
 	Rakugo.set_variable("hw", "hello, world !")
 	
 	Rakugo.set_variable("age", 25)
 	
-	prints(name, "after set :", Rakugo.get_variable("hw"), Rakugo.get_variable("age"))
+	Rakugo.define_character("Sy", "Sylvie")
 	
-	Rakugo.define_character("Sylvie", "Sy", Color.blueviolet)
+	Rakugo.set_character_variable("Sy", "friendship", 5)
+	
+	prints(name, "after set :", Rakugo.get_variable("hw"), Rakugo.get_variable("age"), Rakugo.get_character_variable("Sy", "name"), Rakugo.get_character_variable("Sy", "friendship"))
 	
 	Rakugo.save_game()
 
