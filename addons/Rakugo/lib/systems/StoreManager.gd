@@ -110,7 +110,7 @@ func get_save_path(save_name, no_ext=false):
 	var savefile_path = save_folder_path.plus_file(save_name)
 
 	if not no_ext:
-		if ProjectSettings.get_setting('rakugo/saves/test_mode'):
+		if ProjectSettings.get_setting(Rakugo.test_mode):
 			savefile_path += ".tres"
 
 		else:
