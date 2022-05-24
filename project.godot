@@ -10,11 +10,6 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Resource",
-"class": "Character",
-"language": "GDScript",
-"path": "res://addons/Rakugo/lib/resources/Character.gd"
-}, {
-"base": "Resource",
 "class": "HistoryEntry",
 "language": "GDScript",
 "path": "res://addons/Rakugo/lib/resources/HistoryEntry.gd"
@@ -40,7 +35,6 @@ _global_script_classes=[ {
 "path": "res://addons/Rakugo/lib/resources/StoreStack.gd"
 } ]
 _global_script_class_icons={
-"Character": "",
 "HistoryEntry": "",
 "Parser": "",
 "RakuScriptDialogue": "",

@@ -14,8 +14,9 @@ func init():
 	pass
 
 
+#TODO
 func _on_say(character, text):
-	last_say_hash = hash_say(character, text)
+#	last_say_hash = hash_say(character, text)
 	if not last_say_hash in global_history:
 		step_has_unseen = true
 
@@ -77,14 +78,14 @@ func hash_event(dialogue_name:String, event_name:String):
 	var output = dialogue_name + "+" + event_name
 	return output.hash()
 
-
-func hash_say(character:Character, text:String):
-	# maybe there will be need to name of current dialogue or something like that
-
-	var output = str(text.hash())
-	if character:
-		output += character.name + character.tag
-	else:
-		output += Rakugo.get_narrator().name
-	
-	return output.hash()
+#TODO
+#func hash_say(character:Character, text:String):
+#	# maybe there will be need to name of current dialogue or something like that
+#
+#	var output = str(text.hash())
+#	if character:
+#		output += character.name + character.tag
+#	else:
+#		output += Rakugo.get_narrator().name
+#
+#	return output.hash()
