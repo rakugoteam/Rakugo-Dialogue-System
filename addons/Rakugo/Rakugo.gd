@@ -47,8 +47,6 @@ var waiting_ask_return := false setget , is_waiting_ask_return
 
 var waiting_menu_return := false setget , is_waiting_menu_return
 
-var narrator:Character = null setget, get_narrator
-
 #Parser
 onready var current_parser: Parser = Parser.new()
 
@@ -81,6 +79,23 @@ func get_variable(var_name:String):
 func has_variable(var_name:String) -> bool:
 	return store_manager.variables.has(var_name)
 
+## Characters
+# create new character, store it into current store using its tag, then return it
+func define_character(character_tag:String, character_name:String):
+	store_manager.characters[character_tag] = {"name":character_name}
+
+func get_character(character_tag:String) -> Dictionary:
+	return store_manager.characters.get(character_tag, {})
+	
+func get_narrator():
+	return get_character("narrator")
+	
+func set_character_variable(character_tag:String, var_name:String, value):
+	store_manager.characters[character_tag][var_name] = value
+	
+func get_character_variable(character_tag:String, var_name:String):
+	return store_manager.characters.get(character_tag, {}).get(var_name)
+
 func _ready():
 	self.scene_anchor = get_tree().get_root()
 	History.init()
@@ -88,11 +103,8 @@ func _ready():
 	var title = ProjectSettings.get_setting(Rakugo.game_title)
 	OS.set_window_title(title + " " + version)
 	
-	narrator = Character.new()
-	narrator.init(ProjectSettings.get_setting(Rakugo.narrator_name), "", Color.transparent)
-
-func get_narrator():
-	return narrator
+	var narrator_name = ProjectSettings.get_setting(Rakugo.narrator_name)
+	define_character("narrator", narrator_name)
 
 ## Rakugo flow control
 
@@ -173,10 +185,6 @@ func clean_scene_anchor():
 		for c in self.scene_anchor.get_children():
 			self.scene_anchor.remove_child(c)
 
-# create new character, store it into current store using its tag, then return it
-func define_character(character_name:String, character_tag:String, color=null) -> Character:
-	return store_manager.define_character(character_name, character_tag, color)
-
 func debug_dict(parameters:Dictionary, parameters_names:Array = [], some_custom_text:String = "") -> String:
 	var dbg = ""
 
@@ -224,8 +232,6 @@ func do_step():
 	current_parser.step_semaphore.post()
 
 #Utils functions
-func get_character(character_tag:String) -> Character:
-	return store_manager.characters.get(character_tag)
 
 # statement of type say
 # its make given 'character' say 'text'
