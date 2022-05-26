@@ -127,7 +127,8 @@ func _ready():
 	var title = ProjectSettings.get_setting(Rakugo.game_title)
 	OS.set_window_title(title + " " + version)
 	
-	define_character("narrator", Rakugo.narrator_name)
+	var narrator_name = ProjectSettings.get_setting(Rakugo.narrator_name)
+	define_character("narrator", narrator_name)
 
 ## Rakugo flow control
 
