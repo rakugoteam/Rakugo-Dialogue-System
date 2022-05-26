@@ -1,7 +1,9 @@
 hello_world
+boby = 5
 character test_ch "Test Character"
 first_dialogue:
-	"Hello, world !"
+	"Hello, world ! <boby> <test_ch.name>"
+	"Hello, error ! <bob> <test.name>"
 jump menu_emily
 menu menu_emily:
 	"Talk with emily" > emily_talk

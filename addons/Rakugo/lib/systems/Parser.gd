@@ -73,7 +73,14 @@ var parser_regex :={
 #	CONDITION = "(if|elif) (?<condition>.*)",
 }
 
+var other_regex :={
+	CHARACTER_VARIABLES = "\\<(?<char_tag>{VALID_VARIABLE}).(?<var_name>{VALID_VARIABLE})\\>",
+	VARIABLES = "\\<(?<var_name>{VALID_VARIABLE})\\>",
+}
+
 var regex_cache := {}
+
+var other_cache := {}
 
 var thread:Thread
 var step_semaphore:Semaphore
@@ -91,6 +98,18 @@ var parse_array:Array
 #contain label : index
 var labels:Dictionary
 
+func add_regex(key:String, regex:String, cache:Dictionary, error:String):
+	regex = regex.format(Regex)
+	
+	var reg := RegEx.new()
+	if reg.compile(regex) != OK:
+		push_error(error)
+		
+	cache[key] = reg
+	
+func add_regex_at_runtime(key:String, regex:String):
+	add_regex(key, regex, regex_cache, "Parser, add_regex_at_runtime, failed " + key)
+
 func _init():
 	Rakugo.connect("menu_return", self, "_on_menu_return")
 	Rakugo.connect("ask_return", self, "_on_ask_return")
@@ -106,22 +125,10 @@ func _init():
 #		regex_cache[t] = reg
 
 	for key in parser_regex:
-		parser_regex[key] = parser_regex[key].format(Regex)
-
-		var reg := RegEx.new()
-		if reg.compile(parser_regex[key]) != OK:
-			push_error("Parser, _init, failed " + key)
+		add_regex(key, parser_regex[key], regex_cache, "Parser, _init, failed " + key)
 		
-		regex_cache[key] = reg
-
-func add_regex_at_runtime(key:String, regex:String):
-	regex.format(Regex)
-	
-	var reg := RegEx.new()
-	if reg.compile(regex) != OK:
-		push_error("Parser, add_regex_at_runtime, failed " + key)
-		
-	regex_cache[key] = reg
+	for key in other_regex:
+		add_regex(key, other_regex[key], other_cache, "Parser, _init, failed " + key)
 
 func parse_script(file_name:String) -> int:
 	thread = Thread.new()
@@ -259,7 +266,28 @@ func do_execute_script():
 					break
 			
 			"SAY":
-				Rakugo.say(result.get_string("character_tag"), remove_double_quotes(result.get_string("text")))
+				var text = remove_double_quotes(result.get_string("text"))
+				
+				var sub_results = other_cache["CHARACTER_VARIABLES"].search_all(text)
+				
+				for sub_result in sub_results:
+					var var_ = Rakugo.get_character_variable(
+						sub_result.get_string("char_tag"),
+						sub_result.get_string("var_name")
+					)
+						
+					if var_:
+						text = text.replace(sub_result.strings[0], var_)
+				
+				sub_results = other_cache["VARIABLES"].search_all(text)
+				
+				for sub_result in sub_results:
+					var var_ = Rakugo.get_variable(sub_result.get_string("var_name"))
+					
+					if var_:
+						text = text.replace(sub_result.strings[0], var_)
+				
+				Rakugo.say(result.get_string("character_tag"), text)
 
 				Rakugo.step()
 
@@ -324,7 +352,7 @@ func do_execute_script():
 		
 		index += 1
 		
-	prints("Parser", "do_execute_script", "end")
+	prints("Parser", "do_execute_script", "end ")
 
 func do_parse_and_execute(file_name:String):
 	do_parse_script(file_name)
