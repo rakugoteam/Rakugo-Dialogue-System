@@ -74,7 +74,12 @@ func set_variable(var_name:String, value):
 	store_manager.variables[var_name] = value
 	
 func get_variable(var_name:String):
-	return store_manager.variables.get(var_name)
+	if store_manager.variables.has(var_name):
+		return store_manager.variables.get(var_name)
+		
+	push_error("Rakugo does not knew a variable called: " + var_name)
+	
+	return null
 	
 func has_variable(var_name:String) -> bool:
 	return store_manager.variables.has(var_name)
@@ -85,16 +90,35 @@ func define_character(character_tag:String, character_name:String):
 	store_manager.characters[character_tag] = {"name":character_name}
 
 func get_character(character_tag:String) -> Dictionary:
-	return store_manager.characters.get(character_tag, {})
+	if character_tag.empty():
+		return {}
+	
+	if store_manager.characters.has(character_tag):
+		return store_manager.characters.get(character_tag)
+		
+	push_error("Rakugo does not knew a character with this tag: " + character_tag)
+	
+	return {}
 	
 func get_narrator():
 	return get_character("narrator")
 	
 func set_character_variable(character_tag:String, var_name:String, value):
-	store_manager.characters[character_tag][var_name] = value
+	var char_ = get_character(character_tag)
+	
+	if !char_.empty():
+		char_[var_name] = value
 	
 func get_character_variable(character_tag:String, var_name:String):
-	return store_manager.characters.get(character_tag, {}).get(var_name)
+	var char_ = get_character(character_tag)
+	
+	if !char_.empty():
+		if char_.has(var_name):
+			return char_[var_name]
+		else:
+			push_error("Rakugo does not have this variable: " + var_name + " on a character with this tag : " + character_tag)
+	
+	return null
 
 func _ready():
 	self.scene_anchor = get_tree().get_root()
