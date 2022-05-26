@@ -74,6 +74,7 @@ var parser_regex :={
 }
 
 var other_regex :={
+	CHARACTER_VARIABLES = "\\<(?<char_tag>{VALID_VARIABLE}).(?<var_name>{VALID_VARIABLE})\\>",
 	VARIABLES = "\\<(?<var_name>{VALID_VARIABLE})\\>",
 }
 
@@ -267,12 +268,24 @@ func do_execute_script():
 			"SAY":
 				var text = remove_double_quotes(result.get_string("text"))
 				
-				var sub_results = other_cache["VARIABLES"].search_all(text)
+				var sub_results = other_cache["CHARACTER_VARIABLES"].search_all(text)
 				
 				for sub_result in sub_results:
-					var var_name = sub_result.get_string("var_name")
-					if Rakugo.has_variable(var_name):
-						text = text.replace(sub_result.strings[0], Rakugo.get_variable(var_name))
+					var var_ = Rakugo.get_character_variable(
+						sub_result.get_string("char_tag"),
+						sub_result.get_string("var_name")
+					)
+						
+					if var_:
+						text = text.replace(sub_result.strings[0], var_)
+				
+				sub_results = other_cache["VARIABLES"].search_all(text)
+				
+				for sub_result in sub_results:
+					var var_ = Rakugo.get_variable(sub_result.get_string("var_name"))
+					
+					if var_:
+						text = text.replace(sub_result.strings[0], var_)
 				
 				Rakugo.say(result.get_string("character_tag"), text)
 
