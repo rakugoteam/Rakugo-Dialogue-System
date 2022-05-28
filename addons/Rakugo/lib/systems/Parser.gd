@@ -61,7 +61,7 @@ var parser_regex :={
 	# "like regex" (> label_name)?
 	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?$",
 	# jump label
-	JUMP = "^jump (?<label>{VALID_VARIABLE})$",
+	JUMP = "^jump (?<label>{VALID_VARIABLE})( if (?<expression>.+))?$",
 	# for setting Rakugo variables
 	SET_VARIABLE = "(?<lvar_name>{VALID_VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VALID_VARIABLE}))",
 	# $ some_gd_script_code
@@ -74,7 +74,8 @@ var parser_regex :={
 }
 
 var other_regex :={
-	CHARACTER_VARIABLES = "\\<(?<char_tag>{VALID_VARIABLE}).(?<var_name>{VALID_VARIABLE})\\>",
+	ALL_VARIABLES = "\\<((?<char_tag>{VALID_VARIABLE})\\.)?(?<var_name>{VALID_VARIABLE})\\>",
+	CHARACTER_VARIABLES = "\\<(?<char_tag>{VALID_VARIABLE})\\.(?<var_name>{VALID_VARIABLE})\\>",
 	VARIABLES = "\\<(?<var_name>{VALID_VARIABLE})\\>",
 }
 
@@ -217,6 +218,28 @@ func do_parse_script(file_name:String):
 				
 								labels[dialogue_label] = parse_array.size()
 							
+							"JUMP":
+								var str_expression = result.get_string("expression")
+								
+								if str_expression.empty():
+									parse_array.push_back([key, result])
+									break
+									
+								var sub_results = other_cache["ALL_VARIABLES"].search_all(str_expression)
+								
+								var vars = []
+								
+								for sub_result in sub_results:
+									vars.push_back(sub_result.strings[0])
+									
+								var expression = Expression.new()
+								
+								if expression.parse(str_expression, vars) != OK:
+									push_error("Parser: " + expression.get_error_text())
+									break
+									
+								parse_array.push_back([key, result, expression])
+							
 							_:
 								parse_array.push_back([key, result])
 						break
@@ -254,13 +277,21 @@ func do_execute_script():
 	var index := 0
 	
 	while !stop_thread and index < parse_array.size():
-		var line = parse_array[index]
+		var line:Array = parse_array[index]
 		
 		var result = line[1]
 		
 		match(line[0]):
 			"JUMP":
-				index = do_execute_jump(result.get_string("label")) - 1
+				var can_jump = false
+				
+				if line.size() > 2:
+					can_jump = line[2].execute([], self)
+				else:
+					can_jump = true
+				
+				if can_jump:
+					index = do_execute_jump(result.get_string("label")) - 1
 				
 				if index == -2:
 					break
