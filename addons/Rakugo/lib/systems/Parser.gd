@@ -286,7 +286,7 @@ func do_execute_script():
 				var can_jump = false
 				
 				if line.size() > 2:
-					can_jump = line[2].execute([], self)
+					can_jump = line[2].execute([], null)
 				else:
 					can_jump = true
 				
