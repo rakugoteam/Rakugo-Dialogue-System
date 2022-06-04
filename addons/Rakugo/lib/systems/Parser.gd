@@ -74,7 +74,7 @@ var parser_regex :={
 }
 
 var other_regex :={
-	ALL_VARIABLES = "\\<((?<char_tag>{VALID_VARIABLE})\\.)?(?<var_name>{VALID_VARIABLE})\\>",
+	ALL_VARIABLES = "((?<char_tag>{VALID_VARIABLE})\\.)?(?<var_name>{VALID_VARIABLE})",
 	CHARACTER_VARIABLES = "\\<(?<char_tag>{VALID_VARIABLE})\\.(?<var_name>{VALID_VARIABLE})\\>",
 	VARIABLES = "\\<(?<var_name>{VALID_VARIABLE})\\>",
 }
@@ -230,12 +230,17 @@ func do_parse_script(file_name:String):
 								var vars = []
 								
 								for sub_result in sub_results:
-									vars.push_back(sub_result.strings[0])
+									var sub_result_str = sub_result.strings[0]
 									
+									if !vars.has(sub_result_str):
+										vars.push_back(sub_result_str)
+								
+								prints("Parser ", vars)
+								
 								var expression = Expression.new()
 								
 								if expression.parse(str_expression, vars) != OK:
-									push_error("Parser: " + expression.get_error_text())
+									push_error("Parser: Error on line: " + str(i) + ", " + expression.get_error_text())
 									break
 									
 								parse_array.push_back([key, result, expression])
@@ -286,7 +291,7 @@ func do_execute_script():
 				var can_jump = false
 				
 				if line.size() > 2:
-					can_jump = line[2].execute([], null)
+					can_jump = line[2].execute([2])
 				else:
 					can_jump = true
 				
