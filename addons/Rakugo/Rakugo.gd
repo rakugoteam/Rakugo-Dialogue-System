@@ -71,9 +71,19 @@ signal parser_unhandled_regex(key, result)
 
 ## Variables
 func set_variable(var_name:String, value):
+	var vars_ = var_name.split(".")
+	
+	if vars_.size() > 1:
+		return set_character_variable(vars_[0], vars_[1], value)
+	
 	store_manager.variables[var_name] = value
 	
 func get_variable(var_name:String):
+	var vars_ = var_name.split(".")
+	
+	if vars_.size() > 1:
+		return get_character_variable(vars_[0], vars_[1])
+	
 	if store_manager.variables.has(var_name):
 		return store_manager.variables.get(var_name)
 		
