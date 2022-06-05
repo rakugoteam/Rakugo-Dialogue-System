@@ -345,6 +345,11 @@ func do_execute_script():
 					value = remove_double_quotes(text)
 				else:
 					value = result.get_string("number")
+					
+					if value.is_valid_integer():
+						value = int(value)
+					else:
+						value = float(value)
 				
 				Rakugo.set_variable(result.get_string("lvar_name"), value)
 			_:

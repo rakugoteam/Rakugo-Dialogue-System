@@ -1,5 +1,5 @@
 aaa = 1
 bbb = 2.5
-ccc = "3"
+ccc = "hello, world !"
 ddd = aaa
 "Test"
