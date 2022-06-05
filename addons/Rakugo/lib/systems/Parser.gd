@@ -219,7 +219,7 @@ func do_parse_script(file_name:String):
 								labels[dialogue_label] = parse_array.size()
 							
 							"JUMP":
-								var str_expression = result.get_string("expression")
+								var str_expression:String = result.get_string("expression")
 								
 								if str_expression.empty():
 									parse_array.push_back([key, result])
@@ -231,6 +231,13 @@ func do_parse_script(file_name:String):
 								
 								for sub_result in sub_results:
 									var sub_result_str = sub_result.strings[0]
+									
+									var char_name = sub_result.get_string("char_name")
+									
+									if !char_name.empty():
+										var var_name = sub_result.get_string("var_name")
+										
+										str_expression.replace(sub_result_str, char_name + "_" + var_name)
 									
 									if !vars.has(sub_result_str):
 										vars.push_back(sub_result_str)
