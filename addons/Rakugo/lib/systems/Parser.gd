@@ -235,15 +235,13 @@ func do_parse_script(file_name:String):
 									if !vars.has(sub_result_str):
 										vars.push_back(sub_result_str)
 								
-								prints("Parser ", vars)
-								
 								var expression = Expression.new()
 								
 								if expression.parse(str_expression, vars) != OK:
 									push_error("Parser: Error on line: " + str(i) + ", " + expression.get_error_text())
 									break
 									
-								parse_array.push_back([key, result, expression])
+								parse_array.push_back([key, result, expression, vars])
 							
 							_:
 								parse_array.push_back([key, result])
@@ -291,7 +289,18 @@ func do_execute_script():
 				var can_jump = false
 				
 				if line.size() > 2:
-					can_jump = line[2].execute([2])
+					var values = []
+					
+					for var_name in line[3]:
+						var var_ = Rakugo.get_variable(var_name)
+						
+						if !var_:
+							push_error("Execute: Error on line: " + str(index))
+							return FAILED
+						
+						values.push_back(var_)
+					
+					can_jump = line[2].execute(values)
 				else:
 					can_jump = true
 				

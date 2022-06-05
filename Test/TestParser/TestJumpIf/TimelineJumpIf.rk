@@ -1,6 +1,7 @@
-jump end if 1 == ax
+ax = 2
+jump end if "1" == ax
 "no jump"
-jump end if 2 == ax
+jump end if "2" == ax
 "no jump"
 end:
 "jump"
