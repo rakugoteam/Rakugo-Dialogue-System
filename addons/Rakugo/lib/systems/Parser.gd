@@ -15,8 +15,8 @@ const init_dialogue_name = "_init"
 
 # tokens
 var Tokens := {
-	TOKEN_FUNCTION = "^{VALID_VARIABLE}\\(",
-	TOKEN_DICTIONARY_REFERENCE = "^{VALID_VARIABLE}\\[",
+	TOKEN_FUNCTION = "^{NAME}\\(",
+	TOKEN_DICTIONARY_REFERENCE = "^{NAME}\\[",
 	TOKEN_PARENS_OPEN = "^\\(",
 	TOKEN_PARENS_CLOSE = "^\\)",
 	TOKEN_BRACKET_OPEN = "^\\[",
@@ -38,9 +38,10 @@ var Tokens := {
 }
 
 var Regex := {
-	VALID_VARIABLE = "[a-zA-Z_][a-zA-Z_0-9]+",
+	NAME = "[a-zA-Z_][a-zA-Z_0-9]+",
 	NUMERIC = "-?[1-9][0-9.]*",
 	STRING = "\".*\"",
+	VARIABLE = "((?<char_tag>{NAME})\\.)?(?<var_name>{NAME})",
 #	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
 }
 
@@ -49,21 +50,21 @@ var Regex := {
 # Order is matter !
 var parser_regex :={
 	# dialogue label_name:
-	DIALOGUE = "^(?<label>{VALID_VARIABLE}):$",
+	DIALOGUE = "^(?<label>{NAME}):$",
 	# character tag = "character_name"
-	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<name>.*)\"$",
+	CHARACTER_DEF = "^character (?<tag>{NAME}) \"(?<name>.*)\"$",
 	# character_tag? "say"
-	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?(?<text>{STRING})$",
+	SAY = "^((?<character_tag>{NAME}) )?(?<text>{STRING})$",
 	# var_name = character_tag? "please enter text" 
-	ASK = "^(?<variable>{VALID_VARIABLE}) = ((?<character_tag>{VALID_VARIABLE}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})$",
+	ASK = "^(?<variable>{VARIABLE}) = ((?<character_tag>{NAME}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})$",
 	# menu label_name?:
-	MENU = "^menu( (?<label>{VALID_VARIABLE}))?:$",
+	MENU = "^menu( (?<label>{NAME}))?:$",
 	# "like regex" (> label_name)?
-	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?$",
+	CHOICE = "^(?<text>{STRING})( > (?<label>{NAME}))?$",
 	# jump label
-	JUMP = "^jump (?<label>{VALID_VARIABLE})$",
+	JUMP = "^jump (?<label>{NAME})$",
 	# for setting Rakugo variables
-	SET_VARIABLE = "(?<lvar_name>{VALID_VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VALID_VARIABLE}))",
+	SET_VARIABLE = "(?<lvar_name>{VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE}))",
 	# $ some_gd_script_code
 #	IN_LINE_GDSCRIPT = "^\\$.*",
 	# gdscript:
@@ -74,8 +75,8 @@ var parser_regex :={
 }
 
 var other_regex :={
-	CHARACTER_VARIABLES = "\\<(?<char_tag>{VALID_VARIABLE}).(?<var_name>{VALID_VARIABLE})\\>",
-	VARIABLES = "\\<(?<var_name>{VALID_VARIABLE})\\>",
+	CHARACTER_VARIABLES = "\\<(?<char_tag>{NAME}).(?<var_name>{NAME})\\>",
+	VARIABLES = "\\<(?<var_name>{NAME})\\>",
 }
 
 var regex_cache := {}
@@ -123,6 +124,9 @@ func _init():
 #			push_error("Parser, _init, failed " + t)
 #
 #		regex_cache[t] = reg
+
+	for key in Regex:
+		Regex[key] = Regex[key].format(Regex)
 
 	for key in parser_regex:
 		add_regex(key, parser_regex[key], regex_cache, "Parser, _init, failed " + key)
