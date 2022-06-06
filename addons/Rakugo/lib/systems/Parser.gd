@@ -130,9 +130,11 @@ func _init():
 
 	for key in parser_regex:
 		add_regex(key, parser_regex[key], regex_cache, "Parser, _init, failed " + key)
-		
+	
 	for key in other_regex:
 		add_regex(key, other_regex[key], other_cache, "Parser, _init, failed " + key)
+		
+	add_regex("VARIABLE", Regex["VARIABLE"], other_cache, "Parser, _init, failed VARIABLE")
 
 func parse_script(file_name:String) -> int:
 	thread = Thread.new()
@@ -228,26 +230,34 @@ func do_parse_script(file_name:String):
 									parse_array.push_back([key, result])
 									break
 
-								var sub_results = other_cache["ALL_VARIABLES"].search_all(str_expression)
+								var sub_results = other_cache["VARIABLE"].search_all(str_expression)
 
 								var vars = []
 
+								# Expression does not like '.'
+								var vars_expression = []
+
 								for sub_result in sub_results:
 									var sub_result_str = sub_result.strings[0]
-
-									var char_name = sub_result.get_string("char_name")
-
-									if !char_name.empty():
-										var var_name = sub_result.get_string("var_name")
-
-										str_expression.replace(sub_result_str, char_name + "_" + var_name)
-
+									
 									if !vars.has(sub_result_str):
 										vars.push_back(sub_result_str)
 
+									var var_name_expr = sub_result.get_string("char_tag")
+
+									if !var_name_expr.empty():
+										var_name_expr += "_" + sub_result.get_string("var_name")
+
+										str_expression = str_expression.replace(sub_result_str, var_name_expr)
+									else:
+										var_name_expr = sub_result.get_string("var_name")
+									
+									if !vars_expression.has(var_name_expr):
+										vars_expression.push_back(var_name_expr)
+
 								var expression = Expression.new()
 
-								if expression.parse(str_expression, vars) != OK:
+								if expression.parse(str_expression, vars_expression) != OK:
 									push_error("Parser: Error on line: " + str(i) + ", " + expression.get_error_text())
 									break
 
@@ -311,6 +321,10 @@ func do_execute_script():
 						values.push_back(var_)
 
 					can_jump = line[2].execute(values)
+					
+					if line[2].has_execute_failed():
+						push_error("Execute: Error on line: " + str(index))
+						return FAILED
 				else:
 					can_jump = true
 
