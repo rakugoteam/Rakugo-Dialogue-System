@@ -9,6 +9,16 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Reference",
+"class": "GutHookScript",
+"language": "GDScript",
+"path": "res://addons/gut/hook_script.gd"
+}, {
+"base": "Node",
+"class": "GutTest",
+"language": "GDScript",
+"path": "res://addons/gut/test.gd"
+}, {
 "base": "Resource",
 "class": "HistoryEntry",
 "language": "GDScript",
@@ -35,6 +45,8 @@ _global_script_classes=[ {
 "path": "res://addons/Rakugo/lib/resources/StoreStack.gd"
 } ]
 _global_script_class_icons={
+"GutHookScript": "",
+"GutTest": "",
 "HistoryEntry": "",
 "Parser": "",
 "RakuScriptDialogue": "",
@@ -69,7 +81,7 @@ Settings="*res://addons/Rakugo/Settings.gd"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/Rakugo/plugin.cfg" )
+enabled=PoolStringArray( "res://addons/Rakugo/plugin.cfg", "res://addons/gut/plugin.cfg" )
 
 [physics]
 
