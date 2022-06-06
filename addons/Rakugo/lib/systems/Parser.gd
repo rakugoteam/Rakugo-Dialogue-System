@@ -15,8 +15,8 @@ const init_dialogue_name = "_init"
 
 # tokens
 var Tokens := {
-	TOKEN_FUNCTION = "^{VALID_VARIABLE}\\(",
-	TOKEN_DICTIONARY_REFERENCE = "^{VALID_VARIABLE}\\[",
+	TOKEN_FUNCTION = "^{NAME}\\(",
+	TOKEN_DICTIONARY_REFERENCE = "^{NAME}\\[",
 	TOKEN_PARENS_OPEN = "^\\(",
 	TOKEN_PARENS_CLOSE = "^\\)",
 	TOKEN_BRACKET_OPEN = "^\\[",
@@ -38,9 +38,10 @@ var Tokens := {
 }
 
 var Regex := {
-	VALID_VARIABLE = "[a-zA-Z_][a-zA-Z_0-9]+",
+	NAME = "[a-zA-Z_][a-zA-Z_0-9]+",
 	NUMERIC = "-?[1-9][0-9.]*",
 	STRING = "\".*\"",
+	VARIABLE = "((?<char_tag>{NAME})\\.)?(?<var_name>{NAME})",
 #	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
 }
 
@@ -49,21 +50,21 @@ var Regex := {
 # Order is matter !
 var parser_regex :={
 	# dialogue label_name:
-	DIALOGUE = "^(?<label>{VALID_VARIABLE}):$",
+	DIALOGUE = "^(?<label>{NAME}):$",
 	# character tag = "character_name"
-	CHARACTER_DEF = "^character (?<tag>{VALID_VARIABLE}) \"(?<name>.*)\"$",
+	CHARACTER_DEF = "^character (?<tag>{NAME}) \"(?<name>.*)\"$",
 	# character_tag? "say"
-	SAY = "^((?<character_tag>{VALID_VARIABLE}) )?(?<text>{STRING})$",
+	SAY = "^((?<character_tag>{NAME}) )?(?<text>{STRING})$",
 	# var_name = character_tag? "please enter text" 
-	ASK = "^(?<variable>{VALID_VARIABLE}) = ((?<character_tag>{VALID_VARIABLE}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})$",
+	ASK = "^(?<variable>{VARIABLE}) = ((?<character_tag>{NAME}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})$",
 	# menu label_name?:
-	MENU = "^menu( (?<label>{VALID_VARIABLE}))?:$",
+	MENU = "^menu( (?<label>{NAME}))?:$",
 	# "like regex" (> label_name)?
-	CHOICE = "^(?<text>{STRING})( > (?<label>{VALID_VARIABLE}))?$",
+	CHOICE = "^(?<text>{STRING})( > (?<label>{NAME}))?$",
 	# jump label
-	JUMP = "^jump (?<label>{VALID_VARIABLE})( if (?<expression>.+))?$",
+	JUMP = "^jump (?<label>{NAME})( if (?<expression>.+))?$",
 	# for setting Rakugo variables
-	SET_VARIABLE = "(?<lvar_name>{VALID_VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VALID_VARIABLE}))",
+	SET_VARIABLE = "(?<lvar_name>{VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE}))",
 	# $ some_gd_script_code
 #	IN_LINE_GDSCRIPT = "^\\$.*",
 	# gdscript:
@@ -74,9 +75,8 @@ var parser_regex :={
 }
 
 var other_regex :={
-	ALL_VARIABLES = "((?<char_tag>{VALID_VARIABLE})\\.)?(?<var_name>{VALID_VARIABLE})",
-	CHARACTER_VARIABLES = "\\<(?<char_tag>{VALID_VARIABLE})\\.(?<var_name>{VALID_VARIABLE})\\>",
-	VARIABLES = "\\<(?<var_name>{VALID_VARIABLE})\\>",
+	CHARACTER_VARIABLES = "\\<(?<char_tag>{NAME}).(?<var_name>{NAME})\\>",
+	VARIABLES = "\\<(?<var_name>{NAME})\\>",
 }
 
 var regex_cache := {}
@@ -124,6 +124,9 @@ func _init():
 #			push_error("Parser, _init, failed " + t)
 #
 #		regex_cache[t] = reg
+
+	for key in Regex:
+		Regex[key] = Regex[key].format(Regex)
 
 	for key in parser_regex:
 		add_regex(key, parser_regex[key], regex_cache, "Parser, _init, failed " + key)
@@ -220,36 +223,36 @@ func do_parse_script(file_name:String):
 							
 							"JUMP":
 								var str_expression:String = result.get_string("expression")
-								
+
 								if str_expression.empty():
 									parse_array.push_back([key, result])
 									break
-									
+
 								var sub_results = other_cache["ALL_VARIABLES"].search_all(str_expression)
-								
+
 								var vars = []
-								
+
 								for sub_result in sub_results:
 									var sub_result_str = sub_result.strings[0]
-									
+
 									var char_name = sub_result.get_string("char_name")
-									
+
 									if !char_name.empty():
 										var var_name = sub_result.get_string("var_name")
-										
+
 										str_expression.replace(sub_result_str, char_name + "_" + var_name)
-									
+
 									if !vars.has(sub_result_str):
 										vars.push_back(sub_result_str)
-								
+
 								var expression = Expression.new()
-								
+
 								if expression.parse(str_expression, vars) != OK:
 									push_error("Parser: Error on line: " + str(i) + ", " + expression.get_error_text())
 									break
-									
+
 								parse_array.push_back([key, result, expression, vars])
-							
+
 							_:
 								parse_array.push_back([key, result])
 						break
@@ -294,23 +297,23 @@ func do_execute_script():
 		match(line[0]):
 			"JUMP":
 				var can_jump = false
-				
+
 				if line.size() > 2:
 					var values = []
-					
+
 					for var_name in line[3]:
 						var var_ = Rakugo.get_variable(var_name)
-						
+
 						if !var_:
 							push_error("Execute: Error on line: " + str(index))
 							return FAILED
-						
+
 						values.push_back(var_)
-					
+
 					can_jump = line[2].execute(values)
 				else:
 					can_jump = true
-				
+
 				if can_jump:
 					index = do_execute_jump(result.get_string("label")) - 1
 				
@@ -397,7 +400,12 @@ func do_execute_script():
 					value = remove_double_quotes(text)
 				else:
 					value = result.get_string("number")
-				
+
+					if value.is_valid_integer():
+						value = int(value)
+					else:
+						value = float(value)
+
 				Rakugo.set_variable(result.get_string("lvar_name"), value)
 			_:
 				Rakugo.emit_signal("parser_unhandled_regex", line[0], result)
