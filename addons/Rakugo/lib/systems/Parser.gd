@@ -62,7 +62,7 @@ var parser_regex :={
 	# "like regex" (> label_name)?
 	CHOICE = "^(?<text>{STRING})( > (?<label>{NAME}))?$",
 	# jump label
-	JUMP = "^jump (?<label>{NAME})$",
+	JUMP = "^jump (?<label>{NAME})( if (?<expression>.+))?$",
 	# for setting Rakugo variables
 	SET_VARIABLE = "(?<lvar_name>{VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE}))",
 	# $ some_gd_script_code
@@ -130,9 +130,11 @@ func _init():
 
 	for key in parser_regex:
 		add_regex(key, parser_regex[key], regex_cache, "Parser, _init, failed " + key)
-		
+	
 	for key in other_regex:
 		add_regex(key, other_regex[key], other_cache, "Parser, _init, failed " + key)
+		
+	add_regex("VARIABLE", Regex["VARIABLE"], other_cache, "Parser, _init, failed VARIABLE")
 
 func parse_script(file_name:String) -> int:
 	thread = Thread.new()
@@ -221,6 +223,46 @@ func do_parse_script(file_name:String):
 				
 								labels[dialogue_label] = parse_array.size()
 							
+							"JUMP":
+								var str_expression:String = result.get_string("expression")
+
+								if str_expression.empty():
+									parse_array.push_back([key, result])
+									break
+
+								var sub_results = other_cache["VARIABLE"].search_all(str_expression)
+
+								var vars = []
+
+								# Expression does not like '.'
+								var vars_expression = []
+
+								for sub_result in sub_results:
+									var sub_result_str = sub_result.strings[0]
+									
+									if !vars.has(sub_result_str):
+										vars.push_back(sub_result_str)
+
+									var var_name_expr = sub_result.get_string("char_tag")
+
+									if !var_name_expr.empty():
+										var_name_expr += "_" + sub_result.get_string("var_name")
+
+										str_expression = str_expression.replace(sub_result_str, var_name_expr)
+									else:
+										var_name_expr = sub_result.get_string("var_name")
+									
+									if !vars_expression.has(var_name_expr):
+										vars_expression.push_back(var_name_expr)
+
+								var expression = Expression.new()
+
+								if expression.parse(str_expression, vars_expression) != OK:
+									push_error("Parser: Error on line: " + str(i) + ", " + expression.get_error_text())
+									break
+
+								parse_array.push_back([key, result, expression, vars])
+
 							_:
 								parse_array.push_back([key, result])
 						break
@@ -258,13 +300,36 @@ func do_execute_script():
 	var index := 0
 	
 	while !stop_thread and index < parse_array.size():
-		var line = parse_array[index]
+		var line:Array = parse_array[index]
 		
 		var result = line[1]
 		
 		match(line[0]):
 			"JUMP":
-				index = do_execute_jump(result.get_string("label")) - 1
+				var can_jump = false
+
+				if line.size() > 2:
+					var values = []
+
+					for var_name in line[3]:
+						var var_ = Rakugo.get_variable(var_name)
+
+						if !var_:
+							push_error("Execute: Error on line: " + str(index))
+							return FAILED
+
+						values.push_back(var_)
+
+					can_jump = line[2].execute(values)
+					
+					if line[2].has_execute_failed():
+						push_error("Execute: Error on line: " + str(index))
+						return FAILED
+				else:
+					can_jump = true
+
+				if can_jump:
+					index = do_execute_jump(result.get_string("label")) - 1
 				
 				if index == -2:
 					break
@@ -349,12 +414,12 @@ func do_execute_script():
 					value = remove_double_quotes(text)
 				else:
 					value = result.get_string("number")
-					
+
 					if value.is_valid_integer():
 						value = int(value)
 					else:
 						value = float(value)
-				
+
 				Rakugo.set_variable(result.get_string("lvar_name"), value)
 			_:
 				Rakugo.emit_signal("parser_unhandled_regex", line[0], result)
