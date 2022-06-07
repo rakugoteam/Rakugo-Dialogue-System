@@ -75,8 +75,7 @@ var parser_regex :={
 }
 
 var other_regex :={
-	CHARACTER_VARIABLES = "\\<(?<char_tag>{NAME}).(?<var_name>{NAME})\\>",
-	VARIABLES = "\\<(?<var_name>{NAME})\\>",
+	VARIABLE_IN_STR = "\\<(?<variable>{VARIABLE})\\>",
 }
 
 var regex_cache := {}
@@ -337,21 +336,10 @@ func do_execute_script():
 			"SAY":
 				var text = remove_double_quotes(result.get_string("text"))
 				
-				var sub_results = other_cache["CHARACTER_VARIABLES"].search_all(text)
+				var sub_results = other_cache["VARIABLE_IN_STR"].search_all(text)
 				
 				for sub_result in sub_results:
-					var var_ = Rakugo.get_character_variable(
-						sub_result.get_string("char_tag"),
-						sub_result.get_string("var_name")
-					)
-						
-					if var_:
-						text = text.replace(sub_result.strings[0], var_)
-				
-				sub_results = other_cache["VARIABLES"].search_all(text)
-				
-				for sub_result in sub_results:
-					var var_ = Rakugo.get_variable(sub_result.get_string("var_name"))
+					var var_ = Rakugo.get_variable(sub_result.get_string("variable"))
 					
 					if var_:
 						text = text.replace(sub_result.strings[0], var_)
