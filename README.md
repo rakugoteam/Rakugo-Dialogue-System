@@ -82,6 +82,9 @@ Gd "I'm <Gd.name> !"
 
 - Run Scene (F6)
 
+## Documentation
+Check the [wiki](https://github.com/rakugoteam/Rakugo/wiki) to learn more things !
+
 ## Rakugo Addons
 - [Advanced Text](https://github.com/rakugoteam/AdvancedText)
 
