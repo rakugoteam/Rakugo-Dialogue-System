@@ -71,7 +71,7 @@ func _process(delta):
     Rakugo.do_step()
 ```
 
-- Create a text file "Timeline.rk" in your project folder (res://)
+- Create your first RakuScript (text file) *"Timeline.rk"* at root of your project folder (res://)
 
 Basic RkScript (Timeline.rk) :
 ```
