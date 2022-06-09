@@ -24,13 +24,11 @@ Support this project here [itch.io](https://rakugoteam.github.io/donations/).
 ---
 
 ## Feature
+* Ren'Py like
+* Dialog system (say, choices, ask, jump)
+* Own script language
 * Save/Load system
-* Funcs, Objects and Vars like in Ren'Py
-* Dialog system
-* Ability to Rollback
-* History
-* Skipping
-* Documentation: https://rakugodocs.readthedocs.io
+* Global variables and character's variables
 
 ## Showcase
 
@@ -44,11 +42,13 @@ If your game uses Rakugo, tell us on [Discord](https://discord.gg/K9gvjdg).
 
 To install Rakugo plugin, download it as a [ZIP archive](). Extract the `addons/Rakugo` folder into your project folder. Then, enable the plugin in project settings and restart Godot-Engine.
 
-If you want to know more about installing plugins you can read the [official documentation page](https://docs.godotengine.org/en/stable/tutorials/plugins/editor/installing_plugins.html).
+If you want to know more about installing plugins you can read the [godot official documentation page](https://docs.godotengine.org/en/stable/tutorials/plugins/editor/installing_plugins.html).
 
 ## Get Started
 
-Basic GdScript :
+- Create a scene with a Node and script on it
+
+Basic GdScript (Node.gd) :
 ```gdscript
 extends Node
 
@@ -60,8 +60,8 @@ func _ready():
   
   Rakugo.parse_script(file_name)
   
-func _on_say(character:Character, text:String):
-  prints("say", character.name if character else "null", text)
+func _on_say(character:Dictionary, text:String):
+  prints("say", character.get("name", ""), text)
   
 func _on_step():
   prints("Press 'Enter' to continue...")
@@ -71,16 +71,19 @@ func _process(delta):
     Rakugo.do_step()
 ```
 
+- Create a text file "Timeline.rk" in your project folder (res://)
+
 Basic RkScript (Timeline.rk) :
 ```
 character Gd "Godot"
 Gd "Hello, world !"
-Gd "I'm Godot !"
+Gd "I'm <Gd.name> !"
 ```
+
+- Run Scene (F6)
 
 ## Rakugo Addons
 - [Advanced Text](https://github.com/rakugoteam/AdvancedText)
-- [Rakugo Core](https://github.com/rakugoteam/Rakugo)
 
 ## Rakugo Kits
 - [Visual Novel](https://github.com/rakugoteam/VisualNovelKit)
@@ -92,29 +95,20 @@ Project Roadmap : <https://github.com/rakugoteam/Rakugo/projects/1>
 
 ## FAQ:
 
-**Q:** So it's about adding a refined writing and dialogue system to the engine? </p>
-**A:** Yes, and more - nodes, objects and funcs to make easy to provide mechanics like in point&click and rpgs.
-
-**Q:** As a scenarist, what would I gain from using Rakugo over Ren'Py or Twine ? </p>
-**A:** It is made as godot addon - you can use all godot features.
-You can make your game 2d, 2.5d or 3d - you can only 2d in Ren'Py.
-You can easy add minigames or mix it with other game genre.
-It will have mechanics for point&click games and rpgs - Ren'Py and Twine are only for vn.
-This project's dialog functions can do more than Ren'Py equivalents.
+**Q:** So it's about adding a dialogue system to the engine? </p>
+**A:** Yes
 
 **Q:** How does the project interact with the engine ? </p>
-**A:** For now this project is a singleton and a collection of special nodes. There is also gui include in example project that is connected with the project and has all functions like in a Ren'Py game.
+**A:** It is a singleton (autoload)
 
 **Q:** Is it easy to use ?</p>
-**A:** For now it is not that easy as I want it to be, but I am working to make it use RakuScript (this project's own language) and visual script.
+**A:** Yes
 
 ## Infos
 
 If you want to help please write to us on our [Discord](https://discord.gg/K9gvjdg).
 
 - Rakugo Team website: https://rakugoteam.github.io/
-
-- Docs repo here: https://github.com/rakugoteam/Docs
 
 - [Godot icons](https://github.com/godotengine/godot-design/tree/master/engine/icons/optimized)
 
