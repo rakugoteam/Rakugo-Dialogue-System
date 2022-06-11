@@ -167,12 +167,12 @@ func count_indent(s:String) -> int:
 func remove_double_quotes(s:String) -> String:
 	return s.substr(1, s.length()-2)
 
-func do_parse_script(file_name:String):
+func do_parse_script(file_name:String) -> int:
 	var file = File.new()
 	
 	if file.open(file_name, File.READ) != OK:
-		prints("Parser", "can't open file : " + file_name)
-		return
+		push_error("can't open file : " + file_name)
+		return ERR_FILE_CANT_OPEN
 	
 	var lines = file.get_as_text().split("\n", false)
 	
@@ -258,7 +258,7 @@ func do_parse_script(file_name:String):
 
 								if expression.parse(str_expression, vars_expression) != OK:
 									push_error("Parser: Error on line: " + str(i) + ", " + expression.get_error_text())
-									break
+									return FAILED
 
 								parse_array.push_back([key, result, expression, vars])
 
@@ -280,7 +280,7 @@ func do_parse_script(file_name:String):
 		if state == State.Menu and i == lines.size() - 1 and !menu_choices.empty():
 			parse_array.push_back(["MENU", current_menu_result, menu_choices])
 	
-	prints("Parser", "do_parse_script", "end")
+	return OK
 
 func do_execute_jump(jump_label:String) -> int:
 	var index := -1
@@ -295,7 +295,7 @@ func do_execute_jump(jump_label:String) -> int:
 		
 	return index
 
-func do_execute_script():
+func do_execute_script() -> int:
 	var index := 0
 	
 	while !stop_thread and index < parse_array.size():
@@ -382,9 +382,7 @@ func do_execute_script():
 					index = do_execute_jump(jump_label) - 1
 				
 					if index == -2:
-						break
-						
-					prints("Parser", "do_execute_script", "menu_jump", jump_label)
+						return FAILED
 		
 			"SET_VARIABLE":
 				var rvar_name = result.get_string("rvar_name")
@@ -397,7 +395,8 @@ func do_execute_script():
 						value = Rakugo.get_variable(rvar_name)
 					else:
 						push_error("Parser::do_execute_script::SET_VARIABLE, variable " + rvar_name + " does not exist !")
-						break
+						return FAILED
+						
 				elif !text.empty():
 					value = remove_double_quotes(text)
 				else:
@@ -414,12 +413,11 @@ func do_execute_script():
 		
 		index += 1
 		
-	prints("Parser", "do_execute_script", "end ")
+	return OK
 
 func do_parse_and_execute(file_name:String):
-	do_parse_script(file_name)
-	
-	do_execute_script()
+	if do_parse_script(file_name) == OK:
+		do_execute_script()
 
 func _on_menu_return(index:int):
 	menu_jump_index = index
