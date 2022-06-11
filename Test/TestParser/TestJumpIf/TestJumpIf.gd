@@ -1,20 +1,29 @@
-extends Node
+extends GutTest
 
-const file_name = "res://Test/TestParser/TestJumpIf/TimelineJumpIf.rk"
+const file_name = "res://Test/TestParser/TestJumpIf/TestJumpIf.rk"
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
+func before_all():
 	Rakugo.connect("say", self, "_on_say")
-	Rakugo.connect("step", self, "_on_step")
 	
 	Rakugo.parse_script(file_name)
 
+var say_char:Dictionary
+var say_text:String
 func _on_say(character:Dictionary, text:String):
-	prints("TestParser", "say", character.get("name", "null"), text)
+	say_char = character
+	say_text = text
 
-func _on_step():
-	prints("TestParser", "Press 'Enter' to continue...\n")
-
-func _process(delta):
-	if Rakugo.is_waiting_step() and Input.is_action_just_pressed("ui_accept"):
-		Rakugo.do_step()
+func test_jump_if():
+	yield(yield_to(Rakugo, "say", 0.2), YIELD)
+	
+	assert_true(say_char.empty())
+	assert_eq(say_text, "no jump")
+	
+	Rakugo.do_step()
+	
+	yield(yield_to(Rakugo, "say", 0.2), YIELD)
+	
+	assert_true(say_char.empty())
+	assert_eq(say_text, "jump")
+	
+	Rakugo.do_step()
