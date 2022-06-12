@@ -5,7 +5,7 @@ const file_name = "res://Test/TestParser/TestJumpIf/TestJumpIf.rk"
 func before_all():
 	Rakugo.connect("say", self, "_on_say")
 	
-	Rakugo.parse_script(file_name)
+	Rakugo.parse_and_execute_script(file_name)
 
 var say_char:Dictionary
 var say_text:String
