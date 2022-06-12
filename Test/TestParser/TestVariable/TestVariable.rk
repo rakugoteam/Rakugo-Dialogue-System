@@ -1,0 +1,8 @@
+aaa = 1
+bbb = 2.5
+ccc = "Hello, world !"
+ddd = aaa
+character Sy "Sylvie"
+Sy.life = 5
+eee = Sy.life
+"Test"
