@@ -175,14 +175,17 @@ func reset_game():
 	emit_signal("game_ended")
 
 # Parser
-func parse_script(file_name:String):
-	current_parser.parse_script(file_name)
+func parse_script(file_name:String) -> int:
+	return current_parser.parse_script(file_name)
 	
-func execute_script(file_base_name:String):
-	current_parser.execute_script(file_base_name)
+func execute_script(file_base_name:String) -> int:
+	return current_parser.execute_script(file_base_name)
 	
-func parse_and_execute_script(file_name):
-	current_parser.parse_and_execute(file_name)
+func parse_and_execute_script(file_name) -> int:
+	return current_parser.parse_and_execute(file_name)
+
+func end_thread():
+	current_parser.call_deferred("close")
 
 func _exit_tree() -> void:
 	current_parser.close()

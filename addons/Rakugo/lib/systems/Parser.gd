@@ -82,9 +82,6 @@ var regex_cache := {}
 
 var other_cache := {}
 
-var thread:Thread
-var step_semaphore:Semaphore
-
 var stop_thread := false
 
 enum State {Normal = 0, Menu, Jump}
@@ -94,6 +91,12 @@ var state = State.Normal
 var menu_jump_index:int
 
 var parsed_scripts:Dictionary
+
+var current_thread:Thread
+
+var current_semaphore:Semaphore
+
+var threads:Dictionary
 
 func add_regex(key:String, regex:String, cache:Dictionary, error:String):
 	regex = regex.format(Regex)
@@ -132,23 +135,29 @@ func _init():
 		
 	add_regex("VARIABLE", Regex["VARIABLE"], other_cache, "Parser, _init, failed VARIABLE")
 
+func close() -> int:
+#	if thread:
+#		stop_thread = true
+#
+#		step_semaphore.post()
+#
+##		thread.wait_to_finish()
+	return OK
+
 func execute_script(file_base_name:String) -> int:
+	close()
+	
 	if parsed_scripts.has(file_base_name):
-		thread = Thread.new()
+		var thread = Thread.new()
 	
-		step_semaphore = Semaphore.new()
+		var semaphore = Semaphore.new()
+		
+		threads[thread.get_id()] = {"thread":thread, "semaphore":semaphore}
 	
-		return thread.start(self, "do_execute_script", file_base_name)
+		if thread.start(self, "do_execute_script", thread.get_id(), file_base_name) != OK:
+			threads.erase(thread.get_id())
 	push_error("Rakugo does not have parse a script named: " + file_base_name)
 	return FAILED
-
-func close():
-	if thread:
-		stop_thread = true
-		
-		step_semaphore.post()
-		
-		thread.wait_to_finish()
 
 func count_indent(s:String) -> int:
 	var ret := 0
@@ -284,7 +293,7 @@ func parse_script(file_name:String) -> int:
 		if state == State.Menu and i == lines.size() - 1 and !menu_choices.empty():
 			parse_array.push_back(["MENU", current_menu_result, menu_choices])
 	
-	parsed_scripts[file_name.get_basename()] = {"parse_array":parse_array, "labels":labels}
+	parsed_scripts[file_name.get_file().get_basename()] = {"parse_array":parse_array, "labels":labels}
 	
 	return OK
 
@@ -301,7 +310,16 @@ func do_execute_jump(jump_label:String, parse_array:Array, labels:Dictionary) ->
 		
 	return index
 
-func do_execute_script(file_base_name:String) -> int:
+func do_execute_script_end(thread_id:String):
+	var thread = threads[thread_id]
+	
+	var r = thread.wait_to_finish()
+	
+	prints("Parser", "finish")
+
+func do_execute_script(thread_id:String, file_base_name:String) -> int:
+	var semephore = threads[thread_id]["semaphore"]
+	
 	var index := 0
 	
 	var parse_array:Array = parsed_scripts[file_base_name]["parse_array"]
@@ -346,6 +364,8 @@ func do_execute_script(file_base_name:String) -> int:
 			"SAY":
 				var text = remove_double_quotes(result.get_string("text"))
 				
+				prints("Parser", text)
+				
 				var sub_results = other_cache["VARIABLE_IN_STR"].search_all(text)
 				
 				for sub_result in sub_results:
@@ -358,7 +378,7 @@ func do_execute_script(file_base_name:String) -> int:
 
 				Rakugo.step()
 
-				step_semaphore.wait()
+				semephore.wait()
 				
 			"CHARACTER_DEF":
 				Rakugo.define_character(result.get_string("tag"), result.get_string("name"))
@@ -366,7 +386,7 @@ func do_execute_script(file_base_name:String) -> int:
 			"ASK":
 				Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), remove_double_quotes(result.get_string("question")), remove_double_quotes(result.get_string("default_answer")))
 
-				step_semaphore.wait()
+				semephore.wait()
 				
 			"MENU":
 				var menu_choices:PoolStringArray
@@ -384,7 +404,7 @@ func do_execute_script(file_base_name:String) -> int:
 				
 				Rakugo.menu(menu_choices)
 
-				step_semaphore.wait()
+				semephore.wait()
 				
 				if menu_jumps.has(menu_jump_index):
 					var jump_label = menu_jumps[menu_jump_index]
@@ -423,11 +443,14 @@ func do_execute_script(file_base_name:String) -> int:
 		
 		index += 1
 	
+	call_deferred("do_execute_script_end")
+	
 	return OK
 
 func parse_and_execute(file_name:String):
 	if parse_script(file_name) == OK:
-		execute_script(file_name.get_basename())
+		return execute_script(file_name.get_file().get_basename())
+	return FAILED
 
 func _on_menu_return(index:int):
 	menu_jump_index = index
