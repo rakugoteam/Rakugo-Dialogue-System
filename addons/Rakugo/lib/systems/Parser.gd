@@ -93,10 +93,7 @@ var state = State.Normal
 
 var menu_jump_index:int
 
-var parse_array:Array
-
-#contain label : index
-var labels:Dictionary
+var parsed_scripts:Dictionary
 
 func add_regex(key:String, regex:String, cache:Dictionary, error:String):
 	regex = regex.format(Regex)
@@ -135,12 +132,15 @@ func _init():
 		
 	add_regex("VARIABLE", Regex["VARIABLE"], other_cache, "Parser, _init, failed VARIABLE")
 
-func parse_script(file_name:String) -> int:
-	thread = Thread.new()
+func execute_script(file_base_name:String) -> int:
+	if parsed_scripts.has(file_base_name):
+		thread = Thread.new()
 	
-	step_semaphore = Semaphore.new()
+		step_semaphore = Semaphore.new()
 	
-	return thread.start(self, "do_parse_and_execute", file_name)
+		return thread.start(self, "do_execute_script", file_base_name)
+	push_error("Rakugo does not have parse a script named: " + file_base_name)
+	return FAILED
 
 func close():
 	if thread:
@@ -167,7 +167,7 @@ func count_indent(s:String) -> int:
 func remove_double_quotes(s:String) -> String:
 	return s.substr(1, s.length()-2)
 
-func do_parse_script(file_name:String) -> int:
+func parse_script(file_name:String) -> int:
 	var file = File.new()
 	
 	if file.open(file_name, File.READ) != OK:
@@ -177,6 +177,10 @@ func do_parse_script(file_name:String) -> int:
 	var lines = file.get_as_text().split("\n", false)
 	
 	file.close()
+	
+	var parse_array:Array
+	
+	var labels:Dictionary
 	
 	var indent_count:int
 	
@@ -280,9 +284,11 @@ func do_parse_script(file_name:String) -> int:
 		if state == State.Menu and i == lines.size() - 1 and !menu_choices.empty():
 			parse_array.push_back(["MENU", current_menu_result, menu_choices])
 	
+	parsed_scripts[file_name.get_basename()] = {"parse_array":parse_array, "labels":labels}
+	
 	return OK
 
-func do_execute_jump(jump_label:String) -> int:
+func do_execute_jump(jump_label:String, parse_array:Array, labels:Dictionary) -> int:
 	var index := -1
 	if labels.has(jump_label):
 		index = labels[jump_label]
@@ -295,8 +301,12 @@ func do_execute_jump(jump_label:String) -> int:
 		
 	return index
 
-func do_execute_script() -> int:
+func do_execute_script(file_base_name:String) -> int:
 	var index := 0
+	
+	var parse_array:Array = parsed_scripts[file_base_name]["parse_array"]
+	
+	var labels = parsed_scripts[file_base_name]["labels"]
 	
 	while !stop_thread and index < parse_array.size():
 		var line:Array = parse_array[index]
@@ -328,7 +338,7 @@ func do_execute_script() -> int:
 					can_jump = true
 
 				if can_jump:
-					index = do_execute_jump(result.get_string("label")) - 1
+					index = do_execute_jump(result.get_string("label"), parse_array, labels) - 1
 				
 				if index == -2:
 					break
@@ -379,7 +389,7 @@ func do_execute_script() -> int:
 				if menu_jumps.has(menu_jump_index):
 					var jump_label = menu_jumps[menu_jump_index]
 
-					index = do_execute_jump(jump_label) - 1
+					index = do_execute_jump(jump_label, parse_array, labels) - 1
 				
 					if index == -2:
 						return FAILED
@@ -412,12 +422,12 @@ func do_execute_script() -> int:
 				Rakugo.emit_signal("parser_unhandled_regex", line[0], result)
 		
 		index += 1
-		
+	
 	return OK
 
-func do_parse_and_execute(file_name:String):
-	if do_parse_script(file_name) == OK:
-		do_execute_script()
+func parse_and_execute(file_name:String):
+	if parse_script(file_name) == OK:
+		execute_script(file_name.get_basename())
 
 func _on_menu_return(index:int):
 	menu_jump_index = index
