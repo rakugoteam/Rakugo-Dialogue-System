@@ -3,7 +3,8 @@
  "config_file": "res://.gutconfig.json",
  "dirs": [
   "res://Test/TestParser/TestSay",
-  "res://Test/TestParser/TestJumpIf"
+  "res://Test/TestParser/TestJumpIf",
+  "res://Test/TestParser/TestVariable"
  ],
  "disable_colors": false,
  "double_strategy": "partial",
@@ -21,7 +22,7 @@
  "post_run_script": "",
  "pre_run_script": "",
  "prefix": "Test",
- "selected": "TestJumpIf.gd",
+ "selected": "TestVariable.gd",
  "should_exit": false,
  "should_exit_on_success": false,
  "should_maximize": false,
@@ -31,7 +32,7 @@
  "tests": [
 
  ],
- "unit_test_name": "test_jump_if",
+ "unit_test_name": "test_variable",
  "gut_on_top": true,
  "panel_options": {
   "font_name": "CourierPrime",
