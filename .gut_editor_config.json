@@ -4,7 +4,7 @@
  "dirs": [
   "res://Test/TestParser/TestSay",
   "res://Test/TestParser/TestJumpIf",
-  "res://Test/TestParser/TestParseAndExecute"
+  "res://Test/TestParser/TestVariable"
  ],
  "disable_colors": false,
  "double_strategy": "partial",
@@ -22,7 +22,7 @@
  "post_run_script": "",
  "pre_run_script": "",
  "prefix": "Test",
- "selected": "TestParseAndExecute.gd",
+ "selected": "TestVariable.gd",
  "should_exit": false,
  "should_exit_on_success": false,
  "should_maximize": false,
@@ -32,7 +32,7 @@
  "tests": [
 
  ],
- "unit_test_name": "test_parse_and_execute",
+ "unit_test_name": "test_variable",
  "gut_on_top": true,
  "panel_options": {
   "font_name": "CourierPrime",
