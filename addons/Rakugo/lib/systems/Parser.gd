@@ -82,9 +82,6 @@ var regex_cache := {}
 
 var other_cache := {}
 
-var thread:Thread
-var step_semaphore:Semaphore
-
 var stop_thread := false
 
 enum State {Normal = 0, Menu, Jump}
@@ -93,10 +90,13 @@ var state = State.Normal
 
 var menu_jump_index:int
 
-var parse_array:Array
+var parsed_scripts:Dictionary
 
-#contain label : index
-var labels:Dictionary
+var current_thread:Thread
+
+var current_semaphore:Semaphore
+
+var threads:Dictionary
 
 func add_regex(key:String, regex:String, cache:Dictionary, error:String):
 	regex = regex.format(Regex)
@@ -135,20 +135,35 @@ func _init():
 		
 	add_regex("VARIABLE", Regex["VARIABLE"], other_cache, "Parser, _init, failed VARIABLE")
 
-func parse_script(file_name:String) -> int:
-	thread = Thread.new()
-	
-	step_semaphore = Semaphore.new()
-	
-	return thread.start(self, "do_parse_and_execute", file_name)
+func close() -> int:
+	if current_thread and current_thread.is_active():
+		var dico = threads[current_thread.get_id()]
+		
+		dico["stop"] = true
+		dico["semaphore"].post()
+	return OK
 
-func close():
-	if thread:
-		stop_thread = true
+func execute_script(file_base_name:String) -> int:
+	close()
+	
+	if parsed_scripts.has(file_base_name):
+		current_thread = Thread.new()
+	
+		current_semaphore = Semaphore.new()
 		
-		step_semaphore.post()
-		
-		thread.wait_to_finish()
+		var dico = {"thread":current_thread, "semaphore":current_semaphore, "file_base_name":file_base_name, "stop":false}
+	
+		if current_thread.start(self, "do_execute_script", dico) != OK:
+			current_thread = null
+			
+			current_semaphore = null
+			
+			threads.erase(current_thread.get_id())
+			
+			return FAILED
+		return OK
+	push_error("Rakugo does not have parse a script named: " + file_base_name)
+	return FAILED
 
 func count_indent(s:String) -> int:
 	var ret := 0
@@ -167,7 +182,7 @@ func count_indent(s:String) -> int:
 func remove_double_quotes(s:String) -> String:
 	return s.substr(1, s.length()-2)
 
-func do_parse_script(file_name:String) -> int:
+func parse_script(file_name:String) -> int:
 	var file = File.new()
 	
 	if file.open(file_name, File.READ) != OK:
@@ -177,6 +192,10 @@ func do_parse_script(file_name:String) -> int:
 	var lines = file.get_as_text().split("\n", false)
 	
 	file.close()
+	
+	var parse_array:Array
+	
+	var labels:Dictionary
 	
 	var indent_count:int
 	
@@ -280,9 +299,11 @@ func do_parse_script(file_name:String) -> int:
 		if state == State.Menu and i == lines.size() - 1 and !menu_choices.empty():
 			parse_array.push_back(["MENU", current_menu_result, menu_choices])
 	
+	parsed_scripts[file_name.get_file().get_basename()] = {"parse_array":parse_array, "labels":labels}
+	
 	return OK
 
-func do_execute_jump(jump_label:String) -> int:
+func do_execute_jump(jump_label:String, parse_array:Array, labels:Dictionary) -> int:
 	var index := -1
 	if labels.has(jump_label):
 		index = labels[jump_label]
@@ -295,10 +316,25 @@ func do_execute_jump(jump_label:String) -> int:
 		
 	return index
 
-func do_execute_script() -> int:
+func do_execute_script_end(thread:Thread):
+	thread.wait_to_finish()
+
+func do_execute_script(parameters:Dictionary) -> int:
+	var thread = parameters["thread"]
+	
+	threads[thread.get_id()] = parameters
+	
+	var semephore = parameters["semaphore"]
+	
+	var file_base_name = parameters["file_base_name"]
+	
 	var index := 0
 	
-	while !stop_thread and index < parse_array.size():
+	var parse_array:Array = parsed_scripts[file_base_name]["parse_array"]
+	
+	var labels = parsed_scripts[file_base_name]["labels"]
+	
+	while !parameters["stop"] and index < parse_array.size():
 		var line:Array = parse_array[index]
 		
 		var result = line[1]
@@ -328,7 +364,7 @@ func do_execute_script() -> int:
 					can_jump = true
 
 				if can_jump:
-					index = do_execute_jump(result.get_string("label")) - 1
+					index = do_execute_jump(result.get_string("label"), parse_array, labels) - 1
 				
 				if index == -2:
 					break
@@ -348,7 +384,7 @@ func do_execute_script() -> int:
 
 				Rakugo.step()
 
-				step_semaphore.wait()
+				semephore.wait()
 				
 			"CHARACTER_DEF":
 				Rakugo.define_character(result.get_string("tag"), result.get_string("name"))
@@ -356,7 +392,7 @@ func do_execute_script() -> int:
 			"ASK":
 				Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), remove_double_quotes(result.get_string("question")), remove_double_quotes(result.get_string("default_answer")))
 
-				step_semaphore.wait()
+				semephore.wait()
 				
 			"MENU":
 				var menu_choices:PoolStringArray
@@ -374,12 +410,12 @@ func do_execute_script() -> int:
 				
 				Rakugo.menu(menu_choices)
 
-				step_semaphore.wait()
+				semephore.wait()
 				
 				if menu_jumps.has(menu_jump_index):
 					var jump_label = menu_jumps[menu_jump_index]
 
-					index = do_execute_jump(jump_label) - 1
+					index = do_execute_jump(jump_label, parse_array, labels) - 1
 				
 					if index == -2:
 						return FAILED
@@ -412,17 +448,20 @@ func do_execute_script() -> int:
 				Rakugo.emit_signal("parser_unhandled_regex", line[0], result)
 		
 		index += 1
-		
+	
+	call_deferred("do_execute_script_end", thread)
+	
 	return OK
 
-func do_parse_and_execute(file_name:String):
-	if do_parse_script(file_name) == OK:
-		do_execute_script()
+func parse_and_execute(file_name:String):
+	if parse_script(file_name) == OK:
+		return execute_script(file_name.get_file().get_basename())
+	return FAILED
 
 func _on_menu_return(index:int):
 	menu_jump_index = index
 	
-	step_semaphore.post()
+	current_semaphore.post()
 
 func _on_ask_return(result):
-	step_semaphore.post()
+	current_semaphore.post()

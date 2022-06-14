@@ -3,7 +3,7 @@ extends GutTest
 const file_name = "res://Test/TestParser/TestVariable/TestVariable.rk"
 
 func before_all():
-	Rakugo.parse_script(file_name)
+	Rakugo.parse_and_execute_script(file_name)
 
 func test_variable():
 	yield(yield_to(Rakugo, "say", 0.2), YIELD)
