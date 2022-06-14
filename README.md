@@ -52,13 +52,13 @@ Basic GdScript (Node.gd) :
 ```gdscript
 extends Node
 
-const file_name = "res://Timeline.rk"
+const file_path = "res://Timeline.rk"
 
 func _ready():
   Rakugo.connect("say", self, "_on_say")
   Rakugo.connect("step", self, "_on_step")
   
-  Rakugo.parse_script(file_name)
+  Rakugo.parse_and_execute_script(file_path)
   
 func _on_say(character:Dictionary, text:String):
   prints("say", character.get("name", ""), text)
