@@ -136,26 +136,32 @@ func _init():
 	add_regex("VARIABLE", Regex["VARIABLE"], other_cache, "Parser, _init, failed VARIABLE")
 
 func close() -> int:
-#	if thread:
-#		stop_thread = true
-#
-#		step_semaphore.post()
-#
-##		thread.wait_to_finish()
+	if current_thread and current_thread.is_active():
+		var dico = threads[current_thread.get_id()]
+		
+		dico["stop"] = true
+		dico["semaphore"].post()
 	return OK
 
 func execute_script(file_base_name:String) -> int:
 	close()
 	
 	if parsed_scripts.has(file_base_name):
-		var thread = Thread.new()
+		current_thread = Thread.new()
 	
-		var semaphore = Semaphore.new()
+		current_semaphore = Semaphore.new()
 		
-		threads[thread.get_id()] = {"thread":thread, "semaphore":semaphore}
+		var dico = {"thread":current_thread, "semaphore":current_semaphore, "file_base_name":file_base_name, "stop":false}
 	
-		if thread.start(self, "do_execute_script", thread.get_id(), file_base_name) != OK:
-			threads.erase(thread.get_id())
+		if current_thread.start(self, "do_execute_script", dico) != OK:
+			current_thread = null
+			
+			current_semaphore = null
+			
+			threads.erase(current_thread.get_id())
+			
+			return FAILED
+		return OK
 	push_error("Rakugo does not have parse a script named: " + file_base_name)
 	return FAILED
 
@@ -310,15 +316,17 @@ func do_execute_jump(jump_label:String, parse_array:Array, labels:Dictionary) ->
 		
 	return index
 
-func do_execute_script_end(thread_id:String):
-	var thread = threads[thread_id]
-	
-	var r = thread.wait_to_finish()
-	
-	prints("Parser", "finish")
+func do_execute_script_end(thread:Thread):
+	thread.wait_to_finish()
 
-func do_execute_script(thread_id:String, file_base_name:String) -> int:
-	var semephore = threads[thread_id]["semaphore"]
+func do_execute_script(parameters:Dictionary) -> int:
+	var thread = parameters["thread"]
+	
+	threads[thread.get_id()] = parameters
+	
+	var semephore = parameters["semaphore"]
+	
+	var file_base_name = parameters["file_base_name"]
 	
 	var index := 0
 	
@@ -326,7 +334,7 @@ func do_execute_script(thread_id:String, file_base_name:String) -> int:
 	
 	var labels = parsed_scripts[file_base_name]["labels"]
 	
-	while !stop_thread and index < parse_array.size():
+	while !parameters["stop"] and index < parse_array.size():
 		var line:Array = parse_array[index]
 		
 		var result = line[1]
@@ -363,8 +371,6 @@ func do_execute_script(thread_id:String, file_base_name:String) -> int:
 			
 			"SAY":
 				var text = remove_double_quotes(result.get_string("text"))
-				
-				prints("Parser", text)
 				
 				var sub_results = other_cache["VARIABLE_IN_STR"].search_all(text)
 				
@@ -443,7 +449,7 @@ func do_execute_script(thread_id:String, file_base_name:String) -> int:
 		
 		index += 1
 	
-	call_deferred("do_execute_script_end")
+	call_deferred("do_execute_script_end", thread)
 	
 	return OK
 
@@ -455,7 +461,7 @@ func parse_and_execute(file_name:String):
 func _on_menu_return(index:int):
 	menu_jump_index = index
 	
-	step_semaphore.post()
+	current_semaphore.post()
 
 func _on_ask_return(result):
-	step_semaphore.post()
+	current_semaphore.post()

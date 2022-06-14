@@ -272,7 +272,7 @@ func is_waiting_step():
 func do_step():
 	waiting_step = false
 
-	current_parser.step_semaphore.post()
+	current_parser.current_semaphore.post()
 
 #Utils functions
 
