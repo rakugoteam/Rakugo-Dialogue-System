@@ -17,9 +17,9 @@ func _ready():
 	
 	prints(name, narrator_name)
 	
-	Rakugo.parse_script(file_name)
+	Rakugo.parse_and_execute_script(file_name)
 
-func _on_say(character:Character, text:String):
+func _on_say(character:Dictionary, text:String):
 #	prints("TestGui", "say", character.name if character else "null", text)
 	label.clear()
 	label.add_text(text)
@@ -27,7 +27,7 @@ func _on_say(character:Character, text:String):
 func _on_step():
 	label.add_text("\nPress 'Enter' to continue...")
 
-func _on_ask(character:Character, question:String, default_answer:String):
+func _on_ask(character:Dictionary, question:String, default_answer:String):
 #	prints("TestGui", "ask", character.name if character else "null", question, default_answer)
 	label.clear()
 	label.add_text(question)
