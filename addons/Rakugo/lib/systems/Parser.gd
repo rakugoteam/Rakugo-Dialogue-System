@@ -427,12 +427,11 @@ func do_execute_script(parameters:Dictionary) -> int:
 				var value
 				
 				if !rvar_name.empty():
-					if Rakugo.has_variable(rvar_name):
-						value = Rakugo.get_variable(rvar_name)
-					else:
+					value = Rakugo.get_variable(rvar_name)
+					
+					if !value:
 						push_error("Parser::do_execute_script::SET_VARIABLE, variable " + rvar_name + " does not exist !")
 						return FAILED
-						
 				elif !text.empty():
 					value = remove_double_quotes(text)
 				else:
