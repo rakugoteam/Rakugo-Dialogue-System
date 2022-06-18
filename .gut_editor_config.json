@@ -6,7 +6,8 @@
   "res://Test/TestParser/TestJumpIf",
   "res://Test/TestParser/TestVariable",
   "res://Test/TestParser/TestParseAndExecute",
-  "res://Test/TestParser/TestCharacter"
+  "res://Test/TestParser/TestCharacter",
+  "res://Test/TestRakugo/TestSaveLoad"
  ],
  "disable_colors": false,
  "double_strategy": "partial",
@@ -24,7 +25,7 @@
  "post_run_script": "",
  "pre_run_script": "",
  "prefix": "Test",
- "selected": "TestCharacter.gd",
+ "selected": "TestSaveLoad.gd",
  "should_exit": false,
  "should_exit_on_success": false,
  "should_maximize": false,
@@ -34,7 +35,7 @@
  "tests": [
 
  ],
- "unit_test_name": "test_character",
+ "unit_test_name": "test_save_load",
  "gut_on_top": true,
  "panel_options": {
   "font_name": "CourierPrime",
