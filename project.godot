@@ -71,7 +71,7 @@ rakugo/test_mode=false
 [application]
 
 config/name="Rakugo.Core"
-run/main_scene="res://Test/TestParser/TestParser.tscn"
+run/main_scene="res://Test/TestParser/_TestParser.tscn"
 config/icon="res://icon.png"
 
 [autoload]

@@ -1,11 +1,11 @@
 extends GutTest
 
-const file_name = "res://Test/TestParser/TestVariable/TestVariable.rk"
+const file_name = "res://Test/TestParser/TestVariables/TestVariables.rk"
 
 func before_all():
 	Rakugo.parse_and_execute_script(file_name)
 
-func test_variable():
+func test_variables():
 	yield(yield_to(Rakugo, "say", 0.2), YIELD)
 
 	var a = Rakugo.get_variable("aaa")
