@@ -40,7 +40,7 @@ If your game uses Rakugo, tell us on [Discord](https://discord.gg/K9gvjdg).
 
 ## Installation
 
-To install Rakugo plugin, download it as a [ZIP archive](). Extract the `addons/Rakugo` folder into your project folder. Then, enable the plugin in project settings and restart Godot-Engine.
+To install Rakugo plugin, download it as a [ZIP archive](https://github.com/rakugoteam/Rakugo/releases). Extract the `addons/Rakugo` folder into your project folder. Then, enable the plugin in project settings and restart Godot-Engine.
 
 If you want to know more about installing plugins you can read the [godot official documentation page](https://docs.godotengine.org/en/stable/tutorials/plugins/editor/installing_plugins.html).
 
