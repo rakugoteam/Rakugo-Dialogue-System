@@ -3,14 +3,14 @@
 changelog:
   exclude:
     labels:
-      - NotInChangelog
+      - notInChangelog
   categories:
     - title: Major Updates
       labels:
-        - MajorChange
+        - majorChange
     - title: Fixed Bugs
       labels:
-        - Bug
+        - bug
     - title: Other Changes
       labels:
-        - InChangelog
+        - inChangelog
