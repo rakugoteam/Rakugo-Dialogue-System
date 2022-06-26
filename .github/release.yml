@@ -1,0 +1,16 @@
+# .github/release.yml
+
+changelog:
+  exclude:
+    labels:
+      - NotInChangelog
+  categories:
+    - title: Major Updates
+      labels:
+        - MajorChange
+    - title: Fixed Bugs
+      labels:
+        - Bug
+    - title: Other Changes
+      labels:
+        - InChangelog
