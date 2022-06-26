@@ -1,9 +1,6 @@
 # .github/release.yml
 
 changelog:
-  exclude:
-    labels:
-      - notInChangelog
   categories:
     - title: Major Updates
       labels:
