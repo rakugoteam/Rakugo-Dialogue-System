@@ -16,8 +16,8 @@ Support this project here [itch.io](https://rakugoteam.github.io/donations/).
 [Showcase](#Showcase) -
 [Installation](#Installation) -
 [Get Started](#Get-Started) -
+[Documentation](#Documentation) -
 [Rakugo Addons](#Rakugo-Addons) -
-[Roadmap](#Roadmap) -
 [FAQ](#faq) -
 [Infos](#Infos)
 
@@ -31,6 +31,12 @@ Support this project here [itch.io](https://rakugoteam.github.io/donations/).
 * Global variables and character's variables
 
 ## Showcase
+
+### Examples
+
+Check our project [RakuDialogUi](https://github.com/rakugoteam/RakuDialogueUI) to see examples of uses. You can copy them to yours projects too !
+
+### Games
 
 - [**Space drive beats**](https://plopsis.itch.io/space-drive-beats)
 - [**Bot Saves Dream**](https://plopsis.itch.io/curator-bot)
@@ -49,6 +55,7 @@ If you want to know more about installing plugins you can read the [godot offici
 - Create a scene with a Node and script on it
 
 Basic GdScript (Node.gd) :
+
 ```gdscript
 extends Node
 
@@ -74,6 +81,7 @@ func _process(delta):
 - Create your first RakuScript (text file) *"Timeline.rk"* at root of your project folder (res://)
 
 Basic RkScript (Timeline.rk) :
+
 ```
 character Gd "Godot"
 Gd "Hello, world !"
@@ -83,26 +91,26 @@ Gd "I'm <Gd.name> !"
 - Run Scene (F6)
 
 ## Documentation
-Check the [wiki](https://github.com/rakugoteam/Rakugo/wiki) to learn more things !
+
+Go to https://rakugoteam.github.io/rakugo-docs/ !
 
 ## Rakugo Addons
+
 - [Advanced Text](https://github.com/rakugoteam/AdvancedText)
 
 ## Rakugo Kits
+
 - [Visual Novel](https://github.com/rakugoteam/VisualNovelKit)
 - [Click & Point Adventures](https://github.com/rakugoteam/Adventure)
 - [RPG](https://github.com/rakugoteam/rakugo-open-rpg)
-
-## Roadmap
-Project Roadmap : <https://github.com/rakugoteam/Rakugo/projects/1>
 
 ## FAQ:
 
 **Q:** So it's about adding a dialogue system to the engine? </p>
 **A:** Yes
 
-**Q:** How does the project interact with the engine ? </p>
-**A:** It is a singleton (autoload)
+**Q:** How does the project works ? </p>
+**A:** By signals and methods from a singleton (autoload) called Rakugo.
 
 **Q:** Is it easy to use ?</p>
 **A:** Yes
