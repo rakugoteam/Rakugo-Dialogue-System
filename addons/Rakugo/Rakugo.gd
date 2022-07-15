@@ -68,6 +68,7 @@ signal started()
 signal game_ended()
 signal loading(progress) ## Progress is to be either NaN or [0,1], loading(1) meaning loading finished.
 signal parser_unhandled_regex(key, result)
+signal execute_script_finished(file_name)
 
 ## Variables
 func set_variable(var_name:String, value):
@@ -184,8 +185,8 @@ func execute_script(file_base_name:String) -> int:
 func parse_and_execute_script(file_name) -> int:
 	return current_parser.parse_and_execute(file_name)
 
-func end_thread():
-	current_parser.call_deferred("close")
+func send_execute_script_finished(file_base_name:String):
+	emit_signal("execute_script_finished", file_base_name)
 
 func _exit_tree() -> void:
 	current_parser.close()
