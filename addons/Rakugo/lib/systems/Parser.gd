@@ -316,8 +316,10 @@ func do_execute_jump(jump_label:String, parse_array:Array, labels:Dictionary) ->
 		
 	return index
 
-func do_execute_script_end(thread:Thread):
+func do_execute_script_end(thread:Thread, file_base_name:String):
 	thread.wait_to_finish()
+	
+	Rakugo.send_execute_script_finished(file_base_name)
 
 func do_execute_script(parameters:Dictionary) -> int:
 	var thread = parameters["thread"]
@@ -448,7 +450,7 @@ func do_execute_script(parameters:Dictionary) -> int:
 		
 		index += 1
 	
-	call_deferred("do_execute_script_end", thread)
+	call_deferred("do_execute_script_end", thread, file_base_name)
 	
 	return OK
 
