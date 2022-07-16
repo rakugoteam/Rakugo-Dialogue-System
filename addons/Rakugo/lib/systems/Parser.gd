@@ -341,6 +341,9 @@ func do_execute_script(parameters:Dictionary) -> int:
 	
 	if parameters.has("label_name"):
 		index = do_execute_jump(parameters["label_name"], parse_array, labels)
+		
+		if index == -1:
+			return FAILED
 	
 	while !parameters["stop"] and index < parse_array.size():
 		var line:Array = parse_array[index]
