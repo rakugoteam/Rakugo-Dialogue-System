@@ -179,11 +179,11 @@ func reset_game():
 func parse_script(file_name:String) -> int:
 	return current_parser.parse_script(file_name)
 	
-func execute_script(file_base_name:String) -> int:
-	return current_parser.execute_script(file_base_name)
+func execute_script(script_name:String, label_name:String = "") -> int:
+	return current_parser.execute_script(script_name, label_name)
 	
-func parse_and_execute_script(file_name) -> int:
-	return current_parser.parse_and_execute(file_name)
+func parse_and_execute_script(file_name:String, label_name:String = "") -> int:
+	return current_parser.parse_and_execute(file_name, label_name)
 
 func send_execute_script_finished(file_base_name:String):
 	emit_signal("execute_script_finished", file_base_name)
