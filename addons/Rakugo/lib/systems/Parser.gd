@@ -143,15 +143,18 @@ func close() -> int:
 		dico["semaphore"].post()
 	return OK
 
-func execute_script(file_base_name:String) -> int:
+func execute_script(script_name:String, label_name:String) -> int:
 	close()
 	
-	if parsed_scripts.has(file_base_name):
+	if parsed_scripts.has(script_name):
 		current_thread = Thread.new()
 	
 		current_semaphore = Semaphore.new()
 		
-		var dico = {"thread":current_thread, "semaphore":current_semaphore, "file_base_name":file_base_name, "stop":false}
+		var dico = {"thread":current_thread, "semaphore":current_semaphore, "file_base_name":script_name, "stop":false}
+	
+		if !label_name.empty():
+			dico["label_name"] = label_name
 	
 		if current_thread.start(self, "do_execute_script", dico) != OK:
 			current_thread = null
@@ -162,7 +165,7 @@ func execute_script(file_base_name:String) -> int:
 			
 			return FAILED
 		return OK
-	push_error("Rakugo does not have parse a script named: " + file_base_name)
+	push_error("Rakugo does not have parse a script named: " + script_name)
 	return FAILED
 
 func count_indent(s:String) -> int:
@@ -336,6 +339,9 @@ func do_execute_script(parameters:Dictionary) -> int:
 	
 	var labels = parsed_scripts[file_base_name]["labels"]
 	
+	if parameters.has("label_name"):
+		index = do_execute_jump(parameters["label_name"], parse_array, labels)
+	
 	while !parameters["stop"] and index < parse_array.size():
 		var line:Array = parse_array[index]
 		
@@ -454,9 +460,9 @@ func do_execute_script(parameters:Dictionary) -> int:
 	
 	return OK
 
-func parse_and_execute(file_name:String):
+func parse_and_execute(file_name:String, label_name:String):
 	if parse_script(file_name) == OK:
-		return execute_script(file_name.get_file().get_basename())
+		return execute_script(file_name.get_file().get_basename(), label_name)
 	return FAILED
 
 func _on_menu_return(index:int):
