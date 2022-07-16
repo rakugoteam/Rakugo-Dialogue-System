@@ -319,7 +319,8 @@ func do_execute_jump(jump_label:String, parse_array:Array, labels:Dictionary) ->
 func do_execute_script_end(thread:Thread, file_base_name:String):
 	thread.wait_to_finish()
 	
-	Rakugo.send_execute_script_finished(file_base_name)
+	if is_instance_valid(Rakugo):
+		Rakugo.send_execute_script_finished(file_base_name)
 
 func do_execute_script(parameters:Dictionary) -> int:
 	var thread = parameters["thread"]
