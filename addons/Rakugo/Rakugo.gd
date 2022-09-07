@@ -100,11 +100,14 @@ func has_variable(var_name:String) -> bool:
 func define_character(character_tag:String, character_name:String):
 	store_manager.characters[character_tag] = {"name":character_name}
 
+func character_exists(character_tag:String) -> bool:
+	return store_manager.characters.has(character_tag)
+
 func get_character(character_tag:String) -> Dictionary:
 	if character_tag.empty():
 		return {}
 	
-	if store_manager.characters.has(character_tag):
+	if character_exists(character_tag):
 		return store_manager.characters.get(character_tag)
 		
 	push_error("Rakugo does not knew a character with this tag: " + character_tag)
@@ -119,6 +122,14 @@ func set_character_variable(character_tag:String, var_name:String, value):
 	
 	if !char_.empty():
 		char_[var_name] = value
+
+func character_has_variable(character_tag:String, var_name:String) -> bool:
+	var char_ = get_character(character_tag)
+	
+	if !char_.empty():
+		return char_.has(var_name)
+		
+	return false
 	
 func get_character_variable(character_tag:String, var_name:String):
 	var char_ = get_character(character_tag)
@@ -127,7 +138,10 @@ func get_character_variable(character_tag:String, var_name:String):
 		if char_.has(var_name):
 			return char_[var_name]
 		else:
-			push_error("Rakugo does not have this variable: " + var_name + " on a character with this tag : " + character_tag)
+			push_error("Rakugo character with tag " + character_tag + " does not have this variable: " + var_name + ", returning null")
+			push_error("Available variables are: " + char_.keys())
+	else:
+		push_error("Rakugo character with this tag: " + character_tag + " does not exists, returning null")
 	
 	return null
 
