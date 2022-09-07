@@ -57,11 +57,11 @@ _global_script_class_icons={
 [addons]
 
 rakugo/spaghetti="bolognaise"
-rakugo/game_version="1.0.0"
 rakugo/force_reload=false
 rakugo/auto_mode_delay=3
 rakugo/skip_delay=0.5
 rakugo/rollback_steps=10
+rakugo/game_version="1.0.0"
 rakugo/history_length=30
 rakugo/narrator/name="narrator"
 rakugo/debug=false
@@ -77,7 +77,11 @@ config/icon="res://icon.png"
 [autoload]
 
 Rakugo="*res://addons/Rakugo/Rakugo.tscn"
-Settings="*res://addons/Rakugo/Settings.gd"
+
+[debug]
+
+gdscript/warnings/unused_argument=false
+gdscript/warnings/return_value_discarded=false
 
 [editor_plugins]
 
