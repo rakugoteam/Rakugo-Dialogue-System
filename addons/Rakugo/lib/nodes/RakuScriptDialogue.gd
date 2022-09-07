@@ -2,12 +2,15 @@ extends Node
 class_name RakuScriptDialogue
 
 export(String, FILE, "*.rk") var raku_script : String
-export var auto_start : bool
+export var starting_label_name := ""
+export var auto_start := false
 
 func _ready():
 	if auto_start:
 		start_dialogue()
 
 func start_dialogue():
-	Rakugo.parse_script(raku_script)
+	start_dialogue_from_label(starting_label_name)
 
+func start_dialogue_from_label(label_name : String):
+	Rakugo.parse_and_execute_script(raku_script, label_name)
