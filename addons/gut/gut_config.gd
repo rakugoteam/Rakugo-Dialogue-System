@@ -45,7 +45,11 @@ var default_options = {
 
 var default_panel_options = {
 	font_name = 'CourierPrime',
-	font_size = 30
+	font_size = 30,
+	hide_result_tree = false,
+	hide_output_text = false,
+	hide_settings = false,
+	use_colors = true
 }
 
 var options = default_options.duplicate()
@@ -86,12 +90,20 @@ func _load_options_from_config_file(file_path, into):
 
 	# Get all the options out of the config file using the option name.  The
 	# options hash is now the default source of truth for the name of an option.
-	for key in into:
-		if(results.result.has(key)):
-			if(results.result[key] != null):
-				into[key] = results.result[key]
+	_load_dict_into(results.result, into)
 
 	return 1
+
+func _load_dict_into(source, dest):
+	for key in dest:
+		if(source.has(key)):
+			if(source[key] != null):
+				if(typeof(source[key]) == TYPE_DICTIONARY):
+					_load_dict_into(source[key], dest[key])
+				else:
+					dest[key] = source[key]
+
+
 
 
 func write_options(path):
@@ -125,15 +137,16 @@ func _apply_options(opts, _tester):
 	_tester.set_log_level(opts.log_level)
 	_tester.set_ignore_pause_before_teardown(opts.ignore_pause)
 
+	if(opts.selected != ''):
+		_tester.select_script(opts.selected)
+		# _run_single = true
+
 	for i in range(opts.dirs.size()):
 		_tester.add_directory(opts.dirs[i], opts.prefix, opts.suffix)
 
 	for i in range(opts.tests.size()):
 		_tester.add_script(opts.tests[i])
 
-	if(opts.selected != ''):
-		_tester.select_script(opts.selected)
-		# _run_single = true
 
 	if(opts.double_strategy == 'full'):
 		_tester.set_double_strategy(DOUBLE_STRATEGY.FULL)
