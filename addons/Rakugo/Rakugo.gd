@@ -47,6 +47,7 @@ signal ask_return(result)
 signal menu(choices)
 signal menu_return(result)
 signal parser_unhandled_regex(key, result)
+signal execute_script_start(file_name)
 signal execute_script_finished(file_name)
 
 
@@ -175,6 +176,8 @@ func execute_script(script_name: String, label_name: String = "") -> int:
 func parse_and_execute_script(file_name: String, label_name: String = "") -> int:
 	return current_parser.parse_and_execute(file_name, label_name)
 
+func send_execute_script_start(file_base_name: String):
+	emit_signal("execute_script_start", file_base_name)
 
 func send_execute_script_finished(file_base_name: String):
 	emit_signal("execute_script_finished", file_base_name)
