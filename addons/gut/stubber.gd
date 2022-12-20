@@ -106,18 +106,16 @@ func _find_stub(obj, method, parameters=null, find_overloads=false):
 		# a paramerter override stub.
 		elif(null_match != null and !null_match.is_param_override_only()):
 			to_return = null_match
-		else:
-			_lgr.warn(str('Call to [', method, '] was not stubbed for the supplied parameters ', parameters, '.  Null was returned.'))
+
+
 
 	return to_return
 
 
 func add_stub(stub_params):
-	if(stub_params.stub_method == '_init'):
-		_lgr.error("You cannot stub _init.  Super's _init is ALWAYS called.")
-	else:
-		var key = _add_obj_method(stub_params.stub_target, stub_params.stub_method, stub_params.target_subpath)
-		returns[key][stub_params.stub_method].append(stub_params)
+	stub_params._lgr = _lgr
+	var key = _add_obj_method(stub_params.stub_target, stub_params.stub_method, stub_params.target_subpath)
+	returns[key][stub_params.stub_method].append(stub_params)
 
 
 # Gets a stubbed return value for the object and method passed in.  If the
@@ -141,6 +139,7 @@ func get_return(obj, method, parameters=null):
 	if(stub_info != null):
 		return stub_info.return_val
 	else:
+		_lgr.warn(str('Call to [', method, '] was not stubbed for the supplied parameters ', parameters, '.  Null was returned.'))
 		return null
 
 
@@ -180,6 +179,7 @@ func get_parameter_count(obj, method):
 func get_default_value(obj, method, p_index):
 	var to_return = null
 	var stub_info = _find_stub(obj, method, null, true)
+
 	if(stub_info != null and
 		stub_info.parameter_defaults != null and
 		stub_info.parameter_defaults.size() > p_index):
