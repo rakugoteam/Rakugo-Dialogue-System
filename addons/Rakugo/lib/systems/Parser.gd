@@ -334,6 +334,8 @@ func do_execute_script(parameters:Dictionary) -> int:
 	
 	var file_base_name = parameters["file_base_name"]
 	
+	Rakugo.send_execute_script_start(file_base_name)
+	
 	var index := 0
 	
 	var parse_array:Array = parsed_scripts[file_base_name]["parse_array"]
