@@ -27,19 +27,6 @@ const rakugo_version := "3.3"
 
 const StoreManager = preload("res://addons/Rakugo/lib/systems/StoreManager.gd")
 
-var current_scene_name := ""
-var current_scene_path := ""
-var current_scene_node: Node = null
-
-# don't save this
-var scene_anchor: Node
-
-var active := false
-var loading_in_progress := false
-var started := false
-var auto_stepping := false
-var skipping := false
-
 var waiting_step := false setget , is_waiting_step
 
 var variable_ask_name: String
@@ -50,12 +37,7 @@ var waiting_menu_return := false setget , is_waiting_menu_return
 #Parser
 onready var current_parser: Parser = Parser.new()
 
-# timers use by rakugo
-onready var auto_timer := $AutoTimer
-onready var skip_timer := $SkipTimer
-
 onready var store_manager := StoreManager.new()
-onready var History := $History
 
 signal step
 signal say(character, text)
@@ -64,9 +46,6 @@ signal ask(character, question, default_answer)
 signal ask_return(result)
 signal menu(choices)
 signal menu_return(result)
-signal started
-signal game_ended
-signal loading(progress)  ## Progress is to be either NaN or [0,1], loading(1) meaning loading finished.
 signal parser_unhandled_regex(key, result)
 signal execute_script_finished(file_name)
 
@@ -168,8 +147,6 @@ func get_character_variable(character_tag: String, var_name: String):
 
 
 func _ready():
-	self.scene_anchor = get_tree().get_root()
-	History.init()
 	var version = ProjectSettings.get_setting(Rakugo.game_version)
 	var title = ProjectSettings.get_setting(Rakugo.game_title)
 	OS.set_window_title(title + " " + version)
@@ -178,47 +155,12 @@ func _ready():
 	define_character("narrator", narrator_name)
 
 
-## Rakugo flow control
-
-
-# it starts Rakugo
-func start(after_load: bool = false):
-	started = true
-	if not after_load:
-		emit_signal("started")
-
-
-#	jump("", "", "")# Engage the auto-start
-
-
 func save_game(save_name: String = "quick"):
 	store_manager.save_game(save_name)
 
 
 func load_game(save_name := "quick"):
 	store_manager.load_game(save_name)
-
-
-#func rollback(amount:int = 1):
-#	var next = self.StoreManager.current_store_id + amount
-#	self.StoreManager.change_current_stack_index(next)
-
-
-func prepare_quitting():
-	if self.started:
-		self.save_game("auto")
-
-	# this don't exist in godot
-	# ProjectSettings.save_property_list()
-
-	# TODO: remove in future
-	# if current_dialogue:
-	# 	current_dialogue.exit()
-
-
-func reset_game():
-	started = false
-	emit_signal("game_ended")
 
 
 # Parser
@@ -262,54 +204,10 @@ func parser_add_regex_at_runtime(key: String, regex: String):
 # 		current_dialogue = new_dialogue
 
 
-func activate_skipping():
-	self.skipping = true
-	skip_timer.start()
-
-
-func deactivate_skipping():
-	self.skipping = false
-
-
-func activate_auto_stepping():
-	self.auto_stepping = true
-	auto_timer.start()
-
-
-func deactivate_auto_stepping():
-	self.auto_stepping = false
-
-
-## Utils
-func clean_scene_anchor():
-	if self.scene_anchor != get_tree().get_root():
-		for c in self.scene_anchor.get_children():
-			self.scene_anchor.remove_child(c)
-
-
-func debug_dict(
-	parameters: Dictionary, parameters_names: Array = [], some_custom_text: String = ""
-) -> String:
-	var dbg = ""
-
-	for k in parameters_names:
-		if k in parameters:
-			if not k in [null, ""]:
-				dbg += k + ":" + str(parameters[k]) + ", "
-
-	if parameters_names.size() > 0:
-		dbg.erase(dbg.length() - 2, 2)
-
-	return some_custom_text + dbg
-
-
 # for printing debugs is only print if debug_on == true
 # put some string array or string as argument
 func debug(some_text = []):
 	if not ProjectSettings.get_setting(Rakugo.debug):
-		return
-
-	if not started:
 		return
 
 	if typeof(some_text) == TYPE_ARRAY:
@@ -338,10 +236,6 @@ func do_step():
 	waiting_step = false
 
 	current_parser.current_semaphore.post()
-
-
-#Utils functions
-
 
 # statement of type say
 # its make given 'character' say 'text'
