@@ -25,7 +25,7 @@ func test_menu():
 		"menu",
 		[PoolStringArray(["Loop", "End"])])
 		
-	Rakugo.menu_return(1)
+	Rakugo.menu_return(2)
 
 	yield(yield_to(Rakugo, "execute_script_finished", 0.2), YIELD)
 

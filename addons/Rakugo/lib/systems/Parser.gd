@@ -430,6 +430,9 @@ func do_execute_script(parameters:Dictionary) -> int:
 					
 					if index == -2:
 						return FAILED
+				elif !(menu_jump_index in [0, menu_choices.size() - 1]):
+					push_error("Parser, do_execute_script, MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size()) )
+					return FAILED
 		
 			"SET_VARIABLE":
 				var rvar_name = result.get_string("rvar_name")
