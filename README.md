@@ -9,7 +9,7 @@
 [![GitHub](https://img.shields.io/github/issues/rakugoteam/Rakugo.svg)](https://github.com/rakugoteam/Rakugo/issues)
 [![GitHub](https://img.shields.io/github/issues-closed/rakugoteam/Rakugo.svg)](https://github.com/rakugoteam/Rakugo/issues)
 
-Inspired by [Ren'Py](https://www.renpy.org), Rakugo is a project aiming to provide a way to make narrative-based games on [Godot](https://godotengine.org) easily. Simplify your project, if it is a visual novel, point and click, RPG, interactive text game or many other styles and blends of styles.
+Core of our projects. Inspired by [Ren'Py](https://www.renpy.org), Rakugo is a project aiming to provide a way to make narrative-based games on [Godot](https://godotengine.org) easily. Simplify your project, if it is a visual novel, point and click, RPG, interactive text game or many other styles and blends of styles.
 
 Support this project here [itch.io](https://rakugoteam.github.io/donations/).
 
@@ -29,12 +29,13 @@ Support this project here [itch.io](https://rakugoteam.github.io/donations/).
 * Own script language
 * Save/Load system
 * Global variables and character's variables
+* [Gut](https://github.com/bitwes/Gut) (Godot Unit Test)
 
 ## Showcase
 
 ### Examples
 
-Check our project [RakuDialogUi](https://github.com/rakugoteam/RakuDialogueUI) to see examples of uses. You can copy them to yours projects too !
+Check our project [Examples](https://github.com/rakugoteam/Examples) to see examples of uses. You can copy and customize them for yours projects too !
 
 ### Games
 
@@ -94,16 +95,6 @@ Gd "I'm <Gd.name> !"
 
 Go to https://rakugoteam.github.io/rakugo-docs/ !
 
-## Rakugo Addons
-
-- [Advanced Text](https://github.com/rakugoteam/AdvancedText)
-
-## Rakugo Kits
-
-- [Visual Novel](https://github.com/rakugoteam/VisualNovelKit)
-- [Click & Point Adventures](https://github.com/rakugoteam/Adventure)
-- [RPG](https://github.com/rakugoteam/rakugo-open-rpg)
-
 ## FAQ:
 
 **Q:** So it's about adding a dialogue system to the engine? </p>
@@ -114,6 +105,19 @@ Go to https://rakugoteam.github.io/rakugo-docs/ !
 
 **Q:** Is it easy to use ?</p>
 **A:** Yes
+
+**Q:** What difference with [Dialogic](https://github.com/coppolaemilio/dialogic) ?</p>
+**A:** Our project use normal coding with our own scripting langue inspired by Ren'Py, instead of visual. Plus is just a core, simple as possible, autoloaded when you enabled the plugin. If you wnat more check our addons and kits bellow.
+
+## Rakugo Addons
+
+- [Advanced Text](https://github.com/rakugoteam/AdvancedText)
+
+## Rakugo Kits
+
+- [Visual Novel](https://github.com/rakugoteam/VisualNovelKit)
+- [Click & Point Adventures](https://github.com/rakugoteam/Adventure)
+- [RPG](https://github.com/rakugoteam/rakugo-open-rpg)
 
 ## Infos
 
