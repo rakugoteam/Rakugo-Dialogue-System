@@ -324,7 +324,7 @@ func do_execute_script_end(thread:Thread, file_base_name:String):
 	if is_instance_valid(Rakugo):
 		Rakugo.send_execute_script_finished(file_base_name)
 
-func do_execute_script(parameters:Dictionary) -> int:
+func do_execute_script(parameters:Dictionary):
 	var thread = parameters["thread"]
 	
 	threads[thread.get_id()] = parameters
@@ -345,7 +345,7 @@ func do_execute_script(parameters:Dictionary) -> int:
 		index = do_execute_jump(parameters["label_name"], parse_array, labels)
 		
 		if index == -1:
-			return FAILED
+			return
 	
 	while !parameters["stop"] and index < parse_array.size():
 		var line:Array = parse_array[index]
@@ -364,7 +364,8 @@ func do_execute_script(parameters:Dictionary) -> int:
 
 						if !var_:
 							push_error("Execute: Error on line: " + str(index))
-							return FAILED
+							parameters["stop"] = true
+							break
 
 						values.push_back(var_)
 
@@ -372,7 +373,8 @@ func do_execute_script(parameters:Dictionary) -> int:
 					
 					if line[2].has_execute_failed():
 						push_error("Execute: Error on line: " + str(index))
-						return FAILED
+						parameters["stop"] = true
+						break
 				else:
 					can_jump = true
 
@@ -380,6 +382,7 @@ func do_execute_script(parameters:Dictionary) -> int:
 					index = do_execute_jump(result.get_string("label"), parse_array, labels) - 1
 				
 				if index == -2:
+					parameters["stop"] = true
 					break
 			
 			"SAY":
@@ -431,10 +434,12 @@ func do_execute_script(parameters:Dictionary) -> int:
 					index = do_execute_jump(jump_label, parse_array, labels) - 1
 					
 					if index == -2:
-						return FAILED
+						parameters["stop"] = true
+						break
 				elif !(menu_jump_index in [0, menu_choices.size() - 1]):
 					push_error("Parser, do_execute_script, MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size()) )
-					return FAILED
+					parameters["stop"] = true
+					break
 		
 			"SET_VARIABLE":
 				var rvar_name = result.get_string("rvar_name")
@@ -447,7 +452,9 @@ func do_execute_script(parameters:Dictionary) -> int:
 					
 					if !value:
 						push_error("Parser::do_execute_script::SET_VARIABLE, variable " + rvar_name + " does not exist !")
-						return FAILED
+						parameters["stop"] = true
+						break
+						
 				elif !text.empty():
 					value = remove_double_quotes(text)
 				else:
@@ -465,8 +472,6 @@ func do_execute_script(parameters:Dictionary) -> int:
 		index += 1
 	
 	call_deferred("do_execute_script_end", thread, file_base_name)
-	
-	return OK
 
 func parse_and_execute(file_name:String, label_name:String):
 	if parse_script(file_name) == OK:
