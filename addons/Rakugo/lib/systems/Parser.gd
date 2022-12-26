@@ -86,7 +86,7 @@ var stop_thread := false
 
 enum State {Normal = 0, Menu, Jump}
 
-var state = State.Normal
+var state:int
 
 var menu_jump_index:int
 
@@ -205,6 +205,8 @@ func parse_script(file_name:String) -> int:
 	var menu_choices
 	
 	var current_menu_result
+	
+	state = State.Normal
 	
 	for i in lines.size():
 		var line = lines[i]
