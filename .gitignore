@@ -6,4 +6,5 @@ mono_crash.*.json
 /addons/*
 !/addons/gd-plug/
 !/addons/Rakugo/
+!/addons/gut/
 site
