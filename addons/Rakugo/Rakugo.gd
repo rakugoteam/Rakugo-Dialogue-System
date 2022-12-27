@@ -87,8 +87,11 @@ func define_character(character_tag: String, character_name: String):
 
 
 func character_exists(character_tag: String) -> bool:
+	push_warning("obsolete, in the next version it will be removed, instead use the function `has_character`")
 	return store_manager.characters.has(character_tag)
 
+func has_character(character_tag: String) -> bool:
+	return store_manager.characters.has(character_tag)
 
 func get_character(character_tag: String) -> Dictionary:
 	if character_tag.empty():
