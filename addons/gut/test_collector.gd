@@ -16,6 +16,14 @@ class Test:
 	# if the test has been marked pending at anypont during
 	# execution.
 	var pending = false
+	# the line number when the  test fails
+	var line_number = -1
+
+	func did_pass():
+		return passed and !pending and assert_count > 0
+
+	func did_assert():
+		return assert_count > 0 or pending
 
 
 # ------------------------------------------------------------------------------

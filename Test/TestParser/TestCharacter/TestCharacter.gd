@@ -2,10 +2,11 @@ extends GutTest
 
 const file_name = "res://Test/TestParser/TestCharacter/TestCharacter.rk"
 
-func before_all():
-	Rakugo.parse_and_execute_script(file_name)
-
 func test_character():
+	Rakugo.parse_and_execute_script(file_name)
+	
+	yield(yield_to(Rakugo, "execute_script_finished", 0.2), YIELD)
+	
 	var sylvie = Rakugo.get_character("Sy")
 	
 	assert_ne(sylvie, {})

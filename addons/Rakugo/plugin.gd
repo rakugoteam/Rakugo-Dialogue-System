@@ -1,10 +1,6 @@
 tool
 extends EditorPlugin
 
-#var rakugo_tools
-#var tools_menu
-#var tm_container
-
 
 func _enter_tree():
 	# Initialization of the plugin goes here
@@ -31,6 +27,3 @@ func _exit_tree():
 	# ProjectSettings.set_setting("addons/rakugo/test_mode", null)
 
 #	remove_control_from_container(tm_container, tools_menu)
-#
-#	tools_menu.free()
-#	rakugo_tools.free()
