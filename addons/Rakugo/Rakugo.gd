@@ -49,17 +49,16 @@ signal menu_return(result)
 signal parser_unhandled_regex(key, result)
 signal execute_script_start(file_name)
 signal execute_script_finished(file_name)
-signal variable_changed(var_name, value)
+
 
 ## Variables
 func set_variable(var_name: String, value):
 	var vars_ = var_name.split(".")
-	
+
 	if vars_.size() > 1:
 		return set_character_variable(vars_[0], vars_[1], value)
-		
+
 	store_manager.variables[var_name] = value
-	emit_signal("variable_changed", var_name, value)
 
 
 func get_variable(var_name: String):
@@ -87,11 +86,8 @@ func define_character(character_tag: String, character_name: String):
 
 
 func character_exists(character_tag: String) -> bool:
-	push_warning("obsolete, in the next version it will be removed, instead use the function `has_character`")
 	return store_manager.characters.has(character_tag)
 
-func has_character(character_tag: String) -> bool:
-	return store_manager.characters.has(character_tag)
 
 func get_character(character_tag: String) -> Dictionary:
 	if character_tag.empty():
