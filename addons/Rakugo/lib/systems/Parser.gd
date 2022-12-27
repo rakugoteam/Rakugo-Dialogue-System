@@ -49,6 +49,8 @@ var Regex := {
 # Regex in this language can be extended by the other addons
 # Order is matter !
 var parser_regex :={
+	# menu label_name?:
+	MENU = "^menu( (?<label>{NAME}))?:$",
 	# dialogue label_name:
 	DIALOGUE = "^(?<label>{NAME}):$",
 	# character tag = "character_name"
@@ -57,8 +59,6 @@ var parser_regex :={
 	SAY = "^((?<character_tag>{NAME}) )?(?<text>{STRING})$",
 	# var_name = character_tag? "please enter text" 
 	ASK = "^(?<variable>{VARIABLE}) = ((?<character_tag>{NAME}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})$",
-	# menu label_name?:
-	MENU = "^menu( (?<label>{NAME}))?:$",
 	# "like regex" (> label_name)?
 	CHOICE = "^(?<text>{STRING})( > (?<label>{NAME}))?$",
 	# jump label
@@ -86,7 +86,7 @@ var stop_thread := false
 
 enum State {Normal = 0, Menu, Jump}
 
-var state = State.Normal
+var state:int
 
 var menu_jump_index:int
 
@@ -206,6 +206,8 @@ func parse_script(file_name:String) -> int:
 	
 	var current_menu_result
 	
+	state = State.Normal
+	
 	for i in lines.size():
 		var line = lines[i]
 		
@@ -236,8 +238,11 @@ func parse_script(file_name:String) -> int:
 								menu_choices = []
 								
 								state = State.Menu
-
-								labels[result.get_string("label")] = parse_array.size()
+								
+								var label = result.get_string("label")
+								
+								if !label.empty():
+									labels[label] = parse_array.size()
 								
 							"DIALOGUE":
 								var dialogue_label = result.get_string("label")
@@ -307,17 +312,11 @@ func parse_script(file_name:String) -> int:
 	return OK
 
 func do_execute_jump(jump_label:String, parse_array:Array, labels:Dictionary) -> int:
-	var index := -1
 	if labels.has(jump_label):
-		index = labels[jump_label]
+		return labels[jump_label]
 		
-		if index >= parse_array.size():
-			push_error("Parser, do_execute_script, JUMP, index out of range")
-			index = -1
-	else:
-		push_error("Parser, do_execute_script, JUMP, unknow label")
-		
-	return index
+	push_error("Parser, do_execute_script, JUMP, unknow label")
+	return -1
 
 func do_execute_script_end(thread:Thread, file_base_name:String):
 	thread.wait_to_finish()
@@ -430,9 +429,12 @@ func do_execute_script(parameters:Dictionary) -> int:
 					var jump_label = menu_jumps[menu_jump_index]
 
 					index = do_execute_jump(jump_label, parse_array, labels) - 1
-				
+					
 					if index == -2:
 						return FAILED
+				elif !(menu_jump_index in [0, menu_choices.size() - 1]):
+					push_error("Parser, do_execute_script, MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size()) )
+					return FAILED
 		
 			"SET_VARIABLE":
 				var rvar_name = result.get_string("rvar_name")

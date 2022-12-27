@@ -267,7 +267,7 @@ func ask_return(result):
 
 	set_variable(variable_ask_name, result)
 
-	Rakugo.emit_signal("ask_return", result)
+	current_parser.current_semaphore.post()
 
 
 # statement of type menu
@@ -283,8 +283,10 @@ func is_waiting_menu_return():
 
 func menu_return(index: int):
 	waiting_menu_return = false
+	
+	current_parser.menu_jump_index = index
 
-	Rakugo.emit_signal("menu_return", index)
+	current_parser.current_semaphore.post()
 
 
 func notify(text: String):
