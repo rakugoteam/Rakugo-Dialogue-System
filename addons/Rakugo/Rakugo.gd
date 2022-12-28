@@ -49,16 +49,17 @@ signal menu_return(result)
 signal parser_unhandled_regex(key, result)
 signal execute_script_start(file_name)
 signal execute_script_finished(file_name)
-
+signal variable_changed(var_name, value)
 
 ## Variables
 func set_variable(var_name: String, value):
 	var vars_ = var_name.split(".")
-
+	
 	if vars_.size() > 1:
 		return set_character_variable(vars_[0], vars_[1], value)
-
+		
 	store_manager.variables[var_name] = value
+	emit_signal("variable_changed", var_name, value)
 
 
 func get_variable(var_name: String):
