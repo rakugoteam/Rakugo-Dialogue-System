@@ -26,6 +26,8 @@ const maximized = "display/window/size/maximized"
 const version := "1.1.2"
 
 const StoreManager = preload("res://addons/Rakugo/lib/systems/StoreManager.gd")
+const Parser = preload("res://addons/Rakugo/lib/systems/Parser.gd")
+const Executer = preload("res://addons/Rakugo/lib/systems/Executer.gd")
 
 var waiting_step := false setget , is_waiting_step
 
@@ -34,18 +36,15 @@ var waiting_ask_return := false setget , is_waiting_ask_return
 
 var waiting_menu_return := false setget , is_waiting_menu_return
 
-#Parser
-onready var current_parser: Parser = Parser.new()
-
 onready var store_manager := StoreManager.new()
+onready var current_parser := Parser.new(store_manager)
+onready var executer := Executer.new(store_manager)
 
 signal step
 signal say(character, text)
 signal notify(text)
 signal ask(character, question, default_answer)
-signal ask_return(result)
 signal menu(choices)
-signal menu_return(result)
 signal parser_unhandled_regex(key, result)
 signal execute_script_start(file_name)
 signal execute_script_finished(file_name)
