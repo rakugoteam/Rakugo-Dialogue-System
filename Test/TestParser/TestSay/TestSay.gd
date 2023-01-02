@@ -2,41 +2,62 @@ extends GutTest
 
 const file_name = "res://Test/TestParser/TestSay/TestSay.rk"
 
-func before_all():
-	Rakugo.connect("say", self, "_on_say")
-	
-	Rakugo.parse_and_execute_script(file_name)
-	
-var say_char:Dictionary
-var say_text:String
-func _on_say(character:Dictionary, text:String):
-	say_char = character
-	say_text = text
+var file_base_name = file_name.get_file().get_basename()
 
 func test_say():
+	watch_signals(Rakugo)
+
+	Rakugo.parse_and_execute_script(file_name)
+
+	yield(yield_to(Rakugo, "execute_script_start", 0.2), YIELD)
+
 	yield(yield_to(Rakugo, "say", 0.2), YIELD)
+
+	assert_signal_emitted_with_parameters(
+		Rakugo,
+		"say",
+		[{}, "Hello, world !"])
+
+	assert_true(Rakugo.waiting_step)
 	
-	assert_true(say_char.empty())
-	assert_eq(say_text, "Hello, world !")
+	Rakugo.do_step()
+	
+	yield(yield_to(Rakugo, "say", 0.2), YIELD)
+
+	assert_signal_emitted_with_parameters(
+		Rakugo,
+		"say",
+		[{"name": "Sylvie"}, "Hello !"])
+
+	assert_true(Rakugo.waiting_step)
 	
 	Rakugo.do_step()
 	
 	yield(yield_to(Rakugo, "say", 0.2), YIELD)
 	
-	assert_false(say_char.empty())
-	assert_eq(say_char["name"], "Sylvie")
-	assert_eq(say_text, "Hello !")
+	assert_signal_emitted_with_parameters(
+		Rakugo,
+		"say",
+		[{}, "My name is Sylvie"])
 	
+	assert_true(Rakugo.waiting_step)
+
 	Rakugo.do_step()
 	
 	yield(yield_to(Rakugo, "say", 0.2), YIELD)
 	
-	assert_eq(say_text, "My name is Sylvie")
+	assert_signal_emitted_with_parameters(
+		Rakugo,
+		"say",
+		[{}, "I am 18"])
 	
+	assert_true(Rakugo.waiting_step)
+
 	Rakugo.do_step()
-	
-	yield(yield_to(Rakugo, "say", 0.2), YIELD)
-	
-	assert_eq(say_text, "I am 18")
-	
-	Rakugo.do_step()
+
+	yield(yield_to(Rakugo, "execute_script_finished", 0.2), YIELD)
+
+	assert_signal_emitted_with_parameters(
+		Rakugo,
+		"execute_script_finished",
+		[file_base_name])
