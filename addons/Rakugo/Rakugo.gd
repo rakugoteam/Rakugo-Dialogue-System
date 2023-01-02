@@ -49,16 +49,18 @@ signal menu_return(result)
 signal parser_unhandled_regex(key, result)
 signal execute_script_start(file_name)
 signal execute_script_finished(file_name)
-
+signal variable_changed(var_name, value)
+signal character_variable_changed(character_tag, var_name, value)
 
 ## Variables
 func set_variable(var_name: String, value):
 	var vars_ = var_name.split(".")
-
+	
 	if vars_.size() > 1:
 		return set_character_variable(vars_[0], vars_[1], value)
-
+		
 	store_manager.variables[var_name] = value
+	emit_signal("variable_changed", var_name, value)
 
 
 func get_variable(var_name: String):
@@ -107,10 +109,12 @@ func get_narrator():
 
 
 func set_character_variable(character_tag: String, var_name: String, value):
+
 	var char_ = get_character(character_tag)
 
 	if !char_.empty():
 		char_[var_name] = value
+		emit_signal("character_variable_changed", character_tag, var_name, value)
 
 
 func character_has_variable(character_tag: String, var_name: String) -> bool:
