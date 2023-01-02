@@ -37,7 +37,7 @@ var waiting_ask_return := false setget , is_waiting_ask_return
 var waiting_menu_return := false setget , is_waiting_menu_return
 
 onready var store_manager := StoreManager.new()
-onready var current_parser := Parser.new(store_manager)
+onready var parser := Parser.new(store_manager)
 onready var executer := Executer.new(store_manager)
 
 signal step
@@ -173,15 +173,17 @@ func load_game(save_name := "quick"):
 
 # Parser
 func parse_script(file_name: String) -> int:
-	return current_parser.parse_script(file_name)
+	return parser.parse_script(file_name)
 
 
 func execute_script(script_name: String, label_name: String = "") -> int:
-	return current_parser.execute_script(script_name, label_name)
+	return executer.execute_script(script_name, label_name)
 
 
 func parse_and_execute_script(file_name: String, label_name: String = "") -> int:
-	return current_parser.parse_and_execute(file_name, label_name)
+	if parser.parse_script(file_name) == OK:
+		return executer.execute_script(file_name.get_file().get_basename(), label_name)
+	return FAILED
 
 func send_execute_script_start(file_base_name: String):
 	emit_signal("execute_script_start", file_base_name)
@@ -191,12 +193,12 @@ func send_execute_script_finished(file_base_name: String):
 
 
 func _exit_tree() -> void:
-	current_parser.close()
+	executer.close()
 
 
 # Todo Handle Error
 func parser_add_regex_at_runtime(key: String, regex: String):
-	current_parser.add_regex_at_runtime(key, regex)
+	parser.add_regex_at_runtime(key, regex)
 
 
 ## Dialogue flow control
@@ -245,7 +247,7 @@ func is_waiting_step():
 func do_step():
 	waiting_step = false
 
-	current_parser.current_semaphore.post()
+	executer.current_semaphore.post()
 
 # statement of type say
 # its make given 'character' say 'text'
@@ -274,7 +276,7 @@ func ask_return(result):
 
 	set_variable(variable_ask_name, result)
 
-	current_parser.current_semaphore.post()
+	executer.current_semaphore.post()
 
 
 # statement of type menu
@@ -291,9 +293,9 @@ func is_waiting_menu_return():
 func menu_return(index: int):
 	waiting_menu_return = false
 	
-	current_parser.menu_jump_index = index
+	executer.menu_jump_index = index
 
-	current_parser.current_semaphore.post()
+	executer.current_semaphore.post()
 
 
 func notify(text: String):

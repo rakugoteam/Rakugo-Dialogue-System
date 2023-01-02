@@ -87,8 +87,6 @@ enum State {Normal = 0, Menu, Jump}
 
 var state:int
 
-var menu_jump_index:int
-
 func add_regex(key:String, regex:String, cache:Dictionary, error:String):
 	regex = regex.format(Regex)
 	
@@ -250,16 +248,3 @@ func parse_script(path:String) -> int:
 	store_manager.parsed_scripts[path.get_file().get_basename()] = {"parse_array":parse_array, "labels":labels}
 	
 	return OK
-
-func parse_and_execute(file_name:String, label_name:String):
-	if parse_script(file_name) == OK:
-		return execute_script(file_name.get_file().get_basename(), label_name)
-	return FAILED
-
-func _on_menu_return(index:int):
-	menu_jump_index = index
-	
-	current_semaphore.post()
-
-func _on_ask_return(result):
-	current_semaphore.post()
