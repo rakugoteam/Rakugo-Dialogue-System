@@ -8,10 +8,25 @@ var variables: Dictionary
 #store rakugo characters
 var characters: Dictionary
 
+var parsed_scripts: Dictionary
 
 func _init():
 	save_folder_path = ProjectSettings.get_setting("addons/rakugo/save_folder")
 
+
+## Rk
+func load_rk(path: String) -> PoolStringArray:
+	var file = File.new()
+	
+	if file.open(path, File.READ) != OK:
+		push_error("can't open file : " + path)
+		return PoolStringArray()
+	
+	var lines = file.get_as_text().split("\n", false)
+	
+	file.close()
+
+	return lines
 
 ## JSON
 func load_json(path: String) -> Dictionary:
