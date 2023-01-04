@@ -1,14 +1,6 @@
 extends Node
 
-var save_folder_path = "user://saves"
-# var save_format = "test"
-
-var store_stack = []
-var store_stack_max_length = 5
-var current_store_id = 0
-var persistent_store = null
-
-signal saved
+var save_folder_path:String
 
 #store rakugo variables
 var variables: Dictionary
@@ -17,9 +9,8 @@ var variables: Dictionary
 var characters: Dictionary
 
 
-func _ready():
-	save_folder_path = ProjectSettings.get_setting("rakugo/save_folder")
-	# save_format = ProjectSettings.get_setting("rakugo/save_format")
+func _init():
+	save_folder_path = ProjectSettings.get_setting("addons/rakugo/save_folder")
 
 
 ## JSON
