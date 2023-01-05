@@ -1,35 +1,20 @@
-extends GutTest
+extends "res://Test/RakugoTest.gd"
 
-const file_name = "res://test/TestParser/TestMenu/TestMenu.rk"
+const file_path = "res://test/TestParser/TestMenu/TestMenu.rk"
 
-var file_base_name = file_name.get_file().get_basename()
+var file_base_name = get_file_base_name(file_path)
 
 func test_menu():
-	watch_signals(Rakugo)
+	watch_rakugo_signals()
 	
-	Rakugo.parse_and_execute_script(file_name)
+	yield(wait_parse_and_execute_script(file_path), "completed")
 	
-	yield(yield_to(Rakugo, "menu", 0.2), YIELD)
-	
-	assert_signal_emitted_with_parameters(
-		Rakugo,
-		"menu",
-		[PoolStringArray(["Loop", "End"])])
+	yield(wait_menu(["Loop", "End"]), "completed")
 
-	Rakugo.menu_return(0)
+	assert_menu_return(0);
 	
-	yield(yield_to(Rakugo, "menu", 0.2), YIELD)
-	
-	assert_signal_emitted_with_parameters(
-		Rakugo,
-		"menu",
-		[PoolStringArray(["Loop", "End"])])
+	yield(wait_menu(["Loop", "End"]), "completed")
 		
-	Rakugo.menu_return(1)
+	assert_menu_return(1);
 
-	yield(yield_to(Rakugo, "execute_script_finished", 0.2), YIELD)
-
-	assert_signal_emitted_with_parameters(
-		Rakugo,
-		"execute_script_finished",
-		[file_base_name])
+	yield(wait_execute_script_finished(file_base_name), "completed")

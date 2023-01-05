@@ -1,19 +1,17 @@
-extends GutTest
+extends "res://Test/RakugoTest.gd"
 
-const file_name = "res://Test/TestParser/TestCharacter/TestCharacter.rk"
+const file_path = "res://Test/TestParser/TestCharacter/TestCharacter.rk"
+
+var file_base_name = get_file_base_name(file_path)
 
 func test_character():
-	Rakugo.parse_and_execute_script(file_name)
+	watch_rakugo_signals()
+
+	yield(wait_parse_and_execute_script(file_path), "completed")
+
+	yield(wait_execute_script_finished(file_base_name), "completed")
 	
-	yield(yield_to(Rakugo, "execute_script_finished", 0.2), YIELD)
-	
-	var sylvie = Rakugo.get_character("Sy")
-	
-	assert_ne(sylvie, {})
-	assert_eq(sylvie.get("name"), "Sylvie")
-	
-	var godot = Rakugo.get_character("Gd")
-	
-	assert_ne(godot, {})
-	assert_eq(godot.get("name"), "Godot")
+	assert_character_name_eq("Sy", "Sylvie")
+
+	assert_character_name_eq("Gd", "Godot")
 	

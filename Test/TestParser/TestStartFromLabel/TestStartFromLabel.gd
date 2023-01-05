@@ -1,18 +1,16 @@
-extends GutTest
+extends "res://Test/RakugoTest.gd"
 
 const file_path = "res://Test/TestParser/TestStartFromLabel/TestStartFromLabel.rk"
 
-var say_char:Dictionary
-var say_text:String
-func _on_say(character:Dictionary, text:String):
-	say_char = character
-	say_text = text
+var file_base_name = get_file_base_name(file_path)
 
 func test_start_from_label():
-	Rakugo.connect("say", self, "_on_say")
-	
 	Rakugo.parse_and_execute_script(file_path, "pictures")
-	
-	yield(yield_to(Rakugo, "say", 0.2), YIELD)
-	
-	assert_eq(say_text, "Pictures of places that I have visited.")
+
+	yield(wait_execute_script_start(file_path), "completed")
+
+	yield(wait_say({}, "Pictures of places that I have visited."), "completed")
+
+	assert_do_step()
+
+	yield(wait_execute_script_finished(file_base_name), "completed")
