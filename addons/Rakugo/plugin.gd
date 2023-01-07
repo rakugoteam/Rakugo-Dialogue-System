@@ -12,7 +12,7 @@ func _enter_tree():
 	ProjectSettings.set_setting("addons/rakugo/history_length", 30)
 	ProjectSettings.set_setting("addons/rakugo/narrator/name", "narrator")
 	ProjectSettings.set_setting("addons/rakugo/debug", false)
-	ProjectSettings.set_setting("addons/rakugo/save_folder", "res://saves")
+	ProjectSettings.set_setting("addons/rakugo/save_folder", "user://saves")
 	# ProjectSettings.set_setting("addons/rakugo/test_mode", false)
 
 	print("Rakugo is enabled")
