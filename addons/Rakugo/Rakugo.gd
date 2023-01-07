@@ -23,7 +23,7 @@ const height = "display/window/size/height"
 const fullscreen = "display/window/size/fullscreen"
 const maximized = "display/window/size/maximized"
 
-const rakugo_version := "3.3"
+const version := "1.1.2"
 
 const StoreManager = preload("res://addons/Rakugo/lib/systems/StoreManager.gd")
 
