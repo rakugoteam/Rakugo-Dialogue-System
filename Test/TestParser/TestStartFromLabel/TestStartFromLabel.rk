@@ -1,5 +1,11 @@
 door:
 "Where did I put the key?"
+exit
 
 pictures:
 "Pictures of places that I have visited."
+exit
+
+plants:
+"They need water."
+exit

@@ -5,4 +5,3 @@ ddd = aaa
 character Sy "Sylvie"
 Sy.life = 5
 eee = Sy.life
-"Test"

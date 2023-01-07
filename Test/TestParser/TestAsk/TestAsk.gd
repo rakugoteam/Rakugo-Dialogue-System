@@ -1,28 +1,16 @@
-extends GutTest
+extends "res://Test/RakugoTest.gd"
 
-const file_name = "res://test/TestParser/TestAsk/TestAsk.rk"
+const file_path = "res://test/TestParser/TestAsk/TestAsk.rk"
 
-var file_base_name = file_name.get_file().get_basename()
+var file_base_name = get_file_base_name(file_path)
 
 func test_ask():
-	watch_signals(Rakugo)
+	watch_rakugo_signals()
+
+	yield(wait_parse_and_execute_script(file_path), "completed")
 	
-	Rakugo.parse_and_execute_script(file_name)
+	yield(wait_ask({}, "Are you human ?", "Yes"), "completed")
 	
-	yield(yield_to(Rakugo, "ask", 0.2), YIELD)
+	assert_ask_return("answer", "No")
 	
-	assert_signal_emitted_with_parameters(
-		Rakugo,
-		"ask",
-		[{}, "Are you human ?", "Yes"])
-		
-	Rakugo.ask_return("No")
-	
-	assert_eq("No", Rakugo.get_variable("answer"))
-	
-	yield(yield_to(Rakugo, "execute_script_finished", 0.2), YIELD)
-	
-	assert_signal_emitted_with_parameters(
-		Rakugo,
-		"execute_script_finished",
-		[file_base_name])
+	yield(wait_execute_script_finished(file_base_name), "completed")

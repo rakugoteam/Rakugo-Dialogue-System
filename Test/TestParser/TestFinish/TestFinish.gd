@@ -1,18 +1,14 @@
-extends GutTest
+extends "res://Test/RakugoTest.gd"
 
 const file_path = "res://Test/TestParser/TestFinish/TestFinish.rk"
 
-var file_name := ""
-func _on_execute_script_finished(file_base_name:String):
-	file_name = file_base_name
+var file_base_name = get_file_base_name(file_path)
 
 func test_finish():
-	Rakugo.connect("execute_script_finished", self, "_on_execute_script_finished")
-	
-	Rakugo.parse_and_execute_script(file_path)
-	
-	Rakugo.do_step()
+	watch_rakugo_signals()
 
-	yield(yield_to(Rakugo, "execute_script_finished", 0.2), YIELD)
-	
-	assert_eq(file_name, "TestFinish")
+	yield(wait_parse_and_execute_script(file_path), "completed")
+
+	assert_do_step()
+
+	yield(wait_execute_script_finished(file_base_name), "completed")

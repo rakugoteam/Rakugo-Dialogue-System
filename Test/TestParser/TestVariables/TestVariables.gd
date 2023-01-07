@@ -1,44 +1,28 @@
-extends GutTest
+extends "res://Test/RakugoTest.gd"
 
-const file_name = "res://Test/TestParser/TestVariables/TestVariables.rk"
+const file_path = "res://Test/TestParser/TestVariables/TestVariables.rk"
 
-func before_all():
-	Rakugo.parse_and_execute_script(file_name)
+var file_base_name = get_file_base_name(file_path)
 
 func test_variables():
-	yield(yield_to(Rakugo, "say", 0.2), YIELD)
+	watch_rakugo_signals()
 
-	var a = Rakugo.get_variable("aaa")
-	
-	assert_eq(typeof(a), TYPE_INT)
-	assert_eq(a, 1)
+	yield(wait_parse_and_execute_script(file_path), "completed")
 
-	var b = Rakugo.get_variable("bbb")
+	yield(wait_execute_script_finished(file_base_name), "completed")
 
-	assert_eq(typeof(b), TYPE_REAL)
-	assert_eq(b, 2.5)
+	assert_variable("aaa", TYPE_INT, 1)
 
-	var c = Rakugo.get_variable("ccc")
+	assert_variable("bbb", TYPE_REAL, 2.5)
 
-	assert_eq(typeof(c), TYPE_STRING)
-	assert_eq(c, "Hello, world !")
+	assert_variable("ccc", TYPE_STRING, "Hello, world !")
 
-	var d = Rakugo.get_variable("ddd")
+	assert_variable("ddd", TYPE_INT, Rakugo.get_variable("aaa"))
+
+	assert_variable("Sy.name", TYPE_STRING, "Sylvie")
 	
-	assert_eq(d, a)
+	assert_variable("Sy.life", TYPE_INT, 5)
 	
-	var syname = Rakugo.get_variable("Sy.name")
-	
-	assert_eq(typeof(syname), TYPE_STRING)
-	assert_eq(syname, "Sylvie")
-	
-	var sylife = Rakugo.get_variable("Sy.life")
-	
-	assert_eq(typeof(sylife), TYPE_INT)
-	assert_eq(sylife, 5)
-	
-	var e = Rakugo.get_variable("eee")
-	
-	assert_eq(e, sylife)
+	assert_variable("eee", TYPE_INT, Rakugo.get_variable("Sy.life"))
 
 	assert_eq(Rakugo.get_variable("fff"), null)
