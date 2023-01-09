@@ -19,11 +19,6 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/gut/test.gd"
 }, {
-"base": "Object",
-"class": "Parser",
-"language": "GDScript",
-"path": "res://addons/Rakugo/lib/systems/Parser.gd"
-}, {
 "base": "Node",
 "class": "RakuScriptDialogue",
 "language": "GDScript",
@@ -32,7 +27,6 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "GutHookScript": "",
 "GutTest": "",
-"Parser": "",
 "RakuScriptDialogue": ""
 }
 
