@@ -11,7 +11,7 @@ var current_semaphore:Semaphore
 var threads:Dictionary
 
 var regex := {
-	NAME = "[a-zA-Z_][a-zA-Z_0-9]+",
+	NAME = "[a-zA-Z][a-zA-Z_0-9]*",
 	VARIABLE = "((?<char_tag>{NAME})\\.)?(?<var_name>{NAME})",
 	VARIABLE_IN_STR = "\\<(?<variable>{VARIABLE})\\>"
 }

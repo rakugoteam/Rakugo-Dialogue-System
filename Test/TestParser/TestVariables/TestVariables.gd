@@ -11,18 +11,18 @@ func test_variables():
 
 	yield(wait_execute_script_finished(file_base_name), "completed")
 
-	assert_variable("aaa", TYPE_INT, 1)
+	assert_variable("a", TYPE_INT, 1)
 
-	assert_variable("bbb", TYPE_REAL, 2.5)
+	assert_variable("b", TYPE_REAL, 2.5)
 
-	assert_variable("ccc", TYPE_STRING, "Hello, world !")
+	assert_variable("c", TYPE_STRING, "Hello, world !")
 
-	assert_variable("ddd", TYPE_INT, Rakugo.get_variable("aaa"))
+	assert_variable("d", TYPE_INT, Rakugo.get_variable("a"))
 
 	assert_variable("Sy.name", TYPE_STRING, "Sylvie")
 	
 	assert_variable("Sy.life", TYPE_INT, 5)
 	
-	assert_variable("eee", TYPE_INT, Rakugo.get_variable("Sy.life"))
+	assert_variable("e", TYPE_INT, Rakugo.get_variable("Sy.life"))
 
-	assert_eq(Rakugo.get_variable("fff"), null)
+	assert_eq(Rakugo.get_variable("f"), null)

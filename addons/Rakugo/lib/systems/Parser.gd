@@ -39,7 +39,7 @@ var Tokens := {
 }
 
 var Regex := {
-	NAME = "[a-zA-Z_][a-zA-Z_0-9]+",
+	NAME = "[a-zA-Z][a-zA-Z_0-9]*",
 	NUMERIC = "-?[1-9][0-9.]*",
 	STRING = "\".*\"",
 	VARIABLE = "((?<char_tag>{NAME})\\.)?(?<var_name>{NAME})",
