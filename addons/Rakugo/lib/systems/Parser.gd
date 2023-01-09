@@ -50,6 +50,8 @@ var Regex := {
 # Regex in this language can be extended by the other addons
 # Order is matter !
 var parser_regex :={
+	# exit dialogue
+	EXIT = "^\\s*exit$",
 	# menu label_name?:
 	MENU = "^menu( (?<label>{NAME}))?:$",
 	# dialogue label_name:

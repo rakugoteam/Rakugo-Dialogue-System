@@ -112,6 +112,10 @@ func do_execute_script(parameters:Dictionary):
 		var result = line[1]
 		
 		match(line[0]):
+			"EXIT":
+				parameters["stop"] = true
+				break
+
 			"JUMP":
 				var can_jump = false
 
