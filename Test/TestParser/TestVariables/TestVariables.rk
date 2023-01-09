@@ -1,7 +1,7 @@
-aaa = 1
-bbb = 2.5
-ccc = "Hello, world !"
-ddd = aaa
+a = 1
+b = 2.5
+c = "Hello, world !"
+d = a
 character Sy "Sylvie"
 Sy.life = 5
-eee = Sy.life
+e = Sy.life
