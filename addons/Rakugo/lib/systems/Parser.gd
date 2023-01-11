@@ -167,10 +167,14 @@ func parse_script(path:String) -> int:
 	
 		match(state):
 			State.Normal:
+				var have_find_key := false
+
 				for key in regex_cache:
 					var result = regex_cache[key].search(line)
 					
 					if result:
+						have_find_key = true
+
 						match(key):
 							"MENU":
 								current_menu_result = result
@@ -232,6 +236,10 @@ func parse_script(path:String) -> int:
 							_:
 								parse_array.push_back([key, result])
 						break
+
+				if (not have_find_key):
+					push_error("Parser: Error on line: " + str(i) + ", can not parse it !")
+					return FAILED
 			State.Menu:
 				var result = regex_cache["CHOICE"].search(line)
 				if result:
@@ -243,6 +251,9 @@ func parse_script(path:String) -> int:
 					menu_choices.push_back(result)
 					
 					continue
+				else:
+					push_error("Parser: Error on line: " + str(i) + ", it is not a choice !")
+					return FAILED
 					
 		if state == State.Menu and i == lines.size() - 1 and !menu_choices.empty():
 			parse_array.push_back(["MENU", current_menu_result, menu_choices])
