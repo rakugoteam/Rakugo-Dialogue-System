@@ -1,5 +1,7 @@
 extends Object
 
+const jump_error = "Executer::do_execute_jump, can not jump to unknow label : "
+
 var store_manager
 
 var stop_thread := false
@@ -65,17 +67,19 @@ func execute_script(script_name:String, label_name:String) -> int:
 	push_error("Rakugo does not have parse a script named: " + script_name)
 	return FAILED
 
-func do_execute_script_end(thread:Thread, file_base_name:String):
-	thread.wait_to_finish()
+func do_execute_script_end(parameters:Dictionary):
+	parameters["thread"].wait_to_finish()
 	
-	if Rakugo != null:
-		Rakugo.send_execute_script_finished(file_base_name)
+	if parameters.has("error"):
+		push_error(parameters["error"])
 
-func do_execute_jump(jump_label:String, parse_array:Array, labels:Dictionary) -> int:
+	if Rakugo != null:
+		Rakugo.send_execute_script_finished(parameters["file_base_name"], parameters.get("error", ""))
+
+func do_execute_jump(jump_label:String, labels:Dictionary) -> int:
 	if labels.has(jump_label):
 		return labels[jump_label]
-		
-	push_error("Parser, do_execute_script, JUMP, unknow label")
+
 	return -1
 
 func remove_double_quotes(s:String) -> String:
@@ -99,12 +103,17 @@ func do_execute_script(parameters:Dictionary):
 	var parse_array:Array = script["parse_array"]
 	
 	var labels = script["labels"]
+
+	var error = OK
 	
 	if parameters.has("label_name"):
-		index = do_execute_jump(parameters["label_name"], parse_array, labels)
+		var label = parameters["label_name"]
+
+		index = do_execute_jump(label, labels)
 		
 		if index == -1:
-			return
+			parameters["error"] = jump_error + label
+			parameters["stop"] = true
 	
 	while !parameters["stop"] and index < parse_array.size():
 		var line:Array = parse_array[index]
@@ -126,7 +135,7 @@ func do_execute_script(parameters:Dictionary):
 						var var_ = Rakugo.get_variable(var_name)
 
 						if !var_:
-							push_error("Execute: Error on line: " + str(index))
+							parameters["error"] = "Executer::do_execute_script::JUMP, can not get variable :" + var_name
 							parameters["stop"] = true
 							break
 
@@ -135,16 +144,19 @@ func do_execute_script(parameters:Dictionary):
 					can_jump = line[2].execute(values)
 					
 					if line[2].has_execute_failed():
-						push_error("Execute: Error on line: " + str(index))
+						parameters["error"] = "Executer::do_execute_script::JUMP, failed to execute expression : " + result.get_string("expression")
 						parameters["stop"] = true
 						break
 				else:
 					can_jump = true
 
+				var label = result.get_string("label")
+
 				if can_jump:
-					index = do_execute_jump(result.get_string("label"), parse_array, labels) - 1
+					index = do_execute_jump(label, labels) - 1
 				
 				if index == -2:
+					parameters["error"] = jump_error + label
 					parameters["stop"] = true
 					break
 			
@@ -194,13 +206,14 @@ func do_execute_script(parameters:Dictionary):
 				if menu_jumps.has(menu_jump_index):
 					var jump_label = menu_jumps[menu_jump_index]
 
-					index = do_execute_jump(jump_label, parse_array, labels) - 1
+					index = do_execute_jump(jump_label, labels) - 1
 					
 					if index == -2:
+						parameters["error"] = jump_error + jump_label
 						parameters["stop"] = true
 						break
 				elif !(menu_jump_index in [0, menu_choices.size() - 1]):
-					push_error("Parser, do_execute_script, MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size()) )
+					parameters["error"] = "Executer::do_execute_script::MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size())
 					parameters["stop"] = true
 					break
 		
@@ -214,7 +227,7 @@ func do_execute_script(parameters:Dictionary):
 					value = Rakugo.get_variable(rvar_name)
 					
 					if !value:
-						push_error("Parser::do_execute_script::SET_VARIABLE, variable " + rvar_name + " does not exist !")
+						parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, can not get variable :" + rvar_name
 						parameters["stop"] = true
 						break
 						
@@ -234,4 +247,4 @@ func do_execute_script(parameters:Dictionary):
 		
 		index += 1
 	
-	call_deferred("do_execute_script_end", thread, file_base_name)
+	call_deferred("do_execute_script_end", parameters)

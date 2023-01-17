@@ -47,7 +47,7 @@ signal ask(character, question, default_answer)
 signal menu(choices)
 signal parser_unhandled_regex(key, result)
 signal execute_script_start(file_name)
-signal execute_script_finished(file_name)
+signal execute_script_finished(file_name, error_str)
 signal variable_changed(var_name, value)
 signal character_variable_changed(character_tag, var_name, value)
 
@@ -188,8 +188,8 @@ func parse_and_execute_script(file_name: String, label_name: String = "") -> int
 func send_execute_script_start(file_base_name: String):
 	emit_signal("execute_script_start", file_base_name)
 
-func send_execute_script_finished(file_base_name: String):
-	emit_signal("execute_script_finished", file_base_name)
+func send_execute_script_finished(file_base_name: String, error_str:String):
+	emit_signal("execute_script_finished", file_base_name, error_str)
 
 
 func _exit_tree() -> void:

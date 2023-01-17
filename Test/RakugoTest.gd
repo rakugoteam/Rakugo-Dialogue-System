@@ -32,8 +32,8 @@ func assert_ask_return(var_name:String, value):
 	
 	assert_eq(value, Rakugo.get_variable(var_name))
 
-func wait_execute_script_finished(file_base_name:String):
-	return wait_signal("execute_script_finished", [file_base_name])
+func wait_execute_script_finished(file_base_name:String, error_str:String = ""):
+	return wait_signal("execute_script_finished", [file_base_name, error_str])
 
 func assert_character_name_eq(char_tag:String, value:String):
 	var character = Rakugo.get_character(char_tag)
