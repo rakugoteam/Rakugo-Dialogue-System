@@ -34,7 +34,7 @@ func _init(store_manager):
 	else:
 		push_error("execturer, VARIABLE_IN_STR compilation failed")
 
-func close() -> int:
+func stop_current_thread() -> int:
 	if current_thread and current_thread.is_active():
 		var dico = threads[current_thread.get_id()]
 		
@@ -43,7 +43,7 @@ func close() -> int:
 	return OK
 
 func execute_script(script_name:String, label_name:String) -> int:
-	close()
+	stop_current_thread()
 	
 	if store_manager.parsed_scripts.has(script_name):
 		current_thread = Thread.new()
@@ -56,11 +56,11 @@ func execute_script(script_name:String, label_name:String) -> int:
 			dico["label_name"] = label_name
 	
 		if current_thread.start(self, "do_execute_script", dico) != OK:
+			threads.erase(current_thread.get_id())
+
 			current_thread = null
 			
 			current_semaphore = null
-			
-			threads.erase(current_thread.get_id())
 			
 			return FAILED
 		return OK
@@ -75,6 +75,12 @@ func do_execute_script_end(parameters:Dictionary):
 
 	if Rakugo != null:
 		Rakugo.send_execute_script_finished(parameters["file_base_name"], parameters.get("error", ""))
+
+	threads.erase(current_thread.get_id())
+
+	current_thread = null
+		
+	current_semaphore = null
 
 func do_execute_jump(jump_label:String, labels:Dictionary) -> int:
 	if labels.has(jump_label):
