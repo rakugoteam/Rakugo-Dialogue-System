@@ -175,10 +175,12 @@ func load_game(save_name := "quick"):
 func parse_script(file_name: String) -> int:
 	return parser.parse_script(file_name)
 
-
+# Executer
 func execute_script(script_name: String, label_name: String = "") -> int:
 	return executer.execute_script(script_name, label_name)
 
+func stop_last_script():
+	executer.stop_current_thread()
 
 func parse_and_execute_script(file_name: String, label_name: String = "") -> int:
 	if parser.parse_script(file_name) == OK:
@@ -193,7 +195,7 @@ func send_execute_script_finished(file_base_name: String, error_str:String):
 
 
 func _exit_tree() -> void:
-	executer.close()
+	executer.stop_current_thread()
 
 
 # Todo Handle Error

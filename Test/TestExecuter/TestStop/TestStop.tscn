@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Test/TestExecuter/TestStop/TestStop.gd" type="Script" id=1]
+
+[node name="TestStop" type="Node"]
+script = ExtResource( 1 )

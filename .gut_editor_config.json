@@ -3,6 +3,7 @@
  "config_file": "res://.gutconfig.json",
  "dirs": [
   "res://Test/TestParser",
+  "res://Test/TestExecuter",
   "res://Test/TestRakugo"
  ],
  "disable_colors": false,
