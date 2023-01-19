@@ -57,7 +57,7 @@ func assert_variable(var_name:String, var_type, value):
 func wait_character_variable_changed(char_tag:String, var_name:String, var_type, value):
 	yield(wait_signal("character_variable_changed", [char_tag, var_name, value]), "completed")
 
-	assert_variable(var_name, var_type, value)
+	assert_variable(char_tag+"."+var_name, var_type, value)
 
 func wait_variable_changed(var_name:String, var_type, value):
 	yield(wait_signal("variable_changed", [var_name, value]), "completed")

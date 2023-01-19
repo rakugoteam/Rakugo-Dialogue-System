@@ -258,6 +258,6 @@ func parse_script(path:String) -> int:
 		if state == State.Menu and i == lines.size() - 1 and !menu_choices.empty():
 			parse_array.push_back(["MENU", current_menu_result, menu_choices])
 	
-	store_manager.parsed_scripts[path.get_file().get_basename()] = {"parse_array":parse_array, "labels":labels}
+	store_manager.parsed_scripts[path.get_file().get_basename()] = {"path": path, "parse_array":parse_array, "labels":labels}
 	
 	return OK
