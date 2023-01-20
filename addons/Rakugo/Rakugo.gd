@@ -117,7 +117,7 @@ func get_character(character_tag: String) -> Dictionary:
 		push_warning("Character tag is empty")
 		return {}
 
-	if character_exists(character_tag):
+	if has_character(character_tag):
 		return store_manager.characters.get(character_tag)
 
 	push_error("Rakugo does not knew a character with this tag: " + character_tag)
