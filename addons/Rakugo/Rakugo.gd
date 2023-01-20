@@ -146,10 +146,6 @@ func get_character_variable(character_tag: String, var_name: String):
 				)
 			)
 			push_error("Available variables are: " + str(char_.keys()))
-	else:
-		push_error(
-			"Rakugo character with this tag: " + character_tag + " does not exists, returning null"
-		)
 
 	return null
 
