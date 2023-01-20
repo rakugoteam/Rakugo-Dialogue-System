@@ -55,21 +55,28 @@ signal character_variable_changed(character_tag, var_name, value)
 func set_variable(var_name: String, value):
 	var vars_ = var_name.split(".")
 	
-	if vars_.size() > 1:
-		return set_character_variable(vars_[0], vars_[1], value)
+	match vars_.size():
+		1:
+			store_manager.variables[var_name] = value
+			emit_signal("variable_changed", var_name, value)
+			return
+
+		2:
+			return set_character_variable(vars_[0], vars_[1], value)
 		
-	store_manager.variables[var_name] = value
-	emit_signal("variable_changed", var_name, value)
+	push_error("Rakugo does not allow to store variables with more than 1 dot in name.")
 
 
 func get_variable(var_name: String):
 	var vars_ = var_name.split(".")
 
-	if vars_.size() > 1:
-		return get_character_variable(vars_[0], vars_[1])
+	match vars_.size():
+		1:
+			if store_manager.variables.has(var_name):
+				return store_manager.variables.get(var_name)
 
-	if store_manager.variables.has(var_name):
-		return store_manager.variables.get(var_name)
+		2:
+			return get_character_variable(vars_[0], vars_[1])
 
 	push_error("Rakugo does not knew a variable called: " + var_name)
 
@@ -77,7 +84,18 @@ func get_variable(var_name: String):
 
 
 func has_variable(var_name: String) -> bool:
-	return store_manager.variables.has(var_name)
+	var vars_ = var_name.split(".")
+
+	match vars_.size():
+		1:
+			return store_manager.variables.has(var_name)
+
+		2:
+			return character_has_variable(vars_[0], vars_[1])
+
+	push_error("Rakugo does not knew a variable called: " + var_name)
+
+	return false
 
 
 ## Characters
