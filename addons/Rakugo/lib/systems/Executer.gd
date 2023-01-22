@@ -34,6 +34,14 @@ func _init(store_manager):
 	else:
 		push_error("execturer, VARIABLE_IN_STR compilation failed")
 
+func get_current_thread_datas() -> Dictionary:
+	if current_thread and current_thread.is_active():
+		var dico = threads[current_thread.get_id()]
+
+		return {"file_base_name":dico["file_base_name"], "last_index":dico["last_index"]}
+
+	return {}
+
 func stop_current_thread() -> int:
 	if current_thread and current_thread.is_active():
 		var dico = threads[current_thread.get_id()]
@@ -42,7 +50,7 @@ func stop_current_thread() -> int:
 		dico["semaphore"].post()
 	return OK
 
-func execute_script(script_name:String, label_name:String) -> int:
+func execute_script(script_name:String, label_name:String = "", index:int = 0) -> int:
 	stop_current_thread()
 	
 	if store_manager.parsed_scripts.has(script_name):
@@ -52,7 +60,9 @@ func execute_script(script_name:String, label_name:String) -> int:
 		
 		var dico = {"thread":current_thread, "semaphore":current_semaphore, "file_base_name":script_name, "stop":false}
 	
-		if !label_name.empty():
+		if index > 0:
+			dico["last_index"] = index
+		elif !label_name.empty():
 			dico["label_name"] = label_name
 	
 		if current_thread.start(self, "do_execute_script", dico) != OK:
@@ -101,8 +111,6 @@ func do_execute_script(parameters:Dictionary):
 	var file_base_name = parameters["file_base_name"]
 	
 	Rakugo.send_execute_script_start(file_base_name)
-	
-	var index := 0
 
 	var script = store_manager.parsed_scripts[file_base_name]
 	
@@ -111,17 +119,26 @@ func do_execute_script(parameters:Dictionary):
 	var labels = script["labels"]
 
 	var error = OK
-	
-	if parameters.has("label_name"):
-		var label = parameters["label_name"]
 
-		index = do_execute_jump(label, labels)
+	var index := 0
+
+	if parameters.has("last_index"):
+		index = parameters["last_index"]
+	else:
+		parameters["last_index"] = 0
+	
+		if parameters.has("label_name"):
+			var label = parameters["label_name"]
+
+			index = do_execute_jump(label, labels)
 		
-		if index == -1:
-			parameters["error"] = jump_error + label
-			parameters["stop"] = true
+			if index == -1:
+				parameters["error"] = jump_error + label
+				parameters["stop"] = true
 	
 	while !parameters["stop"] and index < parse_array.size():
+		parameters["last_index"] = index
+
 		var line:Array = parse_array[index]
 		
 		var result = line[1]
@@ -212,12 +229,15 @@ func do_execute_script(parameters:Dictionary):
 				if menu_jumps.has(menu_jump_index):
 					var jump_label = menu_jumps[menu_jump_index]
 
-					index = do_execute_jump(jump_label, labels) - 1
+					index = do_execute_jump(jump_label, labels)
 					
-					if index == -2:
+					if index == -1:
 						parameters["error"] = jump_error + jump_label
 						parameters["stop"] = true
 						break
+
+					# remove 1 because we add 1 at the end of the loop
+					index -= 1	
 				elif !(menu_jump_index in [0, menu_choices.size() - 1]):
 					parameters["error"] = "Executer::do_execute_script::MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size())
 					parameters["stop"] = true

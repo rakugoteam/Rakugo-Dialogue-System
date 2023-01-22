@@ -36,6 +36,9 @@ var waiting_ask_return := false setget , is_waiting_ask_return
 
 var waiting_menu_return := false setget , is_waiting_menu_return
 
+# when you load game to run last script
+var last_thread_datas:Dictionary
+
 onready var store_manager := StoreManager.new()
 onready var parser := Parser.new(store_manager)
 onready var executer := Executer.new(store_manager)
@@ -178,12 +181,16 @@ func _ready():
 
 
 func save_game(save_name: String = "quick"):
-	store_manager.save_game(save_name)
+	store_manager.save_game(executer.get_current_thread_datas(), save_name)
 
 
 func load_game(save_name := "quick"):
-	store_manager.load_game(save_name)
+	last_thread_datas = store_manager.load_game(save_name)
+	parse_script(last_thread_datas["path"])
 
+func resume_loaded_script():
+	if !last_thread_datas.empty():
+		executer.execute_script(last_thread_datas["file_base_name"], "", last_thread_datas["last_index"])
 
 # Parser
 func parse_script(file_name: String) -> int:

@@ -70,8 +70,7 @@ func save_json(path: String, data: Dictionary) -> int:
 	push_error("can't open file: " + path)
 	return ERR_FILE_CANT_OPEN
 
-
-func save_game(save_name: String = "quick") -> int:
+func save_game(thread_datas:Dictionary, save_name: String = "quick") -> int:
 	var save_folder = save_folder_path + "/" + save_name
 
 	var directory = Directory.new()
@@ -81,10 +80,17 @@ func save_game(save_name: String = "quick") -> int:
 			push_error("can't create dir: " + save_folder)
 			return FAILED
 
-	return save_json(save_folder + "/save.json", {"variables": variables, "characters": characters})
+	var sava_datas = {"variables": variables, "characters": characters}
+
+	if !thread_datas.empty():
+		thread_datas["path"] = parsed_scripts[thread_datas["file_base_name"]]["path"]
+
+		sava_datas["thread_datas"] = thread_datas
+
+	return save_json(save_folder + "/save.json", sava_datas)
 
 
-func load_game(save_name: String = "quick") -> int:
+func load_game(save_name: String = "quick") -> Dictionary:
 	var save_folder = save_folder_path + "/" + save_name
 
 	var directory = Directory.new()
@@ -92,10 +98,11 @@ func load_game(save_name: String = "quick") -> int:
 	if directory.dir_exists(save_folder):
 		var dico = load_json(save_folder + "/save.json")
 
-		variables = dico["variables"]
-		characters = dico["characters"]
+		if !dico.empty():
+			variables = dico["variables"]
+			characters = dico["characters"]
 
-		return OK
+			return dico.get("thread_datas", {})
 
 	push_error("save folder does not exist at path: " + save_folder)
-	return FAILED
+	return {}
