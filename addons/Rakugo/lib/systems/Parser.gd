@@ -1,4 +1,4 @@
-extends Object
+extends Reference
 
 # this code base on code from:
 # https://github.com/nathanhoad/godot_dialogue_manager 

@@ -1,4 +1,4 @@
-extends Node
+extends Reference
 
 var save_folder_path:String
 

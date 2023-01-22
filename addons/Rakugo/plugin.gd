@@ -4,7 +4,7 @@ extends EditorPlugin
 
 func _enter_tree():
 	# Initialization of the plugin goes here
-	add_autoload_singleton("Rakugo", "res://addons/Rakugo/Rakugo.tscn")
+	add_autoload_singleton("Rakugo", "res://addons/Rakugo/Rakugo.gd")
 
 	#TODO look if setting are saved and load them
 

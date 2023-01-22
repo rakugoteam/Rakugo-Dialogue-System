@@ -1,4 +1,4 @@
-extends Object
+extends Reference
 
 const jump_error = "Executer::do_execute_jump, can not jump to unknow label : "
 
