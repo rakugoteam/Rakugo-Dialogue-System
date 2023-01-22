@@ -32,17 +32,16 @@ _global_script_class_icons={
 
 [addons]
 
-rakugo/spaghetti="bolognaise"
 rakugo/force_reload=false
 rakugo/auto_mode_delay=3
 rakugo/skip_delay=0.5
 rakugo/rollback_steps=10
+rakugo/test_mode=false
 rakugo/game_version="1.0.0"
 rakugo/history_length=30
 rakugo/narrator/name="narrator"
 rakugo/debug=false
 rakugo/save_folder="user://saves"
-rakugo/test_mode=false
 
 [application]
 
@@ -52,7 +51,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-Rakugo="*res://addons/Rakugo/Rakugo.tscn"
+Rakugo="*res://addons/Rakugo/Rakugo.gd"
 
 [debug]
 
