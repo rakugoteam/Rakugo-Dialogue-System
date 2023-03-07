@@ -7,22 +7,22 @@ var file_base_name = get_file_base_name(file_path)
 func test_say():
 	watch_rakugo_signals()
 
-	yield(wait_parse_and_execute_script(file_path), "completed")
+	await wait_parse_and_execute_script(file_path)
 
-	yield(wait_say({}, "Hello, world !"), "completed")
+	await wait_say({}, "Hello, world !")
 
 	assert_do_step()
 	
-	yield(wait_say({"name": "Sylvie"}, "Hello !"), "completed")
+	await wait_say({"name": "Sylvie"}, "Hello !")
 
 	assert_do_step()
 
-	yield(wait_say({}, "My name is Sylvie"), "completed")
+	await wait_say({}, "My name is Sylvie")
 	
 	assert_do_step()
 	
-	yield(wait_say({}, "I am 18"), "completed")
+	await wait_say({}, "I am 18")
 	
 	assert_do_step()
 
-	yield(wait_execute_script_finished(file_base_name), "completed")
+	await wait_execute_script_finished(file_base_name)

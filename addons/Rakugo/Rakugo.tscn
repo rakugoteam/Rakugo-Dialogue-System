@@ -3,5 +3,5 @@
 [ext_resource path="res://addons/Rakugo/Rakugo.gd" type="Script" id=1]
 
 [node name="Rakugo" type="Node"]
-pause_mode = 2
+process_mode = 2
 script = ExtResource( 1 )

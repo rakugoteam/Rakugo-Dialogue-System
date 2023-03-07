@@ -7,17 +7,17 @@ func test_menu():
 
 	watch_rakugo_signals()
 	
-	yield(wait_parse_and_execute_script(file_path), "completed")
+	await wait_parse_and_execute_script(file_path)
 	
-	yield(wait_menu(["Loop", "End"]), "completed")
+	await wait_menu(["Loop", "End"])
 
 	assert_menu_return(0);
 	
-	yield(wait_menu(["Loop", "End"]), "completed")
+	await wait_menu(["Loop", "End"])
 		
 	assert_menu_return(1);
 
-	yield(wait_execute_script_finished(file_base_name), "completed")
+	await wait_execute_script_finished(file_base_name)
 
 func test_menu_choice_parse_fail():
 	var file_path = "res://Test/TestParser/TestMenu/TestMenuChoiceParseFail.rk"
