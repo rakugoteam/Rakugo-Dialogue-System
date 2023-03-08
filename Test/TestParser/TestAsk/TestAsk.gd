@@ -7,10 +7,10 @@ var file_base_name = get_file_base_name(file_path)
 func test_ask():
 	watch_rakugo_signals()
 
-	yield(wait_parse_and_execute_script(file_path), "completed")
+	await wait_parse_and_execute_script(file_path)
 	
-	yield(wait_ask({}, "Are you human ?", "Yes"), "completed")
+	await wait_ask({}, "Are you human ?", "Yes")
 	
 	assert_ask_return("answer", "No")
 	
-	yield(wait_execute_script_finished(file_base_name), "completed")
+	await wait_execute_script_finished(file_base_name)

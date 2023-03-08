@@ -25,10 +25,10 @@ func test_parse_and_execute(params=use_parameters(test_params)):
 	else:
 		Rakugo.parse_and_execute_script(file_path)
 	
-	yield(wait_execute_script_start(file_base_name), "completed")
+	await wait_execute_script_start(file_base_name)
 
-	yield(wait_say({}, "Hello, world " + str(index) + " !"), "completed")
+	await wait_say({}, "Hello, world " + str(index) + " !")
 
 	assert_do_step()
 	
-	yield(wait_execute_script_finished(file_base_name), "completed")
+	await wait_execute_script_finished(file_base_name)

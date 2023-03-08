@@ -4,8 +4,8 @@ var Gut = load('res://addons/gut/gut.gd')
 # _utils needs to be split so that constants and what not do not
 # have to rely on the weird singleton thing I made.
 enum DOUBLE_STRATEGY{
-	FULL,
-	PARTIAL
+	SCRIPT_ONLY,
+	INCLUDE_SUPER
 }
 
 
@@ -27,6 +27,7 @@ var default_options = {
 	junit_xml_timestamp = false,
 	log_level = 1,
 	opacity = 100,
+	paint_after = .1,
 	post_run_script = '',
 	pre_run_script = '',
 	prefix = 'test_',
@@ -53,6 +54,7 @@ var default_panel_options = {
 }
 
 var options = default_options.duplicate()
+var json = JSON.new()
 
 
 func _null_copy(h):
@@ -64,25 +66,28 @@ func _null_copy(h):
 
 func _load_options_from_config_file(file_path, into):
 	# SHORTCIRCUIT
-	var f = File.new()
-	if(!f.file_exists(file_path)):
+
+	if(!FileAccess.file_exists(file_path)):
 		if(file_path != 'res://.gutconfig.json'):
 			print('ERROR:  Config File "', file_path, '" does not exist.')
 			return -1
 		else:
 			return 1
 
-	var result = f.open(file_path, f.READ)
-	if(result != OK):
+	var f = FileAccess.open(file_path, FileAccess.READ)
+	if(f == null):
+		var result = FileAccess.get_open_error()
 		push_error(str("Could not load data ", file_path, ' ', result))
 		return result
 
 	var json = f.get_as_text()
-	f.close()
+	f = null # close file
 
-	var results = JSON.parse(json)
+	var test_json_conv = JSON.new()
+	test_json_conv.parse(json)
+	var results = test_json_conv.get_data()
 	# SHORTCIRCUIT
-	if(results.error != OK):
+	if(results == null):
 		print("\n\n",'!! ERROR parsing file:  ', file_path)
 		print('    at line ', results.error_line, ':')
 		print('    ', results.error_string)
@@ -90,7 +95,7 @@ func _load_options_from_config_file(file_path, into):
 
 	# Get all the options out of the config file using the option name.  The
 	# options hash is now the default source of truth for the name of an option.
-	_load_dict_into(results.result, into)
+	_load_dict_into(results, into)
 
 	return 1
 
@@ -107,39 +112,30 @@ func _load_dict_into(source, dest):
 
 
 func write_options(path):
-	var content = JSON.print(options, ' ')
+	var content = json.stringify(options, ' ')
 
-	var f = File.new()
-	var result = f.open(path, f.WRITE)
-	if(result == OK):
+	var f = FileAccess.open(path, FileAccess.WRITE)
+	var result = FileAccess.get_open_error()
+	if(f != null):
 		f.store_string(content)
-		f.close()
+		f = null # closes file
+	else:
+		print('ERROR:  could not open file ', path, ' ', result)
 	return result
 
 
 # Apply all the options specified to _tester.  This is where the rubber meets
 # the road.
 func _apply_options(opts, _tester):
-	_tester.set_yield_between_tests(true)
-	_tester.set_modulate(Color(1.0, 1.0, 1.0, min(1.0, float(opts.opacity) / 100)))
-	_tester.show()
-
-	_tester.set_include_subdirectories(opts.include_subdirs)
-
-	if(opts.should_maximize):
-		_tester.maximize()
-
-	if(opts.compact_mode):
-		_tester.get_gui().compact_mode(true)
+	_tester.include_subdirectories = opts.include_subdirs
 
 	if(opts.inner_class != ''):
-		_tester.set_inner_class_name(opts.inner_class)
-	_tester.set_log_level(opts.log_level)
-	_tester.set_ignore_pause_before_teardown(opts.ignore_pause)
+		_tester.inner_class_name = opts.inner_class
+	_tester.log_level = opts.log_level
+	_tester.ignore_pause_before_teardown = opts.ignore_pause
 
 	if(opts.selected != ''):
 		_tester.select_script(opts.selected)
-		# _run_single = true
 
 	for i in range(opts.dirs.size()):
 		_tester.add_directory(opts.dirs[i], opts.prefix, opts.suffix)
@@ -147,26 +143,19 @@ func _apply_options(opts, _tester):
 	for i in range(opts.tests.size()):
 		_tester.add_script(opts.tests[i])
 
+	if(opts.double_strategy == 'include super'):
+		_tester.double_strategy = DOUBLE_STRATEGY.INCLUDE_SUPER
+	elif(opts.double_strategy == 'script only'):
+		_tester.double_strategy = DOUBLE_STRATEGY.SCRIPT_ONLY
 
-	if(opts.double_strategy == 'full'):
-		_tester.set_double_strategy(DOUBLE_STRATEGY.FULL)
-	elif(opts.double_strategy == 'partial'):
-		_tester.set_double_strategy(DOUBLE_STRATEGY.PARTIAL)
-
-	_tester.set_unit_test_name(opts.unit_test_name)
-	_tester.set_pre_run_script(opts.pre_run_script)
-	_tester.set_post_run_script(opts.post_run_script)
-	_tester.set_color_output(!opts.disable_colors)
+	_tester.unit_test_name = opts.unit_test_name
+	_tester.pre_run_script = opts.pre_run_script
+	_tester.post_run_script = opts.post_run_script
+	_tester.color_output = !opts.disable_colors
 	_tester.show_orphans(!opts.hide_orphans)
-	_tester.set_junit_xml_file(opts.junit_xml_file)
-	_tester.set_junit_xml_timestamp(opts.junit_xml_timestamp)
-
-	_tester.get_gui().set_font_size(opts.font_size)
-	_tester.get_gui().set_font(opts.font_name)
-	if(opts.font_color != null and opts.font_color.is_valid_html_color()):
-		_tester.get_gui().set_default_font_color(Color(opts.font_color))
-	if(opts.background_color != null and opts.background_color.is_valid_html_color()):
-		_tester.get_gui().set_background_color(Color(opts.background_color))
+	_tester.junit_xml_file = opts.junit_xml_file
+	_tester.junit_xml_timestamp = opts.junit_xml_timestamp
+	_tester.paint_after = str(opts.paint_after).to_float()
 
 	return _tester
 

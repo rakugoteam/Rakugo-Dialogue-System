@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 
 # this code base on code from:
 # https://github.com/nathanhoad/godot_dialogue_manager 
@@ -132,7 +132,7 @@ func count_indent(s:String) -> int:
 func parse_script(path:String) -> int:	
 	var lines = store_manager.load_rk(path)
 
-	if lines.empty():
+	if lines.is_empty():
 		push_error("Parser, parse_script : lines is empty !")
 		return FAILED
 	
@@ -151,6 +151,9 @@ func parse_script(path:String) -> int:
 	for i in lines.size():
 		var line = lines[i]
 		
+		if line.is_empty():
+			continue
+		
 		# TODO handle indentation levels
 		indent_count = count_indent(line)
 	
@@ -162,7 +165,7 @@ func parse_script(path:String) -> int:
 				
 #			prints("Parser", "parse_script", "mod Normal")
 			
-			if !menu_choices.empty():
+			if !menu_choices.is_empty():
 				parse_array.push_back(["MENU", current_menu_result, menu_choices])
 	
 		match(state):
@@ -185,7 +188,7 @@ func parse_script(path:String) -> int:
 								
 								var label = result.get_string("label")
 								
-								if !label.empty():
+								if !label.is_empty():
 									labels[label] = parse_array.size()
 								
 							"DIALOGUE":
@@ -196,7 +199,7 @@ func parse_script(path:String) -> int:
 							"JUMP":
 								var str_expression:String = result.get_string("expression")
 
-								if str_expression.empty():
+								if str_expression.is_empty():
 									parse_array.push_back([key, result])
 									break
 
@@ -215,7 +218,7 @@ func parse_script(path:String) -> int:
 
 									var var_name_expr = sub_result.get_string("char_tag")
 
-									if !var_name_expr.empty():
+									if !var_name_expr.is_empty():
 										var_name_expr += "_" + sub_result.get_string("var_name")
 
 										str_expression = str_expression.replace(sub_result_str, var_name_expr)
@@ -250,13 +253,12 @@ func parse_script(path:String) -> int:
 						
 					menu_choices.push_back(result)
 					
-					continue
+					if i == lines.size() - 1:
+						parse_array.push_back(["MENU", current_menu_result, menu_choices])
 				else:
 					push_error("Parser: Error on line: " + str(i) + ", it is not a choice !")
 					return FAILED
-					
-		if state == State.Menu and i == lines.size() - 1 and !menu_choices.empty():
-			parse_array.push_back(["MENU", current_menu_result, menu_choices])
+			
 	
 	store_manager.parsed_scripts[path.get_file().get_basename()] = {"path": path, "parse_array":parse_array, "labels":labels}
 	

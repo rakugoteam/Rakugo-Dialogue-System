@@ -7,10 +7,10 @@ var file_base_name = get_file_base_name(file_path)
 func test_start_from_label():
 	Rakugo.parse_and_execute_script(file_path, "pictures")
 
-	yield(wait_execute_script_start(file_base_name), "completed")
+	await wait_execute_script_start(file_base_name)
 
-	yield(wait_say({}, "Pictures of places that I have visited."), "completed")
+	await wait_say({}, "Pictures of places that I have visited.")
 
 	assert_do_step()
 
-	yield(wait_execute_script_finished(file_base_name), "completed")
+	await wait_execute_script_finished(file_base_name)

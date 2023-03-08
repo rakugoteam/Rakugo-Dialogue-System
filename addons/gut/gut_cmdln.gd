@@ -43,6 +43,8 @@ var Optparse = load('res://addons/gut/optparse.gd')
 var Gut = load('res://addons/gut/gut.gd')
 var GutRunner = load('res://addons/gut/gui/GutRunner.tscn')
 
+var json = JSON.new()
+
 # ------------------------------------------------------------------------------
 # Helper class to resolve the various different places where an option can
 # be set.  Using the get_value method will enforce the order of precedence of:
@@ -55,9 +57,9 @@ var GutRunner = load('res://addons/gut/gui/GutRunner.tscn')
 # will punch through null values of higher precedented hashes.
 # ------------------------------------------------------------------------------
 class OptionResolver:
-	var base_opts = null
-	var cmd_opts = null
-	var config_opts = null
+	var base_opts = {}
+	var cmd_opts = {}
+	var config_opts = {}
 
 
 	func get_value(key):
@@ -88,9 +90,9 @@ class OptionResolver:
 
 	func to_s():
 		return str("base:\n", _string_it(base_opts), "\n", \
-				   "config:\n", _string_it(config_opts), "\n", \
-				   "cmd:\n", _string_it(cmd_opts), "\n", \
-				   "resolved:\n", _string_it(get_resolved_values()))
+				"config:\n", _string_it(config_opts), "\n", \
+				"cmd:\n", _string_it(cmd_opts), "\n", \
+				"resolved:\n", _string_it(get_resolved_values()))
 
 	func get_resolved_values():
 		var to_return = {}
@@ -130,6 +132,7 @@ func setup_options(options, font_names):
 					'with a "g".  Also, any option that requires a value will take the form of ' +
 					'"-g<name>=<value>".  There cannot be any spaces between the option, the "=", or ' +
 					'inside a specified value or godot will think you are trying to run a scene.'))
+
 	opts.add('-gtest', [], 'Comma delimited list of full paths to test scripts to run.')
 	opts.add('-gdir', options.dirs, 'Comma delimited list of directories to add tests from.')
 	opts.add('-gprefix', options.prefix, 'Prefix used to find tests when specifying -gdir.  Default "[default]".')
@@ -163,6 +166,7 @@ func setup_options(options, font_names):
 	opts.add('-gfont_size', options.font_size, 'Font size, default "[default]"')
 	opts.add('-gbackground_color', options.background_color, 'Background color as an html color, default "[default]"')
 	opts.add('-gfont_color',options.font_color, 'Font color as an html color, default "[default]"')
+	opts.add('-gpaint_after', options.paint_after, 'Delay before GUT will add a 1 frame pause to paint the screen/GUI.  default [default]')
 
 	opts.add('-gjunit_xml_file', options.junit_xml_file, 'Export results of run to this file in the Junit XML format.')
 	opts.add('-gjunit_xml_timestamp', options.junit_xml_timestamp, 'Include a timestamp in the -gjunit_xml_file, default [default]')
@@ -198,6 +202,7 @@ func extract_command_line_options(from, to):
 	to.font_name = from.get_value('-gfont_name')
 	to.background_color = from.get_value('-gbackground_color')
 	to.font_color = from.get_value('-gfont_color')
+	to.paint_after = from.get_value('-gpaint_after')
 
 	to.junit_xml_file = from.get_value('-gjunit_xml_file')
 	to.junit_xml_timestamp = from.get_value('-gjunit_xml_timestamp')
@@ -205,25 +210,25 @@ func extract_command_line_options(from, to):
 
 
 func _print_gutconfigs(values):
-	var header = """Here is a sample of a full .gutconfig.json file.
+	var header = """Here is a sample of a full super.gutconfig.json file.
 You do not need to specify all values in your own file.  The values supplied in
 this sample are what would be used if you ran gut w/o the -gprint_gutconfig_sample
-option (option priority:  command-line, .gutconfig, default)."""
+option (option priority:  command-line, super.gutconfig, default)."""
 	print("\n", header.replace("\n", ' '), "\n\n")
 	var resolved = values
 
-	# remove some options that don't make sense to be in config
+	# remove_at some options that don't make sense to be in config
 	resolved.erase("config_file")
 	resolved.erase("show_help")
 
 	print("Here's a config with all the properties set based off of your current command and config.")
-	print(JSON.print(resolved, '  '))
+	print(json.stringify(resolved, '  '))
 
 	for key in resolved:
 		resolved[key] = null
 
 	print("\n\nAnd here's an empty config for you fill in what you want.")
-	print(JSON.print(resolved, ' '))
+	print(json.stringify(resolved, ' '))
 
 
 # parse options and run Gut
@@ -253,7 +258,7 @@ func _run_gut():
 		elif(o.get_value('-gpo')):
 			print('All command line options and where they are specified.  ' +
 				'The "final" value shows which value will actually be used ' +
-				'based on order of precedence (default < .gutconfig < cmd line).' + "\n")
+				'based on order of precedence (default < super.gutconfig < cmd line).' + "\n")
 			print(opt_resolver.to_s_verbose())
 			quit()
 		elif(o.get_value('-gprint_gutconfig_sample')):
@@ -263,15 +268,15 @@ func _run_gut():
 			_final_opts = opt_resolver.get_resolved_values();
 			_gut_config.options = _final_opts
 
-			var runner = GutRunner.instance()
+			var runner = GutRunner.instantiate()
+
 			runner.set_cmdln_mode(true)
 			runner.set_gut_config(_gut_config)
 
-			_tester = runner.get_gut()
-			_tester.connect('tests_finished', self, '_on_tests_finished',
-				[_final_opts.should_exit, _final_opts.should_exit_on_success])
-
 			get_root().add_child(runner)
+			_tester = runner.get_gut()
+			_tester.connect('end_run', Callable(self,'_on_tests_finished').bind(_final_opts.should_exit, _final_opts.should_exit_on_success))
+
 			runner.run_tests()
 
 
@@ -279,21 +284,27 @@ func _run_gut():
 func _on_tests_finished(should_exit, should_exit_on_success):
 	if(_final_opts.dirs.size() == 0):
 		if(_tester.get_summary().get_totals().scripts == 0):
-			var lgr = _tester.get_logger()
-			lgr.error('No directories configured.  Add directories with options or a .gutconfig.json file.  Use the -gh option for more information.')
+			var lgr = _tester.logger
+			lgr.error('No directories configured.  Add directories with options or a super.gutconfig.json file.  Use the -gh option for more information.')
 
 	if(_tester.get_fail_count()):
-		OS.exit_code = 1
+		set_exit_code(1)
 
 	# Overwrite the exit code with the post_script
 	var post_inst = _tester.get_post_run_script_instance()
 	if(post_inst != null and post_inst.get_exit_code() != null):
-		OS.exit_code = post_inst.get_exit_code()
+		set_exit_code(post_inst.get_exit_code())
 
 	if(should_exit or (should_exit_on_success and _tester.get_fail_count() == 0)):
 		quit()
 	else:
 		print("Tests finished, exit manually")
+
+func set_exit_code(val):
+	pass
+	# OS.exit_code doesn't exist anymore, but when we find a solution it just
+	# goes here.
+
 
 # ------------------------------------------------------------------------------
 # MAIN
@@ -302,7 +313,7 @@ func _init():
 	if(!_utils.is_version_ok()):
 		print("\n\n", _utils.get_version_text())
 		push_error(_utils.get_bad_version_text())
-		OS.exit_code = 1
+		set_exit_code(1)
 		quit()
 	else:
 		_run_gut()

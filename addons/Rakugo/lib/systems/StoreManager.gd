@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 
 var save_folder_path:String
 
@@ -15,14 +15,17 @@ func _init():
 
 
 ## Rk
-func load_rk(path: String) -> PoolStringArray:
-	var file = File.new()
+func load_rk(path: String) -> PackedStringArray:
+	var file = FileAccess.open(path, FileAccess.READ)
 	
-	if file.open(path, File.READ) != OK:
+	if file == null:
 		push_error("can't open file : " + path)
-		return PoolStringArray()
+		return PackedStringArray()
 	
-	var lines = file.get_as_text().split("\n", false)
+	var lines = PackedStringArray()
+	
+	while file.get_position() < file.get_length():
+		lines.push_back(file.get_line())
 	
 	file.close()
 
@@ -30,9 +33,9 @@ func load_rk(path: String) -> PoolStringArray:
 
 ## JSON
 func load_json(path: String) -> Dictionary:
-	var file := File.new()
+	var file = FileAccess.open(path, FileAccess.READ)
 
-	if file.open(path, File.READ) != OK:
+	if file == null:
 		push_error("can't open file: " + path)
 		return {}
 
@@ -40,49 +43,48 @@ func load_json(path: String) -> Dictionary:
 
 	file.close()
 
-	if data_text.empty():
+	if data_text.is_empty():
+		push_error("file to parse is empty: " + path)
 		return {}
 
-	var data_parse: JSONParseResult = JSON.parse(data_text)
-
-	if data_parse.error != OK:
-		push_error("error when parse to json this file: " + path)
+	var json := JSON.new()
+	
+	if json.parse(data_text) != OK:
+		push_error("JSON Parse Error: ", json.get_error_message(), " in ", path, " at line ", json.get_error_line())
+	
+	var data_parsed = json.get_data()
+	
+	if typeof(data_parsed) != TYPE_DICTIONARY:
+		push_error("parsed json is not a dictionary: " + path)
 		return {}
-
-	var final_data = data_parse.result
-	if typeof(final_data) == TYPE_DICTIONARY:
-		return final_data
-
-	push_error("parsed json is not a dictionary: " + path)
-	return {}
-
+		
+	return data_parsed
 
 func save_json(path: String, data: Dictionary) -> int:
-	var file = File.new()
+	var file = FileAccess.open(path, FileAccess.WRITE)
 
-	if file.open(path, File.WRITE) == OK:
-		file.store_line(JSON.print(data, "\t", true))
+	if file == null:
+		push_error("can't open file: " + path)
+		return ERR_FILE_CANT_OPEN
 
-		file.close()
+	file.store_line(JSON.stringify(data, "\t", true))
 
-		return OK
-
-	push_error("can't open file: " + path)
-	return ERR_FILE_CANT_OPEN
+	file.close()
+	
+	return OK
+	
 
 func save_game(thread_datas:Dictionary, save_name: String = "quick") -> int:
 	var save_folder = save_folder_path + "/" + save_name
 
-	var directory = Directory.new()
-
-	if !directory.dir_exists(save_folder):
-		if directory.make_dir_recursive(save_folder) != OK:
+	if !DirAccess.dir_exists_absolute(save_folder):
+		if DirAccess.make_dir_recursive_absolute(save_folder) != OK:
 			push_error("can't create dir: " + save_folder)
 			return FAILED
 
 	var sava_datas = {"variables": variables, "characters": characters}
 
-	if !thread_datas.empty():
+	if !thread_datas.is_empty():
 		thread_datas["path"] = parsed_scripts[thread_datas["file_base_name"]]["path"]
 
 		sava_datas["thread_datas"] = thread_datas
@@ -93,16 +95,16 @@ func save_game(thread_datas:Dictionary, save_name: String = "quick") -> int:
 func load_game(save_name: String = "quick") -> Dictionary:
 	var save_folder = save_folder_path + "/" + save_name
 
-	var directory = Directory.new()
+	if !DirAccess.dir_exists_absolute(save_folder):
+		push_error("save folder does not exist at path: " + save_folder)
+		return {}
 
-	if directory.dir_exists(save_folder):
-		var dico = load_json(save_folder + "/save.json")
+	var dico = load_json(save_folder + "/save.json")
 
-		if !dico.empty():
-			variables = dico["variables"]
-			characters = dico["characters"]
+	if dico.is_empty():
+		return {}
 
-			return dico.get("thread_datas", {})
+	variables = dico["variables"]
+	characters = dico["characters"]
 
-	push_error("save folder does not exist at path: " + save_folder)
-	return {}
+	return dico.get("thread_datas", {})
