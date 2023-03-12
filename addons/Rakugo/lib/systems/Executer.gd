@@ -270,7 +270,7 @@ func do_execute_script(parameters:Dictionary):
 
 				Rakugo.set_variable(result.get_string("lvar_name"), value)
 			_:
-				Rakugo.emit_signal("parser_unhandled_regex", line[0], result)
+				Rakugo.sg_parser_unhandled_regex.emit(line[0], result)
 		
 		index += 1
 	
