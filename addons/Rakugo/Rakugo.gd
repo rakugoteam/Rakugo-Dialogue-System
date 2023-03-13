@@ -48,7 +48,7 @@ signal sg_say(character, text)
 signal sg_notify(text)
 signal sg_ask(character, question, default_answer)
 signal sg_menu(choices)
-signal sg_parser_unhandled_regex(key, result)
+signal sg_custom_regex(key, result)
 signal sg_execute_script_start(file_name)
 signal sg_execute_script_finished(file_name, error_str)
 signal sg_variable_changed(var_name, value)
@@ -220,7 +220,7 @@ func _exit_tree() -> void:
 
 
 # Todo Handle Error
-func parser_add_regex_at_runtime(key: String, regex: String):
+func add_custom_regex(key: String, regex: String):
 	parser.add_regex_at_runtime(key, regex)
 
 
