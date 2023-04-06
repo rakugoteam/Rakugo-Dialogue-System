@@ -192,6 +192,9 @@ func do_execute_script(parameters:Dictionary):
 					var var_ = Rakugo.get_variable(sub_result.get_string("variable"))
 					
 					if var_:
+						if typeof(var_) != TYPE_STRING:
+							var_ = str(var_)
+							
 						text = text.replace(sub_result.strings[0], var_)
 
 				Rakugo.say(result.get_string("character_tag"), text)
