@@ -2,16 +2,16 @@ extends Node
 
 const file_name = "res://Test/TestParser/Timeline.rk"
 
-onready var label = $RichTextLabel
-onready var line_edit = $LineEdit
-onready var menu_container = $MenuContainer
+@onready var label = $RichTextLabel
+@onready var line_edit = $LineEdit
+@onready var menu_container = $MenuContainer
 
 func _ready():
-	Rakugo.connect("say", self, "_on_say")
-	Rakugo.connect("step", self, "_on_step")
-	Rakugo.connect("ask", self, "_on_ask")
-	Rakugo.connect("menu", self, "_on_menu")
-	Rakugo.connect("notify", self, "_on_notify")
+	Rakugo.connect("say",Callable(self,"_on_say"))
+	Rakugo.connect("step",Callable(self,"_on_step"))
+	Rakugo.connect("ask",Callable(self,"_on_ask"))
+	Rakugo.connect("menu",Callable(self,"_on_menu"))
+	Rakugo.connect("notify",Callable(self,"_on_notify"))
 	
 	var narrator_name = ProjectSettings.get_setting(Rakugo.narrator_name)
 	
@@ -45,7 +45,7 @@ func _on_menu(choices):
 	for choice in choices:
 		var button = Button.new()
 		button.text = choice
-		button.connect("pressed", self, "_on_menu_button_pressed", [button])
+		button.connect("pressed",Callable(self,"_on_menu_button_pressed").bind(button))
 		menu_container.add_child(button)
 		
 	menu_container.visible = true

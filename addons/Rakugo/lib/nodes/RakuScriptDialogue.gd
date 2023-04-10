@@ -1,9 +1,9 @@
 extends Node
 class_name RakuScriptDialogue
 
-export(String, FILE, "*.rk") var raku_script : String
-export var starting_label_name := ""
-export var auto_start := false
+@export var raku_script : String # (String, FILE, "*.rk")
+@export var starting_label_name := ""
+@export var auto_start := false
 
 func _ready():
 	if auto_start:

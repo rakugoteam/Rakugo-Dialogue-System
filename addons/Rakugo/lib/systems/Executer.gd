@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 
 const jump_error = "Executer::do_execute_jump, can not jump to unknow label : "
 
@@ -35,7 +35,7 @@ func _init(store_manager):
 		push_error("execturer, VARIABLE_IN_STR compilation failed")
 
 func get_current_thread_datas() -> Dictionary:
-	if current_thread and current_thread.is_active():
+	if current_thread:
 		var dico = threads[current_thread.get_id()]
 
 		return {"file_base_name":dico["file_base_name"], "last_index":dico["last_index"]}
@@ -43,7 +43,7 @@ func get_current_thread_datas() -> Dictionary:
 	return {}
 
 func stop_current_thread() -> int:
-	if current_thread and current_thread.is_active():
+	if current_thread and current_thread.is_alive():
 		var dico = threads[current_thread.get_id()]
 		
 		dico["stop"] = true
@@ -62,10 +62,10 @@ func execute_script(script_name:String, label_name:String = "", index:int = 0) -
 	
 		if index > 0:
 			dico["last_index"] = index
-		elif !label_name.empty():
+		elif !label_name.is_empty():
 			dico["label_name"] = label_name
 	
-		if current_thread.start(self, "do_execute_script", dico) != OK:
+		if current_thread.start(Callable(self,"do_execute_script").bind(dico)) != OK:
 			threads.erase(current_thread.get_id())
 
 			current_thread = null
@@ -192,6 +192,9 @@ func do_execute_script(parameters:Dictionary):
 					var var_ = Rakugo.get_variable(sub_result.get_string("variable"))
 					
 					if var_:
+						if typeof(var_) != TYPE_STRING:
+							var_ = str(var_)
+
 						text = text.replace(sub_result.strings[0], var_)
 
 				Rakugo.say(result.get_string("character_tag"), text)
@@ -209,7 +212,8 @@ func do_execute_script(parameters:Dictionary):
 				semephore.wait()
 				
 			"MENU":
-				var menu_choices:PoolStringArray
+				printt("Executer", "MENU")
+				var menu_choices:PackedStringArray
 				
 				var menu_jumps:Dictionary
 				
@@ -219,7 +223,7 @@ func do_execute_script(parameters:Dictionary):
 					menu_choices.push_back(remove_double_quotes(menu_choice_result.get_string("text")))
 					
 					var label = menu_choice_result.get_string("label")
-					if !label.empty():
+					if !label.is_empty():
 						menu_jumps[i] = label
 				
 				Rakugo.menu(menu_choices)
@@ -249,7 +253,7 @@ func do_execute_script(parameters:Dictionary):
 				
 				var value
 				
-				if !rvar_name.empty():
+				if !rvar_name.is_empty():
 					value = Rakugo.get_variable(rvar_name)
 					
 					if !value:
@@ -257,19 +261,19 @@ func do_execute_script(parameters:Dictionary):
 						parameters["stop"] = true
 						break
 						
-				elif !text.empty():
+				elif !text.is_empty():
 					value = remove_double_quotes(text)
 				else:
 					value = result.get_string("number")
 
-					if value.is_valid_integer():
+					if value.is_valid_int():
 						value = int(value)
 					else:
 						value = float(value)
 
 				Rakugo.set_variable(result.get_string("lvar_name"), value)
 			_:
-				Rakugo.emit_signal("parser_unhandled_regex", line[0], result)
+				Rakugo.sg_custom_regex.emit(line[0], result)
 		
 		index += 1
 	

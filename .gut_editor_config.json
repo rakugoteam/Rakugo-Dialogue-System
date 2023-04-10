@@ -1,5 +1,6 @@
 {
  "background_color": "ff262626",
+ "compact_mode": false,
  "config_file": "res://.gutconfig.json",
  "dirs": [
   "res://Test/TestParser",
@@ -11,6 +12,7 @@
  "font_color": "ffcccccc",
  "font_name": "CourierPrime",
  "font_size": 16,
+ "gut_on_top": true,
  "hide_orphans": false,
  "ignore_pause": false,
  "include_subdirs": true,
@@ -19,27 +21,26 @@
  "junit_xml_timestamp": false,
  "log_level": 1,
  "opacity": 100,
+ "paint_after": 0.1,
+ "panel_options": {
+  "font_name": "CourierPrime",
+  "font_size": 30,
+  "hide_output_text": false,
+  "hide_result_tree": false,
+  "hide_settings": true,
+  "use_colors": false
+ },
  "post_run_script": "",
  "pre_run_script": "",
  "prefix": "Test",
- "selected": "TestMenu.gd",
+ "selected": "TestVariablesRk.gd",
  "should_exit": false,
  "should_exit_on_success": false,
  "should_maximize": false,
- "compact_mode": false,
  "show_help": false,
  "suffix": ".gd",
  "tests": [
 
  ],
- "unit_test_name": "test_menu",
- "gut_on_top": true,
- "panel_options": {
-  "font_name": "CourierPrime",
-  "font_size": 30,
-  "hide_result_tree": false,
-  "hide_output_text": false,
-  "hide_settings": false,
-  "use_colors": false
- }
+ "unit_test_name": "test_variables"
 }

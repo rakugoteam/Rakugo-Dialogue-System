@@ -7,10 +7,10 @@ var file_base_name = get_file_base_name(file_path)
 func test_stop():
 	watch_rakugo_signals()
 	
-	yield(wait_parse_and_execute_script(file_path), "completed")
+	await wait_parse_and_execute_script(file_path)
 
-	yield(wait_say({}, "You can see this message"), "completed")
+	await wait_say({}, "You can see this message")
 
 	Rakugo.stop_last_script()
 
-	yield(wait_execute_script_finished(file_base_name), "completed")
+	await wait_execute_script_finished(file_base_name)

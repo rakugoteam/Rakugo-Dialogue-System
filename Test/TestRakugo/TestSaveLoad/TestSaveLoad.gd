@@ -7,15 +7,13 @@ var file_base_name = get_file_base_name(file_path)
 func before_all():
 	var save_folder = ProjectSettings.get_setting("addons/rakugo/save_folder")
 	
-	var directory = Directory.new()
-	
-	if directory.dir_exists(save_folder):
+	if DirAccess.dir_exists_absolute(save_folder):
 		var save_path = save_folder + "/save.json"
 		
-		if directory.file_exists(save_path):
-			directory.remove(save_path)
+		if FileAccess.file_exists(save_path):
+			DirAccess.remove_absolute(save_path)
 			
-		directory.remove(save_folder)
+		DirAccess.remove_absolute(save_folder)
 
 func test_save_load():
 	watch_rakugo_signals()
@@ -30,31 +28,31 @@ func test_save_load():
 
 	wait_character_variable_changed("Sy", "friendship", TYPE_INT, 3)
 
-	yield(wait_parse_and_execute_script(file_path), "completed")
+	await wait_parse_and_execute_script(file_path)
 
-	yield(wait_say({}, "Hello, world !"), "completed")
+	await wait_say({}, "Hello, world !")
 
 	assert_do_step()
 
-	yield(wait_say({}, "Save from here"), "completed")
+	await wait_say({}, "Save from here")
 	
 	Rakugo.save_game()
 
 	Rakugo.stop_last_script()
 
-	yield(wait_execute_script_finished(file_base_name), "completed")
+	await wait_execute_script_finished(file_base_name)
 	
 	Rakugo.load_game()
 
 	Rakugo.resume_loaded_script()
 
-	yield(wait_execute_script_start(file_base_name), "completed")
+	await wait_execute_script_start(file_base_name)
 
-	yield(wait_say({}, "Save from here"), "completed")
+	await wait_say({}, "Save from here")
 
 	Rakugo.stop_last_script()
 
-	yield(wait_execute_script_finished(file_base_name), "completed")
+	await wait_execute_script_finished(file_base_name)
 	
 	assert_eq(Rakugo.get_variable("life"), 5)
 

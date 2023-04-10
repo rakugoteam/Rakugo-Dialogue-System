@@ -5,6 +5,7 @@
 # unofficial GUT export format.
 # ------------------------------------------------------------------------------
 var _utils = load('res://addons/gut/utils.gd').get_instance()
+var json = JSON.new()
 
 func _export_tests(summary_script):
 	var to_return = {}
@@ -77,9 +78,9 @@ func get_results_dictionary(gut, include_scripts=true):
 		props.failures = totals.failing
 		props.passing = totals.passing_tests
 		props.tests = totals.tests
-		props.errors = gut.get_logger().get_errors().size()
-		props.warnings = gut.get_logger().get_warnings().size()
-		props.time = gut.get_gui().elapsed_time_as_str().replace('s', '')
+		props.errors = gut.logger.get_errors().size()
+		props.warnings = gut.logger.get_warnings().size()
+		props.time =  gut.get_elapsed_time()
 		props.orphans = gut.get_orphan_counter().get_counter('total')
 		result.test_scripts.scripts = scripts
 
@@ -88,9 +89,9 @@ func get_results_dictionary(gut, include_scripts=true):
 
 func write_json_file(gut, path):
 	var dict = get_results_dictionary(gut)
-	var json = JSON.print(dict, ' ')
+	var json_text = json.stringify(dict, ' ')
 
-	var f_result = _utils.write_file(path, json)
+	var f_result = _utils.write_file(path, json_text)
 	if(f_result != OK):
 		var msg = str("Error:  ", f_result, ".  Could not create export file ", path)
 		_utils.get_logger().error(msg)
@@ -101,9 +102,9 @@ func write_json_file(gut, path):
 
 func write_summary_file(gut, path):
 	var dict = get_results_dictionary(gut, false)
-	var json = JSON.print(dict, ' ')
+	var json_text = json.stringify(dict, ' ')
 
-	var f_result = _utils.write_file(path, json)
+	var f_result = _utils.write_file(path, json_text)
 	if(f_result != OK):
 		var msg = str("Error:  ", f_result, ".  Could not create export file ", path)
 		_utils.get_logger().error(msg)

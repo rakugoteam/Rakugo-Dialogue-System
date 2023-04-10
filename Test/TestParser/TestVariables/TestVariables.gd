@@ -7,13 +7,13 @@ var file_base_name = get_file_base_name(file_path)
 func test_variables():
 	watch_rakugo_signals()
 
-	yield(wait_parse_and_execute_script(file_path), "completed")
+	await wait_parse_and_execute_script(file_path)
 
-	yield(wait_execute_script_finished(file_base_name), "completed")
+	await wait_execute_script_finished(file_base_name)
 
 	assert_variable("a", TYPE_INT, 1)
 
-	assert_variable("b", TYPE_REAL, 2.5)
+	assert_variable("b", TYPE_FLOAT, 2.5)
 
 	assert_variable("c", TYPE_STRING, "Hello, world !")
 

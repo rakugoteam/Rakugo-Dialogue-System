@@ -6,29 +6,7 @@
 ;   [section] ; section goes between []
 ;   param=value ; assign values to parameters
 
-config_version=4
-
-_global_script_classes=[ {
-"base": "Reference",
-"class": "GutHookScript",
-"language": "GDScript",
-"path": "res://addons/gut/hook_script.gd"
-}, {
-"base": "Node",
-"class": "GutTest",
-"language": "GDScript",
-"path": "res://addons/gut/test.gd"
-}, {
-"base": "Node",
-"class": "RakuScriptDialogue",
-"language": "GDScript",
-"path": "res://addons/Rakugo/lib/nodes/RakuScriptDialogue.gd"
-} ]
-_global_script_class_icons={
-"GutHookScript": "",
-"GutTest": "",
-"RakuScriptDialogue": ""
-}
+config_version=5
 
 [addons]
 
@@ -47,6 +25,7 @@ rakugo/save_folder="user://saves"
 
 config/name="Rakugo.Core"
 run/main_scene="res://Test/TestParser/_TestParser.tscn"
+config/features=PackedStringArray("4.0")
 config/icon="res://icon.png"
 
 [autoload]
@@ -55,12 +34,12 @@ Rakugo="*res://addons/Rakugo/Rakugo.gd"
 
 [debug]
 
-gdscript/warnings/unused_argument=false
 gdscript/warnings/return_value_discarded=false
+gdscript/warnings/unused_argument=false
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/Rakugo/plugin.cfg", "res://addons/gut/plugin.cfg" )
+enabled=PackedStringArray("res://addons/Rakugo/plugin.cfg", "res://addons/gut/plugin.cfg")
 
 [physics]
 
@@ -68,4 +47,4 @@ common/enable_pause_aware_picking=true
 
 [rendering]
 
-environment/default_environment="res://default_env.tres"
+environment/defaults/default_environment="res://default_env.tres"

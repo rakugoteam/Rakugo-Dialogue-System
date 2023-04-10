@@ -1,3 +1,6 @@
+.godot/
+*.translation
+export_presets.cfg
 /.import/
 /.vscode/
 /.mono/
