@@ -9,7 +9,7 @@ func _ready():
 	Rakugo.connect("parser_unhandled_regex",Callable(self,"_on_parser_unhandled_regex"))
 	Rakugo.connect("sg_say",Callable(self,"_on_say"))
 	Rakugo.connect("sg_step",Callable(self,"_on_step"))
-	Rakugo.connect("ask",Callable(self,"_on_ask"))
+	Rakugo.connect("sg_ask",Callable(self,"_on_ask"))
 	Rakugo.connect("menu",Callable(self,"_on_menu"))
 	
 	Rakugo.parse_script(file_name)
