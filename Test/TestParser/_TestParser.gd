@@ -10,7 +10,7 @@ func _ready():
 	Rakugo.connect("sg_say",Callable(self,"_on_say"))
 	Rakugo.connect("sg_step",Callable(self,"_on_step"))
 	Rakugo.connect("sg_ask",Callable(self,"_on_ask"))
-	Rakugo.connect("menu",Callable(self,"_on_menu"))
+	Rakugo.connect("sg_menu",Callable(self,"_on_menu"))
 	
 	Rakugo.parse_script(file_name)
 
