@@ -7,7 +7,7 @@ const file_name = "res://Test/TestParser/Timeline.rk"
 @onready var menu_container = $MenuContainer
 
 func _ready():
-	Rakugo.connect("say",Callable(self,"_on_say"))
+	Rakugo.connect("sg_say",Callable(self,"_on_say"))
 	Rakugo.connect("sg_step",Callable(self,"_on_step"))
 	Rakugo.connect("ask",Callable(self,"_on_ask"))
 	Rakugo.connect("menu",Callable(self,"_on_menu"))
