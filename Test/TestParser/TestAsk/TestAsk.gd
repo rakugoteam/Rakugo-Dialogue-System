@@ -1,6 +1,6 @@
 extends "res://Test/RakugoTest.gd"
 
-const file_path = "res://test/TestParser/TestAsk/TestAsk.rk"
+const file_path = "res://Test/TestParser/TestAsk/TestAsk.rk"
 
 var file_base_name = get_file_base_name(file_path)
 

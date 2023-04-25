@@ -1,7 +1,7 @@
 extends "res://Test/RakugoTest.gd"
 
 func test_menu():
-	var file_path = "res://test/TestParser/TestMenu/TestMenu.rk"
+	var file_path = "res://Test/TestParser/TestMenu/TestMenu.rk"
 
 	var file_base_name = get_file_base_name(file_path)
 
