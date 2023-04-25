@@ -11,7 +11,7 @@ func _ready():
 	Rakugo.connect("sg_step",Callable(self,"_on_step"))
 	Rakugo.connect("ask",Callable(self,"_on_ask"))
 	Rakugo.connect("menu",Callable(self,"_on_menu"))
-	Rakugo.connect("notify",Callable(self,"_on_notify"))
+	Rakugo.connect("sg_notify",Callable(self,"_on_notify"))
 	
 	var narrator_name = ProjectSettings.get_setting(Rakugo.narrator_name)
 	
