@@ -67,7 +67,7 @@ var parser_regex :={
 	# jump label
 	JUMP = "^jump (?<label>{NAME})( if (?<expression>.+))?$",
 	# for setting Rakugo variables
-	SET_VARIABLE = "(?<lvar_name>{VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE}))",
+	SSET_VARIABLE = "^(?<lvar_name>{VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE}))$",
 	COMMENT = "^#.*$",
 	# $ some_gd_script_code
 #	IN_LINE_GDSCRIPT = "^\\$.*",
