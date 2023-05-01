@@ -6,11 +6,11 @@ const file_name = "res://Test/TestParser/Timeline.rk"
 func _ready():
 	Rakugo.add_custom_regex("HW", "^hello_world$")
 	
-	Rakugo.connect("sg_custom_regex",Callable(self,"_on_custom_regex"))
-	Rakugo.connect("sg_say",Callable(self,"_on_say"))
-	Rakugo.connect("sg_step",Callable(self,"_on_step"))
-	Rakugo.connect("sg_ask",Callable(self,"_on_ask"))
-	Rakugo.connect("sg_menu",Callable(self,"_on_menu"))
+	Rakugo.sg_custom_regex.connect(_on_custom_regex)
+	Rakugo.sg_say.connect(_on_say)
+	Rakugo.sg_step.connect(_on_step)
+	Rakugo.sg_ask.connect(_on_ask)
+	Rakugo.sg_menu.connect(_on_menu)
 	
 	Rakugo.parse_script(file_name)
 
