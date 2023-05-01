@@ -67,8 +67,7 @@ var parser_regex :={
 	# jump label
 	JUMP = "^jump (?<label>{NAME})( if (?<expression>.+))?$",
 	# for setting Rakugo variables
-	SSET_VARIABLE = "^(?<lvar_name>{VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE}))$",
-	COMMENT = "^#.*$",
+	SET_VARIABLE = "^(?<lvar_name>{VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE}))$",
 	# $ some_gd_script_code
 #	IN_LINE_GDSCRIPT = "^\\$.*",
 	# gdscript:
@@ -151,7 +150,7 @@ func parse_script(path:String) -> int:
 	for i in lines.size():
 		var line = lines[i]
 		
-		if line.is_empty():
+		if line.is_empty() or line.begins_with("#"):
 			continue
 		
 		# TODO handle indentation levels
