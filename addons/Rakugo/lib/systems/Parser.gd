@@ -35,12 +35,12 @@ var Tokens := {
 	TOKEN_STRING = "^\".*?\"",
 	TOKEN_VARIABLE = "^[a-zA-Z_][a-zA-Z_0-9]+",
 	TOKEN_TAB = "^\\t",
-	TOKEN_NUMERIC = "-?[1-9][0-9\\.]*",
+	TOKEN_NUMERIC = "-?[0-9]\\.?[0-9]*",
 }
 
 var Regex := {
 	NAME = "[a-zA-Z][a-zA-Z_0-9]*",
-	NUMERIC = "-?[1-9][0-9\\.]*",
+	NUMERIC = "-?[0-9]\\.?[0-9]*",
 	STRING = "\".*\"",
 	VARIABLE = "((?<char_tag>{NAME})\\.)?(?<var_name>{NAME})",
 #	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
