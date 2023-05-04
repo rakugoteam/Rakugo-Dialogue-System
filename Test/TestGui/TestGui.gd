@@ -7,17 +7,23 @@ const file_name = "res://Test/TestParser/Timeline.rk"
 @onready var menu_container = $MenuContainer
 
 func _ready():
-	Rakugo.connect("say",Callable(self,"_on_say"))
-	Rakugo.connect("step",Callable(self,"_on_step"))
-	Rakugo.connect("ask",Callable(self,"_on_ask"))
-	Rakugo.connect("menu",Callable(self,"_on_menu"))
-	Rakugo.connect("notify",Callable(self,"_on_notify"))
+	Rakugo.add_custom_regex("HW", "^hello_world$")
+	Rakugo.sg_say.connect(_on_say)
+	Rakugo.sg_step.connect(_on_step)
+	Rakugo.sg_ask.connect(_on_ask)
+	Rakugo.sg_menu.connect(_on_menu)
+	Rakugo.sg_notify.connect(_on_notify)
 	
 	var narrator_name = ProjectSettings.get_setting(Rakugo.narrator_name)
 	
 	prints(name, narrator_name)
 	
 	Rakugo.parse_and_execute_script(file_name)
+
+func _on_custom_regex(key:String, result:RegExMatch):
+	match(key):
+		"HW":
+			prints(name, "regex hello, world !")
 
 func _on_say(character:Dictionary, text:String):
 #	prints("TestGui", "say", character.name if character else "null", text)

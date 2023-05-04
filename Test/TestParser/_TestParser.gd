@@ -4,13 +4,13 @@ const file_name = "res://Test/TestParser/Timeline.rk"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	Rakugo.parser_add_regex_at_runtime("HW", "^hello_world$")
+	Rakugo.add_custom_regex("HW", "^hello_world$")
 	
-	Rakugo.connect("parser_unhandled_regex",Callable(self,"_on_parser_unhandled_regex"))
-	Rakugo.connect("say",Callable(self,"_on_say"))
-	Rakugo.connect("step",Callable(self,"_on_step"))
-	Rakugo.connect("ask",Callable(self,"_on_ask"))
-	Rakugo.connect("menu",Callable(self,"_on_menu"))
+	Rakugo.sg_custom_regex.connect(_on_custom_regex)
+	Rakugo.sg_say.connect(_on_say)
+	Rakugo.sg_step.connect(_on_step)
+	Rakugo.sg_ask.connect(_on_ask)
+	Rakugo.sg_menu.connect(_on_menu)
 	
 	Rakugo.parse_script(file_name)
 
@@ -26,7 +26,7 @@ func _on_ask(character:Dictionary, question:String, default_answer:String):
 func _on_menu(choices):
 	prints("TestParser", "menu", choices)
 	
-func _on_parser_unhandled_regex(key:String, result:RegExMatch):
+func _on_custom_regex(key:String, result:RegExMatch):
 	match(key):
 		"HW":
 			prints(name, "regex hello, world !")

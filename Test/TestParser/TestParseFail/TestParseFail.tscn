@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=2 format=3 uid="uid://bx34mkn13ljwa"]
 
-[ext_resource path="res://Test/TestParser/TestParseFail/TestParseFail.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://Test/TestParser/TestParseFail/TestParseFail.gd" id="1"]
 
 [node name="TestParseFail" type="Node"]
-script = ExtResource( 1 )
+script = ExtResource("1")
