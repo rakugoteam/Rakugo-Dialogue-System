@@ -72,7 +72,6 @@ var parser_regex :={
 #	IN_LINE_GDSCRIPT = "^\\$.*",
 	# gdscript:
 #	GDSCRIPT_BLOCK = "^gdscript:",
-#	COMMENT = "^#.*",
 #	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
 #	CONDITION = "(if|elif) (?<condition>.*)",
 }
@@ -151,7 +150,7 @@ func parse_script(path:String) -> int:
 	for i in lines.size():
 		var line = lines[i]
 		
-		if line.is_empty():
+		if line.is_empty() or line.begins_with("#"):
 			continue
 		
 		# TODO handle indentation levels
