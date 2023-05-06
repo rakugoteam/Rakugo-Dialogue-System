@@ -9,8 +9,6 @@ extends RefCounted
 # _init dialogue is used for code outside other dialogues
 const init_dialogue_name = "_init"
 
-var store_manager
-
 # tokens for RenScript
 # tokens in this language can be extended by the other addons
 
@@ -100,9 +98,7 @@ func add_regex(key:String, regex:String, cache:Dictionary, error:String):
 func add_regex_at_runtime(key:String, regex:String):
 	add_regex(key, regex, regex_cache, "Parser, add_regex_at_runtime, failed " + key)
 
-func _init(store_manager):
-	self.store_manager = store_manager
-
+func _init():
 	for key in Regex:
 		Regex[key] = Regex[key].format(Regex)
 
@@ -128,12 +124,10 @@ func count_indent(s:String) -> int:
 	
 	return ret
 
-func parse_script(path:String) -> int:	
-	var lines = store_manager.load_rk(path)
-
+func parse_script(lines:PackedStringArray) -> Dictionary:
 	if lines.is_empty():
 		push_error("Parser, parse_script : lines is empty !")
-		return FAILED
+		return {}
 	
 	var parse_array:Array
 	
@@ -231,7 +225,7 @@ func parse_script(path:String) -> int:
 
 								if expression.parse(str_expression, vars_expression) != OK:
 									push_error("Parser: Error on line: " + str(i) + ", " + expression.get_error_text())
-									return FAILED
+									return {}
 
 								parse_array.push_back([key, result, expression, vars])
 
@@ -241,7 +235,7 @@ func parse_script(path:String) -> int:
 
 				if (not have_find_key):
 					push_error("Parser: Error on line: " + str(i) + ", can not parse it !")
-					return FAILED
+					return {}
 			State.Menu:
 				var result = regex_cache["CHOICE"].search(line)
 				if result:
@@ -256,9 +250,6 @@ func parse_script(path:String) -> int:
 						parse_array.push_back(["MENU", current_menu_result, menu_choices])
 				else:
 					push_error("Parser: Error on line: " + str(i) + ", it is not a choice !")
-					return FAILED
+					return {}
 			
-	
-	store_manager.parsed_scripts[path.get_file().get_basename()] = {"path": path, "parse_array":parse_array, "labels":labels}
-	
-	return OK
+	return {"parse_array":parse_array, "labels":labels}
