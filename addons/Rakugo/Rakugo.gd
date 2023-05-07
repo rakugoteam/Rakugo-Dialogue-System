@@ -40,8 +40,9 @@ var waiting_menu_return := false : get = is_waiting_menu_return
 var last_thread_datas:Dictionary
 
 @onready var store_manager := StoreManager.new()
-@onready var parser := Parser.new(store_manager)
-@onready var executer := Executer.new()
+@onready var parser := Parser.new()
+@onready var executer := Executer.new(store_manager)
+
 
 signal sg_step
 signal sg_game_loaded
@@ -196,7 +197,21 @@ func resume_loaded_script():
 
 # Parser
 func parse_script(file_name: String) -> int:
-	return parser.parse_script(file_name)
+	var rk_lines = store_manager.load_rk(file_name)
+	
+	if rk_lines.is_empty():
+		return FAILED
+	
+	var parsed_script = parser.parse_script(rk_lines)
+	
+	if rk_lines.is_empty():
+		return FAILED
+		
+	parsed_script["path"] = file_name
+	
+	store_manager.parsed_scripts[file_name.get_file().get_basename()] = parsed_script
+	
+	return OK
 
 # Executer
 func execute_script(script_name: String, label_name: String = "") -> int:
@@ -212,8 +227,8 @@ func stop_last_script():
 	executer.stop_current_thread()
 
 func parse_and_execute_script(file_name: String, label_name: String = "") -> int:
-	if parser.parse_script(file_name) == OK:
-		return execute_script(file_name.get_file().get_basename(), label_name)
+	if parse_script(file_name) == OK:
+		return executer.execute_script(file_name.get_file().get_basename(), label_name)
 	return FAILED
 
 func send_execute_script_start(file_base_name: String):
