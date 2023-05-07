@@ -40,12 +40,10 @@ var waiting_menu_return := false : get = is_waiting_menu_return
 var last_thread_datas:Dictionary
 
 @onready var store_manager := StoreManager.new()
-@onready var parser := Parser.new()
-@onready var executer := Executer.new(store_manager)
-
+@onready var parser := Parser.new(store_manager)
+@onready var executer := Executer.new()
 
 signal sg_step
-signal sg_game_loaded
 signal sg_say(character, text)
 signal sg_notify(text)
 signal sg_ask(character, question, default_answer)
@@ -189,7 +187,6 @@ func save_game(save_name: String = "quick"):
 func load_game(save_name := "quick"):
 	last_thread_datas = store_manager.load_game(save_name)
 	parse_script(last_thread_datas["path"])
-	sg_game_loaded.emit()
 
 func resume_loaded_script():
 	if !last_thread_datas.is_empty():
@@ -197,21 +194,7 @@ func resume_loaded_script():
 
 # Parser
 func parse_script(file_name: String) -> int:
-	var rk_lines = store_manager.load_rk(file_name)
-	
-	if rk_lines.is_empty():
-		return FAILED
-	
-	var parsed_script = parser.parse_script(rk_lines)
-	
-	if rk_lines.is_empty():
-		return FAILED
-		
-	parsed_script["path"] = file_name
-	
-	store_manager.parsed_scripts[file_name.get_file().get_basename()] = parsed_script
-	
-	return OK
+	return parser.parse_script(file_name)
 
 # Executer
 func execute_script(script_name: String, label_name: String = "") -> int:
@@ -227,8 +210,8 @@ func stop_last_script():
 	executer.stop_current_thread()
 
 func parse_and_execute_script(file_name: String, label_name: String = "") -> int:
-	if parse_script(file_name) == OK:
-		return executer.execute_script(file_name.get_file().get_basename(), label_name)
+	if parser.parse_script(file_name) == OK:
+		return execute_script(file_name.get_file().get_basename(), label_name)
 	return FAILED
 
 func send_execute_script_start(file_base_name: String):
