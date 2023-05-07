@@ -41,7 +41,7 @@ var last_thread_datas:Dictionary
 
 @onready var store_manager := StoreManager.new()
 @onready var parser := Parser.new(store_manager)
-@onready var executer := Executer.new(store_manager)
+@onready var executer := Executer.new()
 
 signal sg_step
 signal sg_game_loaded
@@ -200,14 +200,20 @@ func parse_script(file_name: String) -> int:
 
 # Executer
 func execute_script(script_name: String, label_name: String = "") -> int:
-	return executer.execute_script(script_name, label_name)
+	var parsed_script = store_manager.parsed_scripts.get(script_name, {})
+	
+	if parsed_script.is_empty():
+		push_error("Rakugo does not have parse a script named: " + script_name)
+		return FAILED
+	
+	return executer.execute_script(parsed_script, label_name)
 
 func stop_last_script():
 	executer.stop_current_thread()
 
 func parse_and_execute_script(file_name: String, label_name: String = "") -> int:
 	if parser.parse_script(file_name) == OK:
-		return executer.execute_script(file_name.get_file().get_basename(), label_name)
+		return execute_script(file_name.get_file().get_basename(), label_name)
 	return FAILED
 
 func send_execute_script_start(file_base_name: String):
