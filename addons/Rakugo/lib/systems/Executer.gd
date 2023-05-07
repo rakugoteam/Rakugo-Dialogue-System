@@ -2,8 +2,6 @@ extends RefCounted
 
 const jump_error = "Executer::do_execute_jump, can not jump to unknow label : "
 
-var store_manager
-
 var stop_thread := false
 
 var current_thread:Thread
@@ -22,9 +20,7 @@ var regex_cache := {}
 
 var menu_jump_index:int
 
-func _init(store_manager):
-	self.store_manager = store_manager
-
+func _init():
 	for key in regex:
 		regex[key] = regex[key].format(regex)
 
@@ -50,32 +46,35 @@ func stop_current_thread() -> int:
 		dico["semaphore"].post()
 	return OK
 
-func execute_script(script_name:String, label_name:String = "", index:int = 0) -> int:
+func execute_script(parsed_script:Dictionary, label_name:String = "", index:int = 0) -> int:
 	stop_current_thread()
-	
-	if store_manager.parsed_scripts.has(script_name):
-		current_thread = Thread.new()
-	
-		current_semaphore = Semaphore.new()
-		
-		var dico = {"thread":current_thread, "semaphore":current_semaphore, "file_base_name":script_name, "stop":false}
-	
-		if index > 0:
-			dico["last_index"] = index
-		elif !label_name.is_empty():
-			dico["label_name"] = label_name
-	
-		if current_thread.start(Callable(self,"do_execute_script").bind(dico)) != OK:
-			threads.erase(current_thread.get_id())
 
-			current_thread = null
-			
-			current_semaphore = null
-			
-			return FAILED
-		return OK
-	push_error("Rakugo does not have parse a script named: " + script_name)
-	return FAILED
+	current_thread = Thread.new()
+
+	current_semaphore = Semaphore.new()
+	
+	var thread_parameters = {
+		"thread":current_thread,
+		"semaphore":current_semaphore,
+		"parsed_script":parsed_script,
+		"file_base_name":parsed_script["path"].get_file().get_basename(),
+		"stop":false
+		}
+
+	if index > 0:
+		thread_parameters["last_index"] = index
+	elif !label_name.is_empty():
+		thread_parameters["label_name"] = label_name
+
+	if current_thread.start(Callable(self,"do_execute_script").bind(thread_parameters)) != OK:
+		threads.erase(current_thread.get_id())
+
+		current_thread = null
+		
+		current_semaphore = null
+		
+		return FAILED
+	return OK
 
 func do_execute_script_end(parameters:Dictionary):
 	parameters["thread"].wait_to_finish()
@@ -108,15 +107,13 @@ func do_execute_script(parameters:Dictionary):
 	
 	var semephore = parameters["semaphore"]
 	
-	var file_base_name = parameters["file_base_name"]
+	var parsed_script = parameters["parsed_script"]
 	
-	Rakugo.send_execute_script_start(file_base_name)
-
-	var script = store_manager.parsed_scripts[file_base_name]
+	Rakugo.send_execute_script_start(parameters["file_base_name"])
 	
-	var parse_array:Array = script["parse_array"]
+	var parse_array:Array = parsed_script["parse_array"]
 	
-	var labels = script["labels"]
+	var labels = parsed_script["labels"]
 
 	var error = OK
 

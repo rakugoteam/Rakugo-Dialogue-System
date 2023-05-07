@@ -43,7 +43,9 @@ var last_thread_datas:Dictionary
 @onready var parser := Parser.new()
 @onready var executer := Executer.new(store_manager)
 
+
 signal sg_step
+signal sg_game_loaded
 signal sg_say(character, text)
 signal sg_notify(text)
 signal sg_ask(character, question, default_answer)
@@ -187,6 +189,7 @@ func save_game(save_name: String = "quick"):
 func load_game(save_name := "quick"):
 	last_thread_datas = store_manager.load_game(save_name)
 	parse_script(last_thread_datas["path"])
+	sg_game_loaded.emit()
 
 func resume_loaded_script():
 	if !last_thread_datas.is_empty():
@@ -212,7 +215,13 @@ func parse_script(file_name: String) -> int:
 
 # Executer
 func execute_script(script_name: String, label_name: String = "") -> int:
-	return executer.execute_script(script_name, label_name)
+	var parsed_script = store_manager.parsed_scripts.get(script_name, {})
+	
+	if parsed_script.is_empty():
+		push_error("Rakugo does not have parse a script named: " + script_name)
+		return FAILED
+	
+	return executer.execute_script(parsed_script, label_name)
 
 func stop_last_script():
 	executer.stop_current_thread()

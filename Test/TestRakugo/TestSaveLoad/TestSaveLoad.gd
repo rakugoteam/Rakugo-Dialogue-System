@@ -43,6 +43,8 @@ func test_save_load():
 	await wait_execute_script_finished(file_base_name)
 	
 	Rakugo.load_game()
+	
+	await wait_signal(Rakugo.sg_game_loaded, [])
 
 	Rakugo.resume_loaded_script()
 
