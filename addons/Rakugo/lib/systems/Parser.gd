@@ -230,7 +230,7 @@ func parse_script(path:String) -> int:
 								var expression = Expression.new()
 
 								if expression.parse(str_expression, vars_expression) != OK:
-									push_error("Parser: Error on line: " + str(i) + ", " + expression.get_error_text())
+									push_error("Parser: Error on line: " + str(i+1) + ", " + expression.get_error_text())
 									return FAILED
 
 								parse_array.push_back([key, result, expression, vars])
@@ -240,7 +240,7 @@ func parse_script(path:String) -> int:
 						break
 
 				if (not have_find_key):
-					push_error("Parser: Error on line: " + str(i) + ", can not parse it !")
+					push_error("Parser: Error on line: " + str(i+1) + ", can not parse it !")
 					return FAILED
 			State.Menu:
 				var result = regex_cache["CHOICE"].search(line)
@@ -255,7 +255,7 @@ func parse_script(path:String) -> int:
 					if i == lines.size() - 1:
 						parse_array.push_back(["MENU", current_menu_result, menu_choices])
 				else:
-					push_error("Parser: Error on line: " + str(i) + ", it is not a choice !")
+					push_error("Parser: Error on line: " + str(i+1) + ", it is not a choice !")
 					return FAILED
 			
 	
