@@ -152,6 +152,9 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 	
 		#erase tabulations
 		line = line.lstrip('	')
+		
+		if line.is_empty():
+			continue
 	
 		if state == State.Menu and indent_count == 0:
 			state = State.Normal
