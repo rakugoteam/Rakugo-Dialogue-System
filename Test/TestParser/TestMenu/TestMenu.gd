@@ -1,25 +1,66 @@
-extends "res://Test/RakugoTest.gd"
+extends GutTest
 
-func test_menu():
-	var file_path = "res://Test/TestParser/TestMenu/TestMenu.rk"
+const Parser = preload("res://addons/Rakugo/lib/systems/Parser.gd")
 
-	var file_base_name = get_file_base_name(file_path)
+@onready var parser := Parser.new()
 
-	watch_rakugo_signals()
+var test_params = [
+	[
+		"menu menu:",
+		"\"loop\" > menu",
+		"\"end\""
+	],
+	[
+		"menu menu:",
+		"	\"loop\" > menu",
+		"	\"end\""
+	],
+	[
+		" menu menu:	",
+		"	\"loop\" > menu ",
+		"  \"end\""
+	],
+	[
+		"menu menu:",
+		"\"loop\" > menu",
+		"\"end\"",
+		""
+	],
+	[
+		"menu menu:",
+		"\"loop\" > menu",
+		"\"end\"",
+		"	"
+	],
+	[
+		"menu menu:",
+		"\"loop\" > menu",
+		"\"end\"",
+		"\"hello, world !\""
+	],
+	[
+		"menu menu:",
+		"\"loop\" > menu",
+		"\"end\"",
+		"# comment"
+	]
+]
+
+func test_menu(params=use_parameters(test_params)):
+	var parsed_script = parser.parse_script(params)
 	
-	await wait_parse_and_execute_script(file_path)
-	
-	await wait_menu(["Loop", "End"])
+	assert_false(parsed_script.is_empty())
 
-	assert_menu_return(0);
-	
-	await wait_menu(["Loop", "End"])
-		
-	assert_menu_return(1);
+	var parsed_array = parsed_script["parse_array"]
 
-	await wait_execute_script_finished(file_base_name)
+	assert_false(parsed_array.is_empty())
 
-func test_menu_choice_parse_fail():
-	var file_path = "res://Test/TestParser/TestMenu/TestMenuChoiceParseFail.rk"
+	assert_eq(parsed_script["labels"], {"menu":0})
 
-	assert_eq(Rakugo.parse_script(file_path), FAILED)
+	var menu_choice_results = parsed_array[0][2]
+
+	assert_eq(menu_choice_results[0].get_string("text"), "\"loop\"")
+
+	assert_eq(menu_choice_results[0].get_string("label"), "menu")
+
+	assert_eq(menu_choice_results[1].get_string("text"), "\"end\"")
