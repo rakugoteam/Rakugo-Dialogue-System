@@ -143,116 +143,106 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 	
 	for i in lines.size():
 		var line = lines[i]
-		
-		if line.is_empty() or line.begins_with("#"):
-			continue
-		
-		# TODO handle indentation levels
-		indent_count = count_indent(line)
+
+		line = line.strip_edges()
+
+		var isEmptyLine = line.is_empty() or line.begins_with("#")
 	
-		#erase tabulations
-		line = line.lstrip('	')
-		
-		if line.is_empty():
-			continue
-	
-		if state == State.Menu and indent_count == 0:
-			state = State.Normal
-				
-#			prints("Parser", "parse_script", "mod Normal")
-			
-			if !menu_choices.is_empty():
-				parse_array.push_back(["MENU", current_menu_result, menu_choices])
-	
-		match(state):
-			State.Normal:
-				var have_find_key := false
+		if state == State.Menu:
+			var result = regex_cache["CHOICE"].search(line)
 
-				for key in regex_cache:
-					var result = regex_cache[key].search(line)
-					
-					if result:
-						have_find_key = true
-
-						match(key):
-							"MENU":
-								current_menu_result = result
-					
-								menu_choices = []
-								
-								state = State.Menu
-								
-								var label = result.get_string("label")
-								
-								if !label.is_empty():
-									labels[label] = parse_array.size()
-								
-							"DIALOGUE":
-								var dialogue_label = result.get_string("label")
-				
-								labels[dialogue_label] = parse_array.size()
-							
-							"JUMP":
-								var str_expression:String = result.get_string("expression")
-
-								if str_expression.is_empty():
-									parse_array.push_back([key, result])
-									break
-
-								var sub_results = other_cache["VARIABLE"].search_all(str_expression)
-
-								var vars = []
-
-								# Expression does not like '.'
-								var vars_expression = []
-
-								for sub_result in sub_results:
-									var sub_result_str = sub_result.strings[0]
-									
-									if !vars.has(sub_result_str):
-										vars.push_back(sub_result_str)
-
-									var var_name_expr = sub_result.get_string("char_tag")
-
-									if !var_name_expr.is_empty():
-										var_name_expr += "_" + sub_result.get_string("var_name")
-
-										str_expression = str_expression.replace(sub_result_str, var_name_expr)
-									else:
-										var_name_expr = sub_result.get_string("var_name")
-									
-									if !vars_expression.has(var_name_expr):
-										vars_expression.push_back(var_name_expr)
-
-								var expression = Expression.new()
-
-								if expression.parse(str_expression, vars_expression) != OK:
-									push_error("Parser: Error on line: " + str(i+1) + ", " + expression.get_error_text())
-									return {}
-
-								parse_array.push_back([key, result, expression, vars])
-
-							_:
-								parse_array.push_back([key, result])
-						break
-
-				if (not have_find_key):
-					push_error("Parser: Error on line: " + str(i+1) + ", can not parse it !")
-					return {}
-			State.Menu:
-				var result = regex_cache["CHOICE"].search(line)
-				if result:
-#					prints("Parser", "parse_script", "CHOICE")
+			if isEmptyLine or !result:
+				if !menu_choices.is_empty():
+					parse_array.push_back(["MENU", current_menu_result, menu_choices])
+				state = State.Normal
+			else:
+#				prints("Parser", "parse_script", "CHOICE")
 #
-#					for key in result.names:
-#						prints(" ", key, result.get_string(key))
-						
-					menu_choices.push_back(result)
+#				for key in result.names:
+#					prints(" ", key, result.get_string(key))
 					
-					if i == lines.size() - 1:
-						parse_array.push_back(["MENU", current_menu_result, menu_choices])
-				else:
-					push_error("Parser: Error on line: " + str(i+1) + ", it is not a choice !")
-					return {}
+				menu_choices.push_back(result)
+				
+				if i == lines.size() - 1:
+					parse_array.push_back(["MENU", current_menu_result, menu_choices])
+				
+				continue
+			
+		if isEmptyLine:
+			continue
+	
+		var have_find_key := false
+	
+		for key in regex_cache:
+			var result = regex_cache[key].search(line)
+			
+			if result:
+				have_find_key = true
+
+				match(key):
+					"MENU":
+						current_menu_result = result
+			
+						menu_choices = []
+						
+						state = State.Menu
+						
+						var label = result.get_string("label")
+						
+						if !label.is_empty():
+							labels[label] = parse_array.size()
+						
+					"DIALOGUE":
+						var dialogue_label = result.get_string("label")
+		
+						labels[dialogue_label] = parse_array.size()
+					
+					"JUMP":
+						var str_expression:String = result.get_string("expression")
+
+						if str_expression.is_empty():
+							parse_array.push_back([key, result])
+							break
+
+						var sub_results = other_cache["VARIABLE"].search_all(str_expression)
+
+						var vars = []
+
+						# Expression does not like '.'
+						var vars_expression = []
+
+						for sub_result in sub_results:
+							var sub_result_str = sub_result.strings[0]
+							
+							if !vars.has(sub_result_str):
+								vars.push_back(sub_result_str)
+
+							var var_name_expr = sub_result.get_string("char_tag")
+
+							if !var_name_expr.is_empty():
+								var_name_expr += "_" + sub_result.get_string("var_name")
+
+								str_expression = str_expression.replace(sub_result_str, var_name_expr)
+							else:
+								var_name_expr = sub_result.get_string("var_name")
+							
+							if !vars_expression.has(var_name_expr):
+								vars_expression.push_back(var_name_expr)
+
+						var expression = Expression.new()
+
+						if expression.parse(str_expression, vars_expression) != OK:
+							push_error("Parser: Error on line: " + str(i+1) + ", " + expression.get_error_text())
+							return {}
+
+						parse_array.push_back([key, result, expression, vars])
+
+					_:
+						parse_array.push_back([key, result])
+				break
+
+		if (not have_find_key):
+			push_error("Parser: Error on line: " + str(i+1) + ", can not parse it !")
+			return {}
 			
 	return {"parse_array":parse_array, "labels":labels}
