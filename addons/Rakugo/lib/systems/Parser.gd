@@ -124,6 +124,33 @@ func count_indent(s:String) -> int:
 	
 	return ret
 
+func get_vars_in_expression(str_expression:String):
+	var sub_results = other_cache["VARIABLE"].search_all(str_expression)
+	var vars = []
+
+	# Expression does not like '.'
+	var vars_expression = []
+
+	for sub_result in sub_results:
+		var sub_result_str = sub_result.strings[0]
+		
+		if !vars.has(sub_result_str):
+			vars.push_back(sub_result_str)
+
+		var var_name_expr = sub_result.get_string("char_tag")
+
+		if !var_name_expr.is_empty():
+			var_name_expr += "_" + sub_result.get_string("var_name")
+
+			str_expression = str_expression.replace(sub_result_str, var_name_expr)
+		else:
+			var_name_expr = sub_result.get_string("var_name")
+		
+		if !vars_expression.has(var_name_expr):
+			vars_expression.push_back(var_name_expr)
+
+	return vars_expression 
+
 func parse_script(lines:PackedStringArray) -> Dictionary:
 	if lines.is_empty():
 		push_error("Parser, parse_script : lines is empty !")
@@ -204,9 +231,13 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 							parse_array.push_back([key, result])
 							break
 
-						var sub_results = other_cache["VARIABLE"].search_all(str_expression)
+						var vars = get_vars_in_expression(str_expression)
+						var expression = Expression.new()
+						if expression.parse(str_expression, vars) != OK:
+							push_error("Parser: Error on line: " + str(i+1) + ", " + expression.get_error_text())
+							return {}
 
-						var vars = []
+						parse_array.push_back([key, result, expression, vars])
 
 						# Expression does not like '.'
 						var vars_expression = []
