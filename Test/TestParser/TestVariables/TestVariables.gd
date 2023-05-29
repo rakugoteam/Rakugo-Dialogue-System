@@ -11,7 +11,7 @@ func test_variables():
 
 	await wait_execute_script_finished(file_base_name)
 
-	assert_variable("a", TYPE_INT, 1)
+	assert_variable("a", TYPE_INT, 2)
 
 	assert_variable("b", TYPE_FLOAT, 2.5)
 
@@ -25,4 +25,6 @@ func test_variables():
 	
 	assert_variable("e", TYPE_INT, Rakugo.get_variable("Sy.life"))
 
-	assert_eq(Rakugo.get_variable("f"), null)
+	assert_variable("e", TYPE_INT, 4)
+
+	assert_eq(Rakugo.get_variable("g"), null)
