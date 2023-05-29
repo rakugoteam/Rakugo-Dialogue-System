@@ -103,7 +103,7 @@ func _init():
 	for key in other_regex:
 		add_regex(key, other_regex[key], other_cache, "Parser, _init, failed " + key)
 	
-	prints("SET_VARIABLE", regex_cache["SET_VARIABLE"]. get_pattern())
+	# prints("SET_VARIABLE", regex_cache["SET_VARIABLE"]. get_pattern())
 	
 	add_regex("VARIABLE", Regex["VARIABLE"], other_cache, "Parser, _init, failed VARIABLE")
 
@@ -146,7 +146,7 @@ func get_vars_in_expression(str_expression:String):
 		if !vars_expression.has(var_name_expr):
 			vars_expression.push_back(var_name_expr)
 
-	return vars_expression 
+	return [vars_expression, vars]
 
 func parse_script(lines:PackedStringArray) -> Dictionary:
 	if lines.is_empty():
@@ -226,11 +226,11 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 						
 						var vars = get_vars_in_expression(str_expression)
 						var expression = Expression.new()
-						if expression.parse(str_expression, vars) != OK:
+						if expression.parse(str_expression, vars[0]) != OK:
 							push_error("Parser: Error on line: " + str(i+1) + ", " + expression.get_error_text())
 							return {}
 
-						parse_array.push_back([key, result, expression, vars])
+						parse_array.push_back([key, result, expression, vars[1]])
 
 					"SET_VARIABLE":
 						var str_expression:String = result.get_string("expression")
@@ -241,11 +241,11 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 						
 						var vars = get_vars_in_expression(str_expression)
 						var expression = Expression.new()
-						if expression.parse(str_expression, vars) != OK:
+						if expression.parse(str_expression, vars[0]) != OK:
 							push_error("Parser: Error on line: " + str(i+1) + ", " + expression.get_error_text())
 							return {}
 
-						parse_array.push_back([key, result, expression, vars])
+						parse_array.push_back([key, result, expression, vars[1]])
 
 					_:
 						parse_array.push_back([key, result])
