@@ -150,7 +150,9 @@ func do_execute_script(parameters:Dictionary):
 					var values = []
 
 					for var_name in line[3]:
-						var var_ = Rakugo.get_variable(var_name)
+						var var_ = null
+						if Rakugo.has_variable(var_name):
+							var_ = Rakugo.get_variable(var_name)
 
 						if !var_:
 							parameters["error"] = "Executer::do_execute_script::JUMP, can not get variable :" + var_name
@@ -165,6 +167,7 @@ func do_execute_script(parameters:Dictionary):
 						parameters["error"] = "Executer::do_execute_script::JUMP, failed to execute expression : " + result.get_string("expression")
 						parameters["stop"] = true
 						break
+
 				else:
 					can_jump = true
 
