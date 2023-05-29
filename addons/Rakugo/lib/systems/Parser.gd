@@ -41,6 +41,7 @@ var Regex := {
 	NUMERIC = "-?[0-9]\\.?[0-9]*",
 	STRING = "\".*\"",
 	VARIABLE = "((?<char_tag>{NAME})\\.)?(?<var_name>{NAME})",
+	ASSIGNMENT = "(=|\\+=|\\-=|\\*=|\\/=|\\%=)",
 #	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
 }
 
@@ -65,14 +66,7 @@ var parser_regex :={
 	# jump label
 	JUMP = "^jump (?<label>{NAME})( if (?<expression>.+))?$",
 	# for setting Rakugo variables
-	ASSIGNMENT = "^(=|\\+=|\\-=|\\*=|\\/=|\\%=)",
-	SET_VARIABLE = "^(?<rvar_name>{VARIABLE})\\s*(?<operator>ASSIGNMENT)\\s*(?<expression>.+)$",
-	# $ some_gd_script_code
-#	IN_LINE_GDSCRIPT = "^\\$.*",
-	# gdscript:
-#	GDSCRIPT_BLOCK = "^gdscript:",
-#	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
-#	CONDITION = "(if|elif) (?<condition>.*)",
+	SET_VARIABLE = "^(?<rvar_name>{VARIABLE})\\s*(?<operator>{ASSIGNMENT})\\s*(?<expression>.+)$",
 }
 
 var other_regex :={
@@ -108,7 +102,9 @@ func _init():
 	
 	for key in other_regex:
 		add_regex(key, other_regex[key], other_cache, "Parser, _init, failed " + key)
-		
+	
+	prints("SET_VARIABLE", regex_cache["SET_VARIABLE"]. get_pattern())
+	
 	add_regex("VARIABLE", Regex["VARIABLE"], other_cache, "Parser, _init, failed VARIABLE")
 
 func count_indent(s:String) -> int:

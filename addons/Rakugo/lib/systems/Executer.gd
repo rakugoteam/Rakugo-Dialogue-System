@@ -236,7 +236,8 @@ func do_execute_script(parameters:Dictionary):
 						break
 
 					# remove 1 because we add 1 at the end of the loop
-					index -= 1	
+					index -= 1
+					
 				elif !(menu_jump_index in [0, menu_choices.size() - 1]):
 					parameters["error"] = "Executer::do_execute_script::MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size())
 					parameters["stop"] = true
@@ -289,9 +290,9 @@ func do_execute_script(parameters:Dictionary):
 						parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, variable not found : " + rvar_name
 						parameters["stop"] = true
 						break
-
-				else:
-					Rakugo.set_variable(rvar_name, final_value)
+				
+				# if operator is "=" or if the variable does not exist
+				Rakugo.set_variable(rvar_name, final_value)
 				
 			_:
 				Rakugo.sg_custom_regex.emit(line[0], result)
