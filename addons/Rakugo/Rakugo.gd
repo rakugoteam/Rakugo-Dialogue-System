@@ -190,9 +190,12 @@ func load_game(save_name := "quick"):
 	parse_script(last_thread_datas["path"])
 	sg_game_loaded.emit()
 
-func resume_loaded_script():
-	if !last_thread_datas.is_empty():
-		executer.execute_script(last_thread_datas["file_base_name"], "", last_thread_datas["last_index"])
+func resume_loaded_script() -> int:
+	if last_thread_datas.is_empty():
+		push_error("Rakugo does not have script to reload")
+		return FAILED
+	
+	return execute_script(last_thread_datas["file_base_name"], "", last_thread_datas["last_index"])
 
 # Parser
 func parse_script(file_name: String) -> int:
@@ -213,14 +216,14 @@ func parse_script(file_name: String) -> int:
 	return OK
 
 # Executer
-func execute_script(script_name: String, label_name: String = "") -> int:
+func execute_script(script_name: String, label_name: String = "", index:int = 0) -> int:
 	var parsed_script = store_manager.parsed_scripts.get(script_name, {})
 	
 	if parsed_script.is_empty():
 		push_error("Rakugo does not have parse a script named: " + script_name)
 		return FAILED
 	
-	return executer.execute_script(parsed_script, label_name)
+	return executer.execute_script(parsed_script, label_name, index)
 
 func stop_last_script():
 	executer.stop_current_thread()
