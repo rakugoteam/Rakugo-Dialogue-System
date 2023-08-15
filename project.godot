@@ -25,7 +25,7 @@ rakugo/save_folder="user://saves"
 
 config/name="Rakugo.Core"
 run/main_scene="res://Test/TestParser/_TestParser.tscn"
-config/features=PackedStringArray("4.0")
+config/features=PackedStringArray("4.1")
 config/icon="res://icon.png"
 
 [autoload]
