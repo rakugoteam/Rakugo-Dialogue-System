@@ -83,7 +83,7 @@ func do_execute_script_end(parameters:Dictionary):
 		push_error(parameters["error"])
 
 	if Rakugo != null:
-		Rakugo.send_execute_script_finished(parameters["file_base_name"], parameters.get("error", ""))
+		Rakugo.call_thread_safe("send_execute_script_finished", parameters["file_base_name"], parameters.get("error", ""))
 
 	threads.erase(current_thread.get_id())
 
@@ -109,7 +109,7 @@ func do_execute_script(parameters:Dictionary):
 	
 	var parsed_script = parameters["parsed_script"]
 	
-	Rakugo.send_execute_script_start(parameters["file_base_name"])
+	Rakugo.call_thread_safe("send_execute_script_start", parameters["file_base_name"])
 	
 	var parse_array:Array = parsed_script["parse_array"]
 	
@@ -194,9 +194,9 @@ func do_execute_script(parameters:Dictionary):
 
 						text = text.replace(sub_result.strings[0], var_)
 
-				Rakugo.say(result.get_string("character_tag"), text)
-
-				Rakugo.step()
+				Rakugo.call_thread_safe("say", result.get_string("character_tag"), text)
+				
+				Rakugo.call_thread_safe("step")
 
 				semephore.wait()
 				
@@ -204,7 +204,11 @@ func do_execute_script(parameters:Dictionary):
 				Rakugo.define_character(result.get_string("tag"), result.get_string("name"))
 				
 			"ASK":
-				Rakugo.ask(result.get_string("variable"), result.get_string("character_tag"), remove_double_quotes(result.get_string("question")), remove_double_quotes(result.get_string("default_answer")))
+				Rakugo.call_thread_safe("ask",
+					result.get_string("variable"),
+					result.get_string("character_tag"),
+					remove_double_quotes(result.get_string("question")),
+					remove_double_quotes(result.get_string("default_answer")))
 
 				semephore.wait()
 				
@@ -223,7 +227,7 @@ func do_execute_script(parameters:Dictionary):
 					if !label.is_empty():
 						menu_jumps[i] = label
 				
-				Rakugo.menu(menu_choices)
+				Rakugo.call_thread_safe("menu", menu_choices)
 
 				semephore.wait()
 				
@@ -270,7 +274,10 @@ func do_execute_script(parameters:Dictionary):
 
 				Rakugo.set_variable(result.get_string("lvar_name"), value)
 			_:
-				Rakugo.sg_custom_regex.emit(line[0], result)
+				var foo = func():
+					Rakugo.sg_custom_regex.emit(line[0], result)
+				
+				foo.call_deferred()
 		
 		index += 1
 	
