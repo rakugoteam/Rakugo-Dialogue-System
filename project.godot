@@ -10,11 +10,7 @@ config_version=5
 
 [addons]
 
-rakugo/force_reload=false
-rakugo/auto_mode_delay=3
-rakugo/skip_delay=0.5
 rakugo/rollback_steps=10
-rakugo/test_mode=false
 rakugo/game_version="1.0.0"
 rakugo/history_length=30
 rakugo/narrator/name="narrator"
