@@ -235,9 +235,9 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 					"SET_VARIABLE":
 						var str_expression:String = result.get_string("expression")
 
-						if str_expression.is_empty():
-							parse_array.push_back([key, result])
-							break
+						# if str_expression.is_empty():
+						# 	parse_array.push_back([key, result])
+						# 	break
 						
 						var vars = get_vars_in_expression(str_expression)
 						var expression = Expression.new()

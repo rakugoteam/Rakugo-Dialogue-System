@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cnv3uvvte6sbc"]
+
+[ext_resource type="Script" path="res://addons/Rakugo/lib/nodes/RakuScriptDialogue.gd" id="1_ypk6u"]
+
+[node name="RakuScriptDialogue" type="Node"]
+script = ExtResource("1_ypk6u")
+raku_script = "res://Test/TestReadmeExample/TestReadmeExample.rk"
+auto_start = true
