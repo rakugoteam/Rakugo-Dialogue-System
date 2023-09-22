@@ -3,27 +3,16 @@ extends Node
 # Rakugo
 ## Setting's strings
 const game_version = "addons/rakugo/game_version"
-const force_reload = "addons/rakugo/force_reload"
-const auto_mode_delay = "addons/rakugo/auto_mode_delay"
-const typing_effect_delay = "addons/rakugo/typing_effect_delay"
-const skip_delay = "addons/rakugo/skip_delay"
-const rollback_steps = "addons/rakugo/rollback_steps"
 const history_length = "addons/rakugo/history_length"
 const narrator_name = "addons/rakugo/narrator/name"
 const debug = "addons/rakugo/debug"
 const save_folder = "addons/rakugo/save_folder"
-const test_mode = "addons/rakugo/test_mode"
 
 #Godot
 ## Setting's strings
 const game_title = "application/config/name"
-const main_scene = "application/run/main_scene"
-const width = "display/window/size/viewport_width"
-const height = "display/window/size/viewport_height"
-const fullscreen = "display/window/size/fullscreen"
-const maximized = "display/window/size/maximized"
 
-const version := "1.1.2"
+const version := "2.1.1"
 
 const StoreManager = preload("res://addons/Rakugo/lib/systems/StoreManager.gd")
 const Parser = preload("res://addons/Rakugo/lib/systems/Parser.gd")
@@ -173,11 +162,11 @@ func get_character_variable(character_tag: String, var_name: String):
 
 
 func _ready():
-	var version = ProjectSettings.get_setting(Rakugo.game_version)
-	var title = ProjectSettings.get_setting(Rakugo.game_title)
+	var version = ProjectSettings.get_setting(game_version)
+	var title = ProjectSettings.get_setting(game_title)
 	get_window().set_title(title + " " + version)
 
-	var narrator_name = ProjectSettings.get_setting(Rakugo.narrator_name)
+	var narrator_name = ProjectSettings.get_setting(narrator_name)
 	define_character("narrator", narrator_name)
 
 
