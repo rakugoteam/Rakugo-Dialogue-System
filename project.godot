@@ -23,10 +23,9 @@ rakugo/save_folder="user://saves"
 
 [application]
 
-config/name="Rakugo.Core"
-run/main_scene="res://Test/TestParser/_TestParser.tscn"
+config/name="Rakugo Dialogue System"
 config/features=PackedStringArray("4.1")
-config/icon="res://icon.png"
+config/icon="res://WindowIcon.png"
 
 [autoload]
 
@@ -36,6 +35,10 @@ Rakugo="*res://addons/Rakugo/Rakugo.gd"
 
 gdscript/warnings/return_value_discarded=false
 gdscript/warnings/unused_argument=false
+
+[dotnet]
+
+project/assembly_name="Rakugo.Core"
 
 [editor_plugins]
 

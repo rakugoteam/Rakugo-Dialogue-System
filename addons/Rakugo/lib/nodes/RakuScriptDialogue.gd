@@ -1,7 +1,7 @@
 extends Node
 class_name RakuScriptDialogue
 
-@export var raku_script : String # (String, FILE, "*.rk")
+@export_file("*.rk") var raku_script : String
 @export var starting_label_name := ""
 @export var auto_start := false
 
