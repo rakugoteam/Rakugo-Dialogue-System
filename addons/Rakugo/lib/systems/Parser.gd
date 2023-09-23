@@ -39,7 +39,7 @@ var Tokens := {
 var Regex := {
 	NAME = "[a-zA-Z][a-zA-Z_0-9]*",
 	NUMERIC = "-?[0-9]\\.?[0-9]*",
-	STRING = "\".*\"",
+	STRING = "\"[^\"]*\"",
 	VARIABLE = "((?<char_tag>{NAME})\\.)?(?<var_name>{NAME})",
 #	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
 }
@@ -59,7 +59,7 @@ var parser_regex :={
 	# character_tag? "say"
 	SAY = "^((?<character_tag>{NAME}) )?(?<text>{STRING})$",
 	# var_name = character_tag? "please enter text" 
-	ASK = "^(?<variable>{VARIABLE}) = ((?<character_tag>{NAME}) )?(?<question>{STRING}) \\? (?<default_answer>{STRING})$",
+	ASK = "^(?<variable>{VARIABLE})\\s*=\\s*\\?\\s*((?<character_tag>{NAME}) )?(?<question>{STRING})( (?<default_answer>{STRING}))?$",
 	# "like regex" (> label_name)?
 	CHOICE = "^(?<text>{STRING})( > (?<label>{NAME}))?$",
 	# jump label
@@ -143,6 +143,8 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 	
 	for i in lines.size():
 		var line = lines[i]
+		
+		prints("Parser", line)
 
 		line = line.strip_edges()
 
