@@ -41,6 +41,7 @@ var Regex := {
 	NUMERIC = "-?[0-9]\\.?[0-9]*",
 	STRING = "\"[^\"]*\"",
 	VARIABLE = "((?<char_tag>{NAME})\\.)?(?<var_name>{NAME})",
+	ASSIGNMENT = "(=|\\+=|\\-=|\\*=|\\/=|\\%=)",
 #	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
 }
 
@@ -65,13 +66,7 @@ var parser_regex :={
 	# jump label
 	JUMP = "^jump (?<label>{NAME})( if (?<expression>.+))?$",
 	# for setting Rakugo variables
-	SET_VARIABLE = "^(?<lvar_name>{VARIABLE}) = ((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE}))$",
-	# $ some_gd_script_code
-#	IN_LINE_GDSCRIPT = "^\\$.*",
-	# gdscript:
-#	GDSCRIPT_BLOCK = "^gdscript:",
-#	TRANSLATION = "\\[TR:(?<tr>.*?)]\\",
-#	CONDITION = "(if|elif) (?<condition>.*)",
+	SET_VARIABLE = "^(?<rvar_name>{VARIABLE})\\s*(?<operator>{ASSIGNMENT})\\s*(?<expression>.+)$",
 }
 
 var other_regex :={
@@ -107,7 +102,9 @@ func _init():
 	
 	for key in other_regex:
 		add_regex(key, other_regex[key], other_cache, "Parser, _init, failed " + key)
-		
+	
+	# prints("SET_VARIABLE", regex_cache["SET_VARIABLE"]. get_pattern())
+	
 	add_regex("VARIABLE", Regex["VARIABLE"], other_cache, "Parser, _init, failed VARIABLE")
 
 func count_indent(s:String) -> int:
@@ -124,19 +121,42 @@ func count_indent(s:String) -> int:
 	
 	return ret
 
+func get_vars_in_expression(str_expression:String):
+	var sub_results = other_cache["VARIABLE"].search_all(str_expression)
+	var vars = []
+
+	# Expression does not like '.'
+	var vars_expression = []
+
+	for sub_result in sub_results:
+		var sub_result_str = sub_result.strings[0]
+		
+		if !vars.has(sub_result_str):
+			vars.push_back(sub_result_str)
+
+		var var_name_expr = sub_result.get_string("char_tag")
+
+		if !var_name_expr.is_empty():
+			var_name_expr += "_" + sub_result.get_string("var_name")
+
+			str_expression = str_expression.replace(sub_result_str, var_name_expr)
+		else:
+			var_name_expr = sub_result.get_string("var_name")
+		
+		if !vars_expression.has(var_name_expr):
+			vars_expression.push_back(var_name_expr)
+
+	return [vars_expression, vars]
+
 func parse_script(lines:PackedStringArray) -> Dictionary:
 	if lines.is_empty():
 		push_error("Parser, parse_script : lines is empty !")
 		return {}
 	
 	var parse_array:Array
-	
 	var labels:Dictionary
-	
 	var indent_count:int
-	
 	var menu_choices
-	
 	var current_menu_result
 	
 	state = State.Normal
@@ -205,42 +225,33 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 						if str_expression.is_empty():
 							parse_array.push_back([key, result])
 							break
-
-						var sub_results = other_cache["VARIABLE"].search_all(str_expression)
-
-						var vars = []
-
-						# Expression does not like '.'
-						var vars_expression = []
-
-						for sub_result in sub_results:
-							var sub_result_str = sub_result.strings[0]
-							
-							if !vars.has(sub_result_str):
-								vars.push_back(sub_result_str)
-
-							var var_name_expr = sub_result.get_string("char_tag")
-
-							if !var_name_expr.is_empty():
-								var_name_expr += "_" + sub_result.get_string("var_name")
-
-								str_expression = str_expression.replace(sub_result_str, var_name_expr)
-							else:
-								var_name_expr = sub_result.get_string("var_name")
-							
-							if !vars_expression.has(var_name_expr):
-								vars_expression.push_back(var_name_expr)
-
+						
+						var vars = get_vars_in_expression(str_expression)
 						var expression = Expression.new()
-
-						if expression.parse(str_expression, vars_expression) != OK:
+						if expression.parse(str_expression, vars[0]) != OK:
 							push_error("Parser: Error on line: " + str(i+1) + ", " + expression.get_error_text())
 							return {}
 
-						parse_array.push_back([key, result, expression, vars])
+						parse_array.push_back([key, result, expression, vars[1]])
+
+					"SET_VARIABLE":
+						var str_expression:String = result.get_string("expression")
+
+						if str_expression.is_empty():
+							parse_array.push_back([key, result])
+							break
+						
+						var vars = get_vars_in_expression(str_expression)
+						var expression = Expression.new()
+						if expression.parse(str_expression, vars[0]) != OK:
+							push_error("Parser: Error on line: " + str(i+1) + ", " + expression.get_error_text())
+							return {}
+
+						parse_array.push_back([key, result, expression, vars[1]])
 
 					_:
 						parse_array.push_back([key, result])
+						
 				break
 
 		if (not have_find_key):

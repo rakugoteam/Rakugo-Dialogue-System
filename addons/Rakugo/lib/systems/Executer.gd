@@ -17,8 +17,7 @@ var regex := {
 }
 
 var regex_cache := {}
-
-var menu_jump_index:int
+var menu_jump_index: int
 
 func _init():
 	for key in regex:
@@ -88,7 +87,6 @@ func do_execute_script_end(parameters:Dictionary):
 	threads.erase(current_thread.get_id())
 
 	current_thread = null
-		
 	current_semaphore = null
 
 func do_execute_jump(jump_label:String, labels:Dictionary) -> int:
@@ -152,7 +150,9 @@ func do_execute_script(parameters:Dictionary):
 					var values = []
 
 					for var_name in line[3]:
-						var var_ = Rakugo.get_variable(var_name)
+						var var_ = null
+						if Rakugo.has_variable(var_name):
+							var_ = Rakugo.get_variable(var_name)
 
 						if !var_:
 							parameters["error"] = "Executer::do_execute_script::JUMP, can not get variable :" + var_name
@@ -167,6 +167,7 @@ func do_execute_script(parameters:Dictionary):
 						parameters["error"] = "Executer::do_execute_script::JUMP, failed to execute expression : " + result.get_string("expression")
 						parameters["stop"] = true
 						break
+
 				else:
 					can_jump = true
 
@@ -242,7 +243,8 @@ func do_execute_script(parameters:Dictionary):
 						break
 
 					# remove 1 because we add 1 at the end of the loop
-					index -= 1	
+					index -= 1
+					
 				elif !(menu_jump_index in [0, menu_choices.size() - 1]):
 					parameters["error"] = "Executer::do_execute_script::MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size())
 					parameters["stop"] = true
@@ -250,29 +252,55 @@ func do_execute_script(parameters:Dictionary):
 		
 			"SET_VARIABLE":
 				var rvar_name = result.get_string("rvar_name")
-				var text = result.get_string("text")
-				
-				var value
-				
-				if !rvar_name.is_empty():
-					value = Rakugo.get_variable(rvar_name)
-					
-					if !value:
-						parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, can not get variable :" + rvar_name
+				var operator = result.get_string("operator")
+				var final_value = null
+
+				var values = []
+				for var_name in line[3]:
+					var var_ = Rakugo.get_variable(var_name)
+
+					if !var_:
+						parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, can not get variable :" + var_name
 						parameters["stop"] = true
 						break
+
+					values.push_back(var_)
+
+				final_value = line[2].execute(values)
+				
+				if line[2].has_execute_failed():
+					parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, failed to execute expression : " + result.get_string("expression")
+					parameters["stop"] = true
+					break
+				
+				if operator != "=":
+					if Rakugo.has_variable(rvar_name):
+						var org_value = Rakugo.get_variable(rvar_name)
 						
-				elif !text.is_empty():
-					value = remove_double_quotes(text)
-				else:
-					value = result.get_string("number")
-
-					if value.is_valid_int():
-						value = int(value)
+						match operator:
+							"+=":
+								Rakugo.set_variable(rvar_name, org_value + final_value)
+							
+							"-=":
+								Rakugo.set_variable(rvar_name, org_value - final_value)
+							
+							"*=":
+								Rakugo.set_variable(rvar_name, org_value * final_value)
+							
+							"/=":
+								Rakugo.set_variable(rvar_name, org_value / final_value)
+							
+							"%=":
+								Rakugo.set_variable(rvar_name, org_value % final_value)
+					
 					else:
-						value = float(value)
-
-				Rakugo.set_variable(result.get_string("lvar_name"), value)
+						parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, variable not found : " + rvar_name
+						parameters["stop"] = true
+						break
+				
+				# if operator is "=" or if the variable does not exist
+				Rakugo.set_variable(rvar_name, final_value)
+				
 			_:
 				var foo = func():
 					Rakugo.sg_custom_regex.emit(line[0], result)
