@@ -143,8 +143,6 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 	
 	for i in lines.size():
 		var line = lines[i]
-		
-		prints("Parser", line)
 
 		line = line.strip_edges()
 
