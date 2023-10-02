@@ -97,9 +97,6 @@ func do_execute_jump(jump_label:String, labels:Dictionary) -> int:
 
 	return -1
 
-func remove_double_quotes(s:String) -> String:
-	return s.substr(1, s.length()-2)
-
 func do_execute_script(parameters:Dictionary):
 	var thread = parameters["thread"]
 	
@@ -181,7 +178,7 @@ func do_execute_script(parameters:Dictionary):
 					break
 			
 			"SAY":
-				var text = remove_double_quotes(result.get_string("text"))
+				var text = result["text"]
 				
 				var sub_results = regex_cache["VARIABLE_IN_STR"].search_all(text)
 				
@@ -194,7 +191,7 @@ func do_execute_script(parameters:Dictionary):
 
 						text = text.replace(sub_result.strings[0], var_)
 
-				Rakugo.call_thread_safe("say", result.get_string("character_tag"), text)
+				Rakugo.call_thread_safe("say", result["character_tag"], text)
 				
 				Rakugo.call_thread_safe("step")
 
@@ -205,15 +202,14 @@ func do_execute_script(parameters:Dictionary):
 				
 			"ASK":
 				Rakugo.call_thread_safe("ask",
-					result.get_string("variable"),
-					result.get_string("character_tag"),
-					remove_double_quotes(result.get_string("question")),
-					remove_double_quotes(result.get_string("default_answer")))
+					result["variable"],
+					result["character_tag"],
+					result["question"],
+					result["default_answer"])
 
 				semephore.wait()
 				
 			"MENU":
-				printt("Executer", "MENU")
 				var menu_choices:PackedStringArray
 				
 				var menu_jumps:Dictionary
@@ -221,9 +217,9 @@ func do_execute_script(parameters:Dictionary):
 				for i in line[2].size():
 					var menu_choice_result = line[2][i]
 					
-					menu_choices.push_back(remove_double_quotes(menu_choice_result.get_string("text")))
+					menu_choices.push_back(menu_choice_result["text"])
 					
-					var label = menu_choice_result.get_string("label")
+					var label = menu_choice_result["label"]
 					if !label.is_empty():
 						menu_jumps[i] = label
 				
@@ -249,8 +245,8 @@ func do_execute_script(parameters:Dictionary):
 					break
 		
 			"SET_VARIABLE":
-				var rvar_name = result.get_string("rvar_name")
-				var text = result.get_string("text")
+				var rvar_name = result["rvar_name"]
+				var text = result["text"]
 				
 				var value
 				
@@ -263,16 +259,16 @@ func do_execute_script(parameters:Dictionary):
 						break
 						
 				elif !text.is_empty():
-					value = remove_double_quotes(text)
+					value = text
 				else:
-					value = result.get_string("number")
+					value = result["number"]
 
 					if value.is_valid_int():
 						value = int(value)
 					else:
 						value = float(value)
 
-				Rakugo.set_variable(result.get_string("lvar_name"), value)
+				Rakugo.set_variable(result["lvar_name"], value)
 			_:
 				var foo = func():
 					Rakugo.sg_custom_regex.emit(line[0], result)

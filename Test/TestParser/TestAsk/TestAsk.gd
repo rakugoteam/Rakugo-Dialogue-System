@@ -22,9 +22,9 @@ func test_ask(params=use_parameters(test_ask_params)):
 
 	var result = parsed_array[0][1]
 
-	assert_eq(result.get_string("variable"), "answer")
+	assert_eq(result["variable"], "answer")
 
-	assert_eq(result.get_string("question"), "\"Hello ?\"")
+	assert_eq(result["question"], "Hello ?")
 
 var test_ask_default_answer_params = [
 	["answer=?\"Hello ?\" \"Bob\""],
@@ -44,11 +44,11 @@ func test_ask_default_answer(params=use_parameters(test_ask_default_answer_param
 
 	var result = parsed_array[0][1]
 
-	assert_eq(result.get_string("variable"), "answer")
+	assert_eq(result["variable"], "answer")
 
-	assert_eq(result.get_string("question"), "\"Hello ?\"")
+	assert_eq(result["question"], "Hello ?")
 
-	assert_eq(result.get_string("default_answer"), "\"Bob\"")
+	assert_eq(result["default_answer"], "Bob")
 
 var test_ask_tag_params = [
 	["answer=?gd \"Hello ?\""],
@@ -68,11 +68,11 @@ func test_ask_tag(params=use_parameters(test_ask_tag_params)):
 
 	var result = parsed_array[0][1]
 
-	assert_eq(result.get_string("variable"), "answer")
+	assert_eq(result["variable"], "answer")
 
-	assert_eq(result.get_string("character_tag"), "gd")
+	assert_eq(result["character_tag"], "gd")
 
-	assert_eq(result.get_string("question"), "\"Hello ?\"")
+	assert_eq(result["question"], "Hello ?")
 
 var test_ask_all_params = [
 	["answer=?gd \"Hello ?\" \"Bob\""],
@@ -92,10 +92,10 @@ func test_ask_all(params=use_parameters(test_ask_all_params)):
 
 	var result = parsed_array[0][1]
 
-	assert_eq(result.get_string("variable"), "answer")
+	assert_eq(result["variable"], "answer")
 
-	assert_eq(result.get_string("character_tag"), "gd")
+	assert_eq(result["character_tag"], "gd")
 
-	assert_eq(result.get_string("question"), "\"Hello ?\"")
+	assert_eq(result["question"], "Hello ?")
 
-	assert_eq(result.get_string("default_answer"), "\"Bob\"")
+	assert_eq(result["default_answer"], "Bob")

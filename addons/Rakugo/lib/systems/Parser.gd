@@ -124,6 +124,10 @@ func count_indent(s:String) -> int:
 	
 	return ret
 
+func treat_string(s:String) -> String:
+	s = s.substr(1, s.length()-2)
+	return s.replace("\\n", "\n").replace("\\t", "\t")
+
 func parse_script(lines:PackedStringArray) -> Dictionary:
 	if lines.is_empty():
 		push_error("Parser, parse_script : lines is empty !")
@@ -160,8 +164,13 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 #
 #				for key in result.names:
 #					prints(" ", key, result.get_string(key))
-					
-				menu_choices.push_back(result)
+				
+				var dic_result := {
+					"text":treat_string(result.get_string("text")),
+					"label":result.get_string("label")
+				}
+
+				menu_choices.push_back(dic_result)
 				
 				if i == lines.size() - 1:
 					parse_array.push_back(["MENU", current_menu_result, menu_choices])
@@ -237,6 +246,33 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 
 						parse_array.push_back([key, result, expression, vars])
 
+					"SAY":
+						var dic_result := {
+							"text":treat_string(result.get_string("text")),
+							"character_tag":result.get_string("character_tag")
+						}
+
+						parse_array.push_back([key, dic_result])
+
+					"ASK":
+						var dic_result := {
+							"variable":result.get_string("variable"),
+							"character_tag":result.get_string("character_tag"),
+							"question":treat_string(result.get_string("question")),
+							"default_answer":treat_string(result.get_string("default_answer"))
+						}
+
+						parse_array.push_back([key, dic_result])
+
+					"SET_VARIABLE":
+						var dic_result := {
+							"lvar_name":result.get_string("lvar_name"),
+							"rvar_name":result.get_string("rvar_name"),
+							"number":result.get_string("number"),
+							"text":treat_string(result.get_string("text"))
+						}
+
+						parse_array.push_back([key, dic_result])
 					_:
 						parse_array.push_back([key, result])
 				break
