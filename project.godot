@@ -32,13 +32,18 @@ Rakugo="*res://addons/Rakugo/Rakugo.gd"
 gdscript/warnings/return_value_discarded=false
 gdscript/warnings/unused_argument=false
 
-[dotnet]
+[editor]
 
-project/assembly_name="Rakugo.Core"
+script/search_in_file_extensions=PackedStringArray("gd", "gdshader", "rk")
 
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/Rakugo/plugin.cfg", "res://addons/gut/plugin.cfg")
+
+[filesystem]
+
+import/blender/enabled=false
+import/fbx/enabled=false
 
 [physics]
 
