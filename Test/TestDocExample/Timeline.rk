@@ -1,0 +1,15 @@
+hello_world
+character gd "Godot"
+character emy "Emily"
+"<gd.name> and <emy.name> meet"
+menu menu_emily:
+	"Wait"
+	"Talk to emily" > gd_start
+emy_start:
+	gd.name = emy "Hello, what is your name ?" ? "<gd.name>"
+	"Oh, your name is <gd.name> !"
+gd_start:
+	gd "Hello <emy.name>, how are you ?"
+menu end:
+	"end"
+	"replay" > first_dialogue

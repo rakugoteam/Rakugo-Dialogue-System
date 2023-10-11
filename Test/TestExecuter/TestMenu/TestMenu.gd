@@ -20,6 +20,6 @@ func test_menu():
 	await wait_execute_script_finished(file_base_name)
 
 func test_menu_choice_parse_fail():
-	var file_path = "res://Test/TestParser/TestMenu/TestMenuChoiceParseFail.rk"
+	var file_path = "res://Test/TestExecuter/TestMenu/TestMenuChoiceParseFail.rk"
 
 	assert_eq(Rakugo.parse_script(file_path), FAILED)
