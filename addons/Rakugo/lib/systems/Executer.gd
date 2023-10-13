@@ -227,6 +227,11 @@ func do_execute_script(parameters:Dictionary):
 
 				semephore.wait()
 				
+				if menu_jump_index < 0 or menu_jump_index >= menu_choices.size():
+					parameters["error"] = "Executer::do_execute_script::MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size())
+					parameters["stop"] = true
+					break
+				
 				if menu_jumps.has(menu_jump_index):
 					var jump_label = menu_jumps[menu_jump_index]
 
@@ -238,12 +243,8 @@ func do_execute_script(parameters:Dictionary):
 						break
 
 					# remove 1 because we add 1 at the end of the loop
-					index -= 1	
-				elif !(menu_jump_index in [0, menu_choices.size() - 1]):
-					parameters["error"] = "Executer::do_execute_script::MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size())
-					parameters["stop"] = true
-					break
-		
+					index -= 1
+					
 			"SET_VARIABLE":
 				var rvar_name = result["rvar_name"]
 				var text = result["text"]
