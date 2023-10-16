@@ -64,3 +64,8 @@ func test_menu(params=use_parameters(test_params)):
 	assert_eq(menu_choice_results[0]["label"], "menu")
 
 	assert_eq(menu_choice_results[1]["text"], "end")
+	
+func test_menu_choice_parse_fail():
+	var file_path = "res://Test/TestExecuter/TestMenu/TestMenuChoiceParseFail.rk"
+
+	assert_eq(Rakugo.parse_script(file_path), FAILED)
