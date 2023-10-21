@@ -94,6 +94,43 @@ func test_say_escape_characters():
 	
 	assert_eq(result["text"], "first\nsecond\n\nthird")
 	
+	assert_true(parsed_array[1][0] == "SAY")
+	
 	result = parsed_array[1][1]
 	
 	assert_eq(result["text"], "\ttabulation\t\ttabulations")
+	
+func test_say_quote():
+	var rk_script = [
+		"\"hello: \"quote\"\"",
+		"\"\"quote\" hello \"quote\"\"",
+		"\"hel\"quote\"lo\""
+	]
+	
+	var parsed_script = parser.parse_script(rk_script)
+
+	assert_false(parsed_script.is_empty())
+
+	var parsed_array = parsed_script["parse_array"]
+
+	assert_false(parsed_array.is_empty())
+	
+	assert_true(parsed_script.get("labels", [""]).is_empty())
+	
+	assert_true(parsed_array[0][0] == "SAY")
+	
+	var result = parsed_array[0][1]
+	
+	assert_eq(result["text"], "hello: \"quote\"")
+	
+	assert_true(parsed_array[1][0] == "SAY")
+	
+	result = parsed_array[1][1]
+	
+	assert_eq(result["text"], "\"quote\" hello \"quote\"")
+	
+	assert_true(parsed_array[2][0] == "SAY")
+	
+	result = parsed_array[2][1]
+	
+	assert_eq(result["text"], "hel\"quote\"lo")
