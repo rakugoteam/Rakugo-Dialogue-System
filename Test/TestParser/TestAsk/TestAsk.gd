@@ -99,3 +99,28 @@ func test_ask_all(params=use_parameters(test_ask_all_params)):
 	assert_eq(result["question"], "Hello ?")
 
 	assert_eq(result["default_answer"], "Bob")
+
+func test_ask_quotes():
+	var rk_script = [
+		"answer=?gd \"Hello: \"quote\"?\" \"Bob: \"quote\"\""
+	]
+
+	var parsed_script = parser.parse_script(rk_script)
+
+	assert_false(parsed_script.is_empty())
+
+	var parsed_array = parsed_script["parse_array"]
+
+	assert_false(parsed_array.is_empty())
+
+	assert_true(parsed_array[0][0] == "ASK")
+
+	var result = parsed_array[0][1]
+
+	assert_eq(result["variable"], "answer")
+
+	assert_eq(result["character_tag"], "gd")
+
+	assert_eq(result["question"], "Hello: \"quote\"?")
+
+	assert_eq(result["default_answer"], "Bob: \"quote\"")
