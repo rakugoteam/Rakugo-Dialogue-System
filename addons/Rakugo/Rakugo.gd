@@ -143,7 +143,6 @@ func get_character(character_tag: String) -> Dictionary:
 	var character = {}
 
 	if character_tag.is_empty():
-		push_warning("Character tag is empty")
 		return character
 
 	mutex.lock()
