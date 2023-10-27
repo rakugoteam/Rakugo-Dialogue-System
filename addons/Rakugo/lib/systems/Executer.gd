@@ -269,7 +269,47 @@ func do_execute_script(parameters:Dictionary):
 					else:
 						value = float(value)
 
-				Rakugo.set_variable(result["lvar_name"], value)
+				var assignment = result["assignment"]
+				
+				var lvar_name = result["lvar_name"]
+				
+				if assignment != "=":
+					var lvalue = Rakugo.get_variable(lvar_name)
+					
+					if lvalue == null:
+						parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, Rakugo does not knew a variable called: " + lvar_name
+						parameters["stop"] = true
+						break
+					
+					var lvalue_type = typeof(lvalue)
+					var value_type = typeof(value)
+					
+					# required because the thread crash (not godot) without error
+					# we only accept string and numbers when we parse
+					if value_type == TYPE_STRING and lvalue_type != TYPE_STRING:
+						parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, Cannot resolve assignement: " + lvar_name + " of type(" + str(lvalue_type) + ") " + assignment + " with type(" + str(value_type) + ")"
+						parameters["stop"] = true
+						break
+					
+					match(assignment):
+						"+=":
+							value = lvalue + value
+							
+						"-=":
+							value = lvalue - value
+							
+						"*=":
+							value = lvalue * value
+							
+						"/=":
+							value = lvalue / value
+						
+						_:
+							parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, the assignment operator is not implemented :" + assignment
+							parameters["stop"] = true
+							break
+
+				Rakugo.set_variable(lvar_name, value)
 			_:
 				var foo = func():
 					Rakugo.sg_custom_regex.emit(line[0], result)

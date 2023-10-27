@@ -1,7 +1,14 @@
 a = 1
 b = 2.5
-c = "Hello, world !"
+c = "Hello,"
 d = a
 character Sy "Sylvie"
 Sy.life = 5
+a /= 1
+b += 1
+c += " world !"
+d -= 2
+Sy.life *= 2
 e = Sy.life
+f = 1
+f += "1"
