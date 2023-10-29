@@ -12,5 +12,9 @@ func test_ask():
 	await wait_ask({}, "Are you human ?", "Yes")
 	
 	assert_ask_return("answer", "No")
+
+	await wait_ask({},"Your answer was No ?", "No")
+
+	assert_ask_return("answer", "Yes")
 	
 	await wait_execute_script_finished(file_base_name)
