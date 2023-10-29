@@ -178,18 +178,7 @@ func do_execute_script(parameters:Dictionary):
 					break
 			
 			"SAY":
-				var text = result["text"]
-				
-				var sub_results = regex_cache["VARIABLE_IN_STR"].search_all(text)
-				
-				for sub_result in sub_results:
-					var var_ = Rakugo.get_variable(sub_result.get_string("variable"))
-					
-					if var_:
-						if typeof(var_) != TYPE_STRING:
-							var_ = str(var_)
-
-						text = text.replace(sub_result.strings[0], var_)
+				var text = Rakugo.replace_variables(result["text"])
 
 				Rakugo.call_thread_safe("say", result["character_tag"], text)
 				
@@ -204,8 +193,9 @@ func do_execute_script(parameters:Dictionary):
 				Rakugo.call_thread_safe("ask",
 					result["variable"],
 					result["character_tag"],
-					result["question"],
-					result["default_answer"])
+					Rakugo.replace_variables(result["question"]),
+					Rakugo.replace_variables(result["default_answer"])
+				)
 
 				semephore.wait()
 				
@@ -217,7 +207,9 @@ func do_execute_script(parameters:Dictionary):
 				for i in line[2].size():
 					var menu_choice_result = line[2][i]
 					
-					menu_choices.push_back(menu_choice_result["text"])
+					menu_choices.push_back(
+						Rakugo.replace_variables(menu_choice_result["text"])
+					)
 					
 					var label = menu_choice_result["label"]
 					if !label.is_empty():
