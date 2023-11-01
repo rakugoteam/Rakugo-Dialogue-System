@@ -12,7 +12,7 @@ const save_folder = "addons/rakugo/save_folder"
 ## Setting's strings
 const game_title = "application/config/name"
 
-const version := "2.1.1"
+const version := "2.2"
 
 const StoreManager = preload("res://addons/Rakugo/lib/systems/StoreManager.gd")
 const Parser = preload("res://addons/Rakugo/lib/systems/Parser.gd")
