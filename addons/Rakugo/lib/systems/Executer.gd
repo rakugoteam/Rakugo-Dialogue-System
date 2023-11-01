@@ -178,18 +178,7 @@ func do_execute_script(parameters:Dictionary):
 					break
 			
 			"SAY":
-				var text = result["text"]
-				
-				var sub_results = regex_cache["VARIABLE_IN_STR"].search_all(text)
-				
-				for sub_result in sub_results:
-					var var_ = Rakugo.get_variable(sub_result.get_string("variable"))
-					
-					if var_:
-						if typeof(var_) != TYPE_STRING:
-							var_ = str(var_)
-
-						text = text.replace(sub_result.strings[0], var_)
+				var text = Rakugo.replace_variables(result["text"])
 
 				Rakugo.call_thread_safe("say", result["character_tag"], text)
 				
@@ -204,8 +193,9 @@ func do_execute_script(parameters:Dictionary):
 				Rakugo.call_thread_safe("ask",
 					result["variable"],
 					result["character_tag"],
-					result["question"],
-					result["default_answer"])
+					Rakugo.replace_variables(result["question"]),
+					Rakugo.replace_variables(result["default_answer"])
+				)
 
 				semephore.wait()
 				
@@ -217,7 +207,9 @@ func do_execute_script(parameters:Dictionary):
 				for i in line[2].size():
 					var menu_choice_result = line[2][i]
 					
-					menu_choices.push_back(menu_choice_result["text"])
+					menu_choices.push_back(
+						Rakugo.replace_variables(menu_choice_result["text"])
+					)
 					
 					var label = menu_choice_result["label"]
 					if !label.is_empty():
@@ -226,6 +218,11 @@ func do_execute_script(parameters:Dictionary):
 				Rakugo.call_thread_safe("menu", menu_choices)
 
 				semephore.wait()
+				
+				if menu_jump_index < 0 or menu_jump_index >= menu_choices.size():
+					parameters["error"] = "Executer::do_execute_script::MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size())
+					parameters["stop"] = true
+					break
 				
 				if menu_jumps.has(menu_jump_index):
 					var jump_label = menu_jumps[menu_jump_index]
@@ -238,12 +235,8 @@ func do_execute_script(parameters:Dictionary):
 						break
 
 					# remove 1 because we add 1 at the end of the loop
-					index -= 1	
-				elif !(menu_jump_index in [0, menu_choices.size() - 1]):
-					parameters["error"] = "Executer::do_execute_script::MENU, menu_jump_index out of range: " + str(menu_jump_index) + " >= " + str(menu_choices.size())
-					parameters["stop"] = true
-					break
-		
+					index -= 1
+					
 			"SET_VARIABLE":
 				var rvar_name = result["rvar_name"]
 				var text = result["text"]
@@ -268,7 +261,47 @@ func do_execute_script(parameters:Dictionary):
 					else:
 						value = float(value)
 
-				Rakugo.set_variable(result["lvar_name"], value)
+				var assignment = result["assignment"]
+				
+				var lvar_name = result["lvar_name"]
+				
+				if assignment != "=":
+					var lvalue = Rakugo.get_variable(lvar_name)
+					
+					if lvalue == null:
+						parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, Rakugo does not knew a variable called: " + lvar_name
+						parameters["stop"] = true
+						break
+					
+					var lvalue_type = typeof(lvalue)
+					var value_type = typeof(value)
+					
+					# required because the thread crash (not godot) without error
+					# we only accept string and numbers when we parse
+					if value_type == TYPE_STRING and lvalue_type != TYPE_STRING:
+						parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, Cannot resolve assignement: " + lvar_name + " of type(" + str(lvalue_type) + ") " + assignment + " with type(" + str(value_type) + ")"
+						parameters["stop"] = true
+						break
+					
+					match(assignment):
+						"+=":
+							value = lvalue + value
+							
+						"-=":
+							value = lvalue - value
+							
+						"*=":
+							value = lvalue * value
+							
+						"/=":
+							value = lvalue / value
+						
+						_:
+							parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, the assignment operator is not implemented :" + assignment
+							parameters["stop"] = true
+							break
+
+				Rakugo.set_variable(lvar_name, value)
 			_:
 				var foo = func():
 					Rakugo.sg_custom_regex.emit(line[0], result)

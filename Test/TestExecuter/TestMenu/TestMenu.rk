@@ -1,3 +1,4 @@
 menu menu:
-	"Loop" > menu
+	"Loop0" > menu
 	"End"
+	"Loop1" > menu

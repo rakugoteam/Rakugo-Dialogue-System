@@ -46,6 +46,23 @@ signal sg_variable_changed(var_name, value)
 signal sg_character_variable_changed(character_tag, var_name, value)
 
 ## Variables
+
+# Replaces <var_name> in given text with its value
+func replace_variables(text:String) -> String:
+	var sub_results = executer.regex_cache["VARIABLE_IN_STR"].search_all(text)
+	
+	for sub_result in sub_results:
+		var var_ = Rakugo.get_variable(sub_result.get_string("variable"))
+		
+		if var_:
+			if typeof(var_) != TYPE_STRING:
+				var_ = str(var_)
+
+			text = text.replace(sub_result.strings[0], var_)
+	
+	return text
+
+
 # Used to be call with call_thread_safe.
 func emit_sg_variable_changed(var_name:String, value):
 	sg_variable_changed.emit(var_name, value)
@@ -86,6 +103,9 @@ func get_variable(var_name: String):
 			if store_manager.variables.has(var_name):
 				variable = store_manager.variables.get(var_name)
 			mutex.unlock()
+			
+			if variable is String:
+				return replace_variables(variable)
 
 			return variable
 
@@ -143,7 +163,6 @@ func get_character(character_tag: String) -> Dictionary:
 	var character = {}
 
 	if character_tag.is_empty():
-		push_warning("Character tag is empty")
 		return character
 
 	mutex.lock()
@@ -210,6 +229,10 @@ func get_character_variable(character_tag: String, var_name: String):
 		push_error("Available variables are: " + str(character.keys()))
 
 	mutex.unlock()
+
+	if character_variable is String:
+		return replace_variables(character_variable)
+
 	return character_variable
 
 
