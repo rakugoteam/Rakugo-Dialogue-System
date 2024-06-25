@@ -33,7 +33,7 @@
  "post_run_script": "",
  "pre_run_script": "",
  "prefix": "Test",
- "selected": null,
+ "selected": "Fix273.gd",
  "should_exit": false,
  "should_exit_on_success": false,
  "should_maximize": false,
