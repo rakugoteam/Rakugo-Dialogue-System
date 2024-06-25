@@ -4,5 +4,3 @@
 
 [node name="Fix273" type="Node"]
 script = ExtResource("1_g2h2x")
-raku_script = "res://Test/TestExecuter/fix_273/fix273.rk"
-auto_start = true

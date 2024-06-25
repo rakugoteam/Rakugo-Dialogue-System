@@ -1,7 +1,5 @@
-# init:
-character char "test char"
-char.var = 0
-jump test if char.var == 0
+test_var = 0
+jump test if test_var == 0
 
 test:
-	char "This won't ever happen"
+	"273 fixed"
