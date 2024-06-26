@@ -1,10 +1,10 @@
 extends "res://Test/RakugoTest.gd"
 
-const file_path = "res://Test/TestExecuter/Fix273/fix273.rk"
+const file_path = "res://Test/TestExecuter/TestFix273/TestFix273.rk"
 
 var file_base_name = get_file_base_name(file_path)
 
-func test_273_fix():
+func test_fix273():
 	watch_rakugo_signals()
 
 	await wait_parse_and_execute_script(file_path)
