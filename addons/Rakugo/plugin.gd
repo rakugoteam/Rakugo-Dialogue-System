@@ -12,10 +12,21 @@ func _enter_tree():
 	# Initialization of the plugin goes here
 	add_autoload_singleton("Rakugo", "res://addons/Rakugo/Rakugo.gd")
 
-	ProjectSettings.set_setting("addons/rakugo/game_version", "1.0.0")
-	ProjectSettings.set_setting("addons/rakugo/history_length", 30)
-	ProjectSettings.set_setting("addons/rakugo/narrator/name", "narrator")
-	ProjectSettings.set_setting("addons/rakugo/debug", false)
+# try to import setting from version 2.2
+	var game_version := 	ProjectSettings.get_setting(
+"addons/rakugo/game_version",1.0)
+	var narrator_name := ProjectSettings.get_setting(
+		"addons/rakugo/narrator/name","narrator")
+var debug := 	ProjectSettings.get_setting(
+		"addons/rakugo/debug", false)
+	var save_folder := ProjectSettings.get_setting(
+		"addons/rakugo/save_folder","user://saves")
+
+	# remvove old seetings
+	ProjectSettings.set_setting("addons/rakugo/game_version", null)
+	ProjectSettings.set_setting("addons/rakugo/history_length", null)
+	ProjectSettings.set_setting("addons/rakugo/narrator/name", null)
+	ProjectSettings.set_setting("addons/rakugo/debug", null)
 	ProjectSettings.set_setting("addons/rakugo/save_folder", null)
 
 	ProjectSettings.set_setting(
