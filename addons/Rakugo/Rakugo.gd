@@ -34,7 +34,6 @@ var last_thread_datas: Dictionary
 signal sg_step
 signal sg_game_loaded
 signal sg_say(character, text)
-signal sg_notify(text)
 signal sg_ask(character, question, default_answer)
 signal sg_menu(choices)
 signal sg_custom_regex(key, result)
@@ -438,12 +437,3 @@ func menu_return(index: int):
 
 	executer.current_semaphore.post()
 	mutex.unlock()
-
-## Statement notify
-## Used to be call with call_thread_safe.
-func emit_sg_notify(text: String):
-	sg_notify.emit(text)
-
-## Call from Executer when is read an instruction notify.
-func notify(text: String):
-	call_thread_safe("emit_sg_notify", text)
