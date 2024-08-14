@@ -1,11 +1,10 @@
 extends Node
 
 # Rakugo setting's strings
-const game_version = "addons/rakugo/game_version"
-const history_length = "addons/rakugo/history_length"
-const narrator_name = "addons/rakugo/narrator/name"
-const debug = "addons/rakugo/debug"
-const save_folder = "addons/rakugo/save_folder"
+const game_version = "application/addons/rakugo/game_version"
+const narrator_name = "application/addons/rakugo/narrator_name"
+const debug = "application/addons/rakugo/debug"
+const save_folder = "application/addons/rakugo/save_folder"
 
 #Godot setting's strings
 const game_title = "application/config/name"
