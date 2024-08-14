@@ -12,8 +12,7 @@ func _ready():
 	Rakugo.sg_step.connect(_on_step)
 	Rakugo.sg_ask.connect(_on_ask)
 	Rakugo.sg_menu.connect(_on_menu)
-	Rakugo.sg_notify.connect(_on_notify)
-	
+
 	var narrator_name = ProjectSettings.get_setting(Rakugo.narrator_name)
 	
 	prints(name, narrator_name)
@@ -55,9 +54,6 @@ func _on_menu(choices):
 		menu_container.add_child(button)
 		
 	menu_container.visible = true
-	
-func _on_notify(text:String):
-	printt("notify", text)
 
 func _process(delta):
 	if Rakugo.is_waiting_step() and Input.is_action_just_pressed("ui_accept"):

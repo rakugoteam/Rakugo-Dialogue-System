@@ -20,7 +20,8 @@ rakugo/save_folder="user://saves"
 [application]
 
 config/name="Rakugo Dialogue System"
-config/features=PackedStringArray("4.1")
+config/tags=PackedStringArray("addon", "rakugo")
+config/features=PackedStringArray("4.2")
 config/icon="res://WindowIcon.png"
 
 [autoload]
