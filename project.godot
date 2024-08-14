@@ -11,11 +11,6 @@ config_version=5
 [addons]
 
 rakugo/rollback_steps=10
-rakugo/game_version="1.0.0"
-rakugo/history_length=30
-rakugo/narrator/name="narrator"
-rakugo/debug=false
-rakugo/save_folder="user://saves"
 
 [application]
 
@@ -23,6 +18,10 @@ config/name="Rakugo Dialogue System"
 config/tags=PackedStringArray("addon", "rakugo")
 config/features=PackedStringArray("4.2")
 config/icon="res://WindowIcon.png"
+addons/rakugo/game_version="1.0.0"
+addons/rakugo/narrator_name="narrator"
+addons/rakugo/debug=false
+addons/rakugo/save_folder="user://saves"
 
 [autoload]
 
