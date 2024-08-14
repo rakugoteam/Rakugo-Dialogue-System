@@ -10,7 +10,7 @@ const save_folder = "addons/rakugo/save_folder"
 #Godot setting's strings
 const game_title = "application/config/name"
 
-const version := "2.2"
+const version := "2.3"
 
 const StoreManager = preload ("res://addons/Rakugo/lib/systems/StoreManager.gd")
 const Parser = preload ("res://addons/Rakugo/lib/systems/Parser.gd")
