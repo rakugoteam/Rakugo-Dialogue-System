@@ -1,7 +1,7 @@
-extends Node
-
+@icon("res://addons/Rakugo/icons/Script.svg")
 ## Simple node to load and run Raku Script
 class_name RakuScriptDialogue
+extends Node
 
 ## Raku Script (*.rk) to load and run
 @export_file("*.rk") var raku_script : String

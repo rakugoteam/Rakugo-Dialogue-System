@@ -9,33 +9,7 @@ extends RefCounted
 # _init dialogue is used for code outside other dialogues
 const init_dialogue_name = "_init"
 
-# tokens for RenScript
-# tokens in this language can be extended by the other addons
-
-# tokens
-var Tokens := {
-	TOKEN_FUNCTION = "^{NAME}\\(",
-	TOKEN_DICTIONARY_REFERENCE = "^{NAME}\\[",
-	TOKEN_PARENS_OPEN = "^\\(",
-	TOKEN_PARENS_CLOSE = "^\\)",
-	TOKEN_BRACKET_OPEN = "^\\[",
-	TOKEN_BRACKET_CLOSE = "^\\]",
-	TOKEN_BRACE_OPEN = "^\\{",
-	TOKEN_BRACE_CLOSE = "^\\}",
-	TOKEN_COLON = "^:",
-	TOKEN_COMPARISON = "^(==|<=|>=|<|>|!=|in )",
-	TOKEN_NUMBER = "^\\-?\\d+(\\.\\d+)?",
-	TOKEN_OPERATOR = "^(\\+|-|\\*|/)",
-	TOKEN_ASSIGNMENT = "^(=|\\+=|\\-=|\\*=|\\/=|\\%=|\\^=|\\|=|\\&=)",
-	TOKEN_COMMA = "^,",
-	TOKEN_BOOL = "^(true|false)",
-	TOKEN_AND_OR = "^(and|or)( |$)",
-	TOKEN_STRING = "^\".*?\"",
-	TOKEN_VARIABLE = "^[a-zA-Z_][a-zA-Z_0-9]+",
-	TOKEN_TAB = "^\\t",
-	TOKEN_NUMERIC = "-?[0-9]\\.?[0-9]*",
-}
-
+# Regex Helpers for RenScript
 var Regex := {
 	NAME = "[a-zA-Z][a-zA-Z_0-9]*",
 	NUMERIC = "-?[0-9]\\.?[0-9]*",
