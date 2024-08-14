@@ -1,23 +1,20 @@
 @tool
 extends EditorPlugin
 
-var editor_interface : EditorInterface
-var script_editor : ScriptEditor
-var code_highlighter : EditorSyntaxHighlighter
-var default_script_types : PackedStringArray
+var script_types : PackedStringArray
+var text_types : String
 var editor_settings : EditorSettings
-var default_text_extensions : String
 
 func _enter_tree():
 	# Initialization of the plugin goes here
 	add_autoload_singleton("Rakugo", "res://addons/Rakugo/Rakugo.gd")
 
-# try to import setting from version 2.2
-	var game_version := 	ProjectSettings.get_setting(
-"addons/rakugo/game_version",1.0)
+	# try to import setting from version 2.2
+	var game_version := ProjectSettings.get_setting(
+		"addons/rakugo/game_version",1.0)
 	var narrator_name := ProjectSettings.get_setting(
 		"addons/rakugo/narrator/name","narrator")
-var debug := 	ProjectSettings.get_setting(
+	var debug := ProjectSettings.get_setting(
 		"addons/rakugo/debug", false)
 	var save_folder := ProjectSettings.get_setting(
 		"addons/rakugo/save_folder","user://saves")
@@ -38,18 +35,27 @@ var debug := 	ProjectSettings.get_setting(
 	ProjectSettings.set_setting(
 		"application/addons/rakugo/save_folder", save_folder)
 
-script_types = ProjectSettings.get_setting(
+	script_types = ProjectSettings.get_setting(
 		"editor/script/search_in_file_extensions")
-	
-	if !("rk" in default_script_types):
-		var script_types = default_script_types.duplicate()
+	if !("rk" in script_types):
 		script_types.append("rk")
 		ProjectSettings.set_setting(
 			"editor/script/search_in_file_extensions",
 			script_types
 		)
-
+	
+	editor_settings = get_editor_interface().get_editor_settings()
+	text_types = editor_settings.get(
+		"docks/filesystem/textfile_extensions")
+	if !("rk" in text_types):
+		text_types += ",rk"
+		ProjectSettings.set_setting(
+			"docks/filesystem/textfile_extensions",
+			text_types
+		)
+	
 	print("Rakugo is enabled")
+
 
 func _exit_tree():
 	ProjectSettings.set_setting(
