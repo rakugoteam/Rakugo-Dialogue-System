@@ -4,11 +4,11 @@ const jump_error = "Executer::do_execute_jump, can not jump to unknow label : "
 
 var stop_thread := false
 
-var current_thread:Thread
+var current_thread: Thread
 
-var current_semaphore:Semaphore
+var current_semaphore: Semaphore
 
-var threads:Dictionary
+var threads: Dictionary
 
 var regex := {
 	NAME = "[a-zA-Z][a-zA-Z_0-9]*",
@@ -18,7 +18,7 @@ var regex := {
 
 var regex_cache := {}
 
-var menu_jump_index:int
+var menu_jump_index: int
 
 func _init():
 	for key in regex:
@@ -34,7 +34,7 @@ func get_current_thread_datas() -> Dictionary:
 	if current_thread:
 		var dico = threads[current_thread.get_id()]
 
-		return {"file_base_name":dico["file_base_name"], "last_index":dico["last_index"]}
+		return {"file_base_name": dico["file_base_name"], "last_index": dico["last_index"]}
 
 	return {}
 
@@ -46,7 +46,7 @@ func stop_current_thread() -> int:
 		dico["semaphore"].post()
 	return OK
 
-func execute_script(parsed_script:Dictionary, label_name:String = "", index:int = 0) -> int:
+func execute_script(parsed_script: Dictionary, label_name: String = "", index: int = 0) -> int:
 	stop_current_thread()
 
 	current_thread = Thread.new()
@@ -54,11 +54,11 @@ func execute_script(parsed_script:Dictionary, label_name:String = "", index:int 
 	current_semaphore = Semaphore.new()
 	
 	var thread_parameters = {
-		"thread":current_thread,
-		"semaphore":current_semaphore,
-		"parsed_script":parsed_script,
-		"file_base_name":parsed_script["path"].get_file().get_basename(),
-		"stop":false
+		"thread": current_thread,
+		"semaphore": current_semaphore,
+		"parsed_script": parsed_script,
+		"file_base_name": parsed_script["path"].get_file().get_basename(),
+		"stop": false
 		}
 
 	if index > 0:
@@ -66,7 +66,7 @@ func execute_script(parsed_script:Dictionary, label_name:String = "", index:int 
 	elif !label_name.is_empty():
 		thread_parameters["label_name"] = label_name
 
-	if current_thread.start(Callable(self,"do_execute_script").bind(thread_parameters)) != OK:
+	if current_thread.start(Callable(self, "do_execute_script").bind(thread_parameters)) != OK:
 		threads.erase(current_thread.get_id())
 
 		current_thread = null
@@ -76,7 +76,7 @@ func execute_script(parsed_script:Dictionary, label_name:String = "", index:int 
 		return FAILED
 	return OK
 
-func do_execute_script_end(parameters:Dictionary):
+func do_execute_script_end(parameters: Dictionary):
 	parameters["thread"].wait_to_finish()
 	
 	if parameters.has("error"):
@@ -91,13 +91,13 @@ func do_execute_script_end(parameters:Dictionary):
 		
 	current_semaphore = null
 
-func do_execute_jump(jump_label:String, labels:Dictionary) -> int:
+func do_execute_jump(jump_label: String, labels: Dictionary) -> int:
 	if labels.has(jump_label):
 		return labels[jump_label]
 
 	return -1
 
-func do_execute_script(parameters:Dictionary):
+func do_execute_script(parameters: Dictionary):
 	var thread = parameters["thread"]
 	
 	threads[thread.get_id()] = parameters
@@ -108,7 +108,7 @@ func do_execute_script(parameters:Dictionary):
 	
 	Rakugo.call_thread_safe("send_execute_script_start", parameters["file_base_name"])
 	
-	var parse_array:Array = parsed_script["parse_array"]
+	var parse_array: Array = parsed_script["parse_array"]
 	
 	var labels = parsed_script["labels"]
 
@@ -133,11 +133,11 @@ func do_execute_script(parameters:Dictionary):
 	while !parameters["stop"] and index < parse_array.size():
 		parameters["last_index"] = index
 
-		var line:Array = parse_array[index]
+		var line: Array = parse_array[index]
 		
 		var result = line[1]
 		
-		match(line[0]):
+		match (line[0]):
 			"EXIT":
 				parameters["stop"] = true
 				break
@@ -200,9 +200,9 @@ func do_execute_script(parameters:Dictionary):
 				semephore.wait()
 				
 			"MENU":
-				var menu_choices:PackedStringArray
+				var menu_choices: PackedStringArray
 				
-				var menu_jumps:Dictionary
+				var menu_jumps: Dictionary
 				
 				for i in line[2].size():
 					var menu_choice_result = line[2][i]
@@ -283,7 +283,7 @@ func do_execute_script(parameters:Dictionary):
 						parameters["stop"] = true
 						break
 					
-					match(assignment):
+					match (assignment):
 						"+=":
 							value = lvalue + value
 							

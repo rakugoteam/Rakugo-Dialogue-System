@@ -22,7 +22,7 @@ var Regex := {
 # Regex for RenScript
 # Regex in this language can be extended by the other addons
 # Order is matter !
-var parser_regex :={
+var parser_regex := {
 	# exit dialogue
 	EXIT = "^\\s*exit$",
 	# menu label_name?:
@@ -49,7 +49,7 @@ var parser_regex :={
 #	CONDITION = "(if|elif) (?<condition>.*)",
 }
 
-var other_regex :={
+var other_regex := {
 	VARIABLE_IN_STR = "\\<(?<variable>{VARIABLE})\\>",
 }
 
@@ -59,9 +59,9 @@ var other_cache := {}
 
 enum State {Normal = 0, Menu, Jump}
 
-var state:int
+var state: int
 
-func add_regex(key:String, regex:String, cache:Dictionary, error:String):
+func add_regex(key: String, regex: String, cache: Dictionary, error: String):
 	regex = regex.format(Regex)
 	
 	var reg := RegEx.new()
@@ -70,7 +70,7 @@ func add_regex(key:String, regex:String, cache:Dictionary, error:String):
 		
 	cache[key] = reg
 	
-func add_regex_at_runtime(key:String, regex:String):
+func add_regex_at_runtime(key: String, regex: String):
 	add_regex(key, regex, regex_cache, "Parser, add_regex_at_runtime, failed " + key)
 
 func _init():
@@ -85,7 +85,7 @@ func _init():
 		
 	add_regex("VARIABLE", Regex["VARIABLE"], other_cache, "Parser, _init, failed VARIABLE")
 
-func count_indent(s:String) -> int:
+func count_indent(s: String) -> int:
 	var ret := 0
 	
 	if s[0] == '	':
@@ -99,20 +99,20 @@ func count_indent(s:String) -> int:
 	
 	return ret
 
-func treat_string(s:String) -> String:
-	s = s.substr(1, s.length()-2)
+func treat_string(s: String) -> String:
+	s = s.substr(1, s.length() - 2)
 	return s.replace("\\n", "\n").replace("\\t", "\t")
 
-func parse_script(lines:PackedStringArray) -> Dictionary:
+func parse_script(lines: PackedStringArray) -> Dictionary:
 	if lines.is_empty():
 		push_error("Parser, parse_script : lines is empty !")
 		return {}
 	
-	var parse_array:Array
+	var parse_array: Array
 	
-	var labels:Dictionary
+	var labels: Dictionary
 	
-	var indent_count:int
+	var indent_count: int
 	
 	var menu_choices
 	
@@ -139,10 +139,9 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 #
 #				for key in result.names:
 #					prints(" ", key, result.get_string(key))
-				
 				var dic_result := {
-					"text":treat_string(result.get_string("text")),
-					"label":result.get_string("label")
+					"text": treat_string(result.get_string("text")),
+					"label": result.get_string("label")
 				}
 
 				menu_choices.push_back(dic_result)
@@ -163,7 +162,7 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 			if result:
 				have_find_key = true
 
-				match(key):
+				match (key):
 					"MENU":
 						current_menu_result = result
 			
@@ -182,7 +181,7 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 						labels[dialogue_label] = parse_array.size()
 					
 					"JUMP":
-						var str_expression:String = result.get_string("expression")
+						var str_expression: String = result.get_string("expression")
 
 						if str_expression.is_empty():
 							parse_array.push_back([key, result])
@@ -216,36 +215,36 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 						var expression = Expression.new()
 
 						if expression.parse(str_expression, vars_expression) != OK:
-							push_error("Parser: Error on line: " + str(i+1) + ", " + expression.get_error_text())
+							push_error("Parser: Error on line: " + str(i + 1) + ", " + expression.get_error_text())
 							return {}
 
 						parse_array.push_back([key, result, expression, vars])
 
 					"SAY":
 						var dic_result := {
-							"text":treat_string(result.get_string("text")),
-							"character_tag":result.get_string("character_tag")
+							"text": treat_string(result.get_string("text")),
+							"character_tag": result.get_string("character_tag")
 						}
 
 						parse_array.push_back([key, dic_result])
 
 					"ASK":
 						var dic_result := {
-							"variable":result.get_string("variable"),
-							"character_tag":result.get_string("character_tag"),
-							"question":treat_string(result.get_string("question")),
-							"default_answer":treat_string(result.get_string("default_answer"))
+							"variable": result.get_string("variable"),
+							"character_tag": result.get_string("character_tag"),
+							"question": treat_string(result.get_string("question")),
+							"default_answer": treat_string(result.get_string("default_answer"))
 						}
 
 						parse_array.push_back([key, dic_result])
 
 					"SET_VARIABLE":
 						var dic_result := {
-							"lvar_name":result.get_string("lvar_name"),
-							"assignment":result.get_string("assignment"),
-							"rvar_name":result.get_string("rvar_name"),
-							"number":result.get_string("number"),
-							"text":treat_string(result.get_string("text"))
+							"lvar_name": result.get_string("lvar_name"),
+							"assignment": result.get_string("assignment"),
+							"rvar_name": result.get_string("rvar_name"),
+							"number": result.get_string("number"),
+							"text": treat_string(result.get_string("text"))
 						}
 
 						parse_array.push_back([key, dic_result])
@@ -254,7 +253,7 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 				break
 
 		if (not have_find_key):
-			push_error("Parser: Error on line: " + str(i+1) + ", can not parse it !")
+			push_error("Parser: Error on line: " + str(i + 1) + ", can not parse it !")
 			return {}
 			
-	return {"parse_array":parse_array, "labels":labels}
+	return {"parse_array": parse_array, "labels": labels}
