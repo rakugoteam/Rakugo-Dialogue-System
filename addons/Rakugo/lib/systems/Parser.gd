@@ -14,6 +14,7 @@ var Regex := {
 	NAME = "[a-zA-Z][a-zA-Z_0-9]*",
 	NUMERIC = "-?[0-9]\\.?[0-9]*",
 	STRING = "\".+?\"",
+	BOOLEAN = "(true|false)",
 	VARIABLE = "((?<char_tag>{NAME})\\.)?(?<var_name>{NAME})",
 	ASSIGNMENT = "(?<assignment>=|\\+=|\\-=|\\*=|\\/=)"
 #	MULTILINE_STRING = "\"\"\"(?<string>.*)\"\"\"",
@@ -21,7 +22,7 @@ var Regex := {
 
 # Regex for RenScript
 # Regex in this language can be extended by the other addons
-# Order is matter !
+# Order matter !
 var parser_regex := {
 	# exit dialogue
 	EXIT = "^\\s*exit$",
@@ -40,7 +41,7 @@ var parser_regex := {
 	# jump label
 	JUMP = "^jump (?<label>{NAME})( if (?<expression>.+))?$",
 	# for setting Rakugo variables
-	SET_VARIABLE = "^(?<lvar_name>{VARIABLE})\\s*{ASSIGNMENT}\\s*((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE}))$",
+	SET_VARIABLE = "^(?<lvar_name>{VARIABLE})\\s*{ASSIGNMENT}\\s*((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE})|(?<bool>{BOOLEAN}))$",
 	# $ some_gd_script_code
 #	IN_LINE_GDSCRIPT = "^\\$.*",
 	# gdscript:
@@ -244,7 +245,8 @@ func parse_script(lines: PackedStringArray) -> Dictionary:
 							"assignment": result.get_string("assignment"),
 							"rvar_name": result.get_string("rvar_name"),
 							"number": result.get_string("number"),
-							"text": treat_string(result.get_string("text"))
+							"text": treat_string(result.get_string("text")),
+							"bool": result.get_string("bool")
 						}
 
 						parse_array.push_back([key, dic_result])

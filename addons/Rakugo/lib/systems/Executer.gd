@@ -241,16 +241,18 @@ func do_execute_script(parameters: Dictionary):
 				var rvar_name = result["rvar_name"]
 				var text = result["text"]
 				
-				var value
+				var value = null
 				
 				if !rvar_name.is_empty():
 					value = Rakugo.get_variable(rvar_name)
-					
-					if !value:
+
+					if value == null:
 						parameters["error"] = "Executer::do_execute_script::SET_VARIABLE, can not get variable :" + rvar_name
 						parameters["stop"] = true
 						break
-						
+				
+				elif !result["bool"].is_empty():
+					value = result["bool"] == "true"
 				elif !text.is_empty():
 					value = text
 				else:
