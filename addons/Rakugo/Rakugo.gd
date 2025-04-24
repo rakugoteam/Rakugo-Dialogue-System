@@ -220,7 +220,7 @@ func get_character_variable(character_tag: String, var_name: String):
 func _ready():
 	var version = ProjectSettings.get_setting(game_version)
 	var title = ProjectSettings.get_setting(game_title)
-	get_window().set_title(title + " " + version)
+	get_window().set_title(title + " " + str(version))
 
 	var narrator_name = ProjectSettings.get_setting(narrator_name)
 	define_character("narrator", narrator_name)
