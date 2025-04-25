@@ -41,6 +41,7 @@ var parser_regex :={
 	JUMP = "^jump (?<label>{NAME})( if (?<expression>.+))?$",
 	# for setting Rakugo variables
 	SET_VARIABLE = "^(?<lvar_name>{VARIABLE})\\s*{ASSIGNMENT}\\s*((?<text>{STRING})|(?<number>{NUMERIC})|(?<rvar_name>{VARIABLE}))$",
+	AWAIT = "^await (?<node>{NAME}) (?<signal>{NAME})$", 
 	# $ some_gd_script_code
 #	IN_LINE_GDSCRIPT = "^\\$.*",
 	# gdscript:
@@ -246,6 +247,14 @@ func parse_script(lines:PackedStringArray) -> Dictionary:
 							"rvar_name":result.get_string("rvar_name"),
 							"number":result.get_string("number"),
 							"text":treat_string(result.get_string("text"))
+						}
+
+						parse_array.push_back([key, dic_result])
+					
+					"AWAIT":
+						var dic_result := {
+							"node":result.get_string("node"),
+							"signal":result.get_string("signal")
 						}
 
 						parse_array.push_back([key, dic_result])

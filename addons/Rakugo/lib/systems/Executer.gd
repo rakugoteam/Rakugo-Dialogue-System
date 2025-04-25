@@ -302,6 +302,40 @@ func do_execute_script(parameters:Dictionary):
 							break
 
 				Rakugo.set_variable(lvar_name, value)
+			
+			"AWAIT":
+				var node_name = result["node"]
+				var signal_name = result["signal"]
+				var sender: Node = null
+				var senders := Rakugo.get_tree().get_nodes_in_group("senders")
+				if senders.size() == 0:
+					parameters["error"] = "Executer::do_execute_script::AWAIT, can not get senders is empty"
+					parameters["stop"] = true
+					break
+				
+				if node_name not in senders:
+					parameters["error"] = "Executer::do_execute_script::AWAIT, there is no sender with name: " + node_name + " or in current scene"
+					parameters["stop"] = true
+					break
+
+				for node in senders:
+					if node.name == node_name:
+						sender = node
+						break
+				
+				if sender == null:
+					parameters["error"] = "Executer::do_execute_script::AWAIT, can not get sender :" + result["node"]
+					parameters["stop"] = true
+					break
+				
+				sender.connect(signal_name, func ():
+					Rakugo.unlock_player_step()
+					Rakugo.call_thread_safe("step")
+				)
+
+				Rakugo.lock_player_step()
+				semephore.wait()
+
 			_:
 				var foo = func():
 					Rakugo.sg_custom_regex.emit(line[0], result)
