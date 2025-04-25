@@ -11,9 +11,9 @@ const game_title = "application/config/name"
 
 const version := "2.3"
 
-const StoreManager = preload ("res://addons/Rakugo/lib/systems/StoreManager.gd")
-const Parser = preload ("res://addons/Rakugo/lib/systems/Parser.gd")
-const Executer = preload ("res://addons/Rakugo/lib/systems/Executer.gd")
+const StoreManager = preload("res://addons/Rakugo/lib/systems/StoreManager.gd")
+const Parser = preload("res://addons/Rakugo/lib/systems/Parser.gd")
+const Executer = preload("res://addons/Rakugo/lib/systems/Executer.gd")
 
 var waiting_step := false: get = is_waiting_step
 
@@ -21,6 +21,8 @@ var variable_ask_name: String
 var waiting_ask_return := false: get = is_waiting_ask_return
 
 var waiting_menu_return := false: get = is_waiting_menu_return
+
+var player_step_locked := false: get = is_player_step_locked
 
 # when you load game to run last script
 var last_thread_datas: Dictionary
@@ -203,9 +205,9 @@ func get_character_variable(character_tag: String, var_name: String):
 			(
 				"Rakugo character with tag "
 				+ character_tag
-				+ " does not have this variable: "
+				+" does not have this variable: "
 				+ var_name
-				+ ", returning null"
+				+", returning null"
 			)
 		)
 		push_error("Available variables are: " + str(character.keys()))
@@ -226,13 +228,13 @@ func _ready():
 	define_character("narrator", narrator_name)
 
 ## Save all variables, characters, script_name and last line readed on last executed script, in user://save/save_name/save.json file.
-func save_game(save_name: String="quick"):
+func save_game(save_name: String = "quick"):
 	mutex.lock()
 	store_manager.save_game(executer.get_current_thread_datas(), save_name)
 	mutex.unlock()
 
 ## Load all variables, characters, script_name and last line readed on last executed script, from user://save/save_name/save.json file if existed.
-func load_game(save_name:="quick"):
+func load_game(save_name := "quick"):
 	last_thread_datas = store_manager.load_game(save_name)
 	parse_script(last_thread_datas["path"])
 	sg_game_loaded.emit()
@@ -272,7 +274,7 @@ func parse_script(file_name: String) -> int:
 
 ## Executer
 ## Execute a script previously registered with parse_script.
-func execute_script(script_name: String, label_name: String="", index: int=0) -> int:
+func execute_script(script_name: String, label_name: String = "", index: int = 0) -> int:
 	var error = FAILED
 	
 	mutex.lock()
@@ -292,7 +294,7 @@ func stop_last_script():
 	mutex.unlock()
 
 ## Do parse_script, if return OK then do execute_script.
-func parse_and_execute_script(file_name: String, label_name: String="") -> int:
+func parse_and_execute_script(file_name: String, label_name: String = "") -> int:
 	var error = FAILED
 	
 	mutex.lock()
@@ -334,6 +336,7 @@ func emit_sg_step():
 
 ## Call from Executer when is stop the reading process.
 func step():
+	if player_step_locked: return
 	mutex.lock()
 	waiting_step = true
 	mutex.unlock()
@@ -435,4 +438,23 @@ func menu_return(index: int):
 	executer.menu_jump_index = index
 
 	executer.current_semaphore.post()
+	mutex.unlock()
+
+func is_player_step_locked() -> bool:
+	var locked_value := false
+
+	mutex.lock()
+	locked_value = player_step_locked
+	mutex.unlock()
+
+	return locked_value
+
+func lock_player_step():
+	mutex.lock()
+	player_step_locked = true
+	mutex.unlock()
+
+func unlock_player_step():
+	mutex.lock()
+	player_step_locked = false
 	mutex.unlock()
