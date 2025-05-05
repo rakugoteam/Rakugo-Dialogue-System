@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b0x8rxs5r3lb5"]
+
+[ext_resource type="Script" path="res://Test/TestExecuter/TestAwait/TestAwait.gd" id="1_tyryf"]
+
+[node name="TestAwait" type="Node"]
+script = ExtResource("1_tyryf")
