@@ -1,0 +1,2 @@
+await Timer timeout
+"You should see this message after 3s."
