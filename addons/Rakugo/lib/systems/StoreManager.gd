@@ -1,6 +1,6 @@
 extends RefCounted
 
-var save_folder_path:String
+var save_folder_path: String
 
 #store rakugo variables
 var variables: Dictionary
@@ -11,8 +11,7 @@ var characters: Dictionary
 var parsed_scripts: Dictionary
 
 func _init():
-	save_folder_path = ProjectSettings.get_setting("addons/rakugo/save_folder")
-
+	save_folder_path = ProjectSettings.get_setting(Rakugo.save_folder, "user://saves")
 
 ## Rk
 func load_rk(path: String) -> PackedStringArray:
@@ -73,8 +72,7 @@ func save_json(path: String, data: Dictionary) -> int:
 	
 	return OK
 	
-
-func save_game(thread_datas:Dictionary, save_name: String = "quick") -> int:
+func save_game(thread_datas: Dictionary, save_name: String = "quick") -> int:
 	var save_folder = save_folder_path + "/" + save_name
 
 	if !DirAccess.dir_exists_absolute(save_folder):
@@ -90,7 +88,6 @@ func save_game(thread_datas:Dictionary, save_name: String = "quick") -> int:
 		sava_datas["thread_datas"] = thread_datas
 
 	return save_json(save_folder + "/save.json", sava_datas)
-
 
 func load_game(save_name: String = "quick") -> Dictionary:
 	var save_folder = save_folder_path + "/" + save_name
