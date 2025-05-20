@@ -11,7 +11,7 @@ var characters: Dictionary
 var parsed_scripts: Dictionary
 
 func _init():
-	save_folder_path = ProjectSettings.get_setting("addons/rakugo/save_folder")
+	save_folder_path = ProjectSettings.get_setting(Rakugo.save_folder, "user://saves")
 
 ## Rk
 func load_rk(path: String) -> PackedStringArray:
