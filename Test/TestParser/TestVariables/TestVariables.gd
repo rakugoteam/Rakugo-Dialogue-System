@@ -27,9 +27,11 @@ func test_variables():
 	
 	assert_variable("Sy.life", TYPE_INT, 10)
 
-	assert_eq(Rakugo.get_variable("g"), null)
+	assert_variable("boolean", TYPE_BOOL, true)
+	
+	assert_variable("boolean", TYPE_BOOL, false)
 
-func  test_variables_in_strings():
+func test_variables_in_strings():
 	var file_path = "res://Test/TestParser/TestVariables/TestDynamicVars.rk"
 
 	var file_base_name = get_file_base_name(file_path)

@@ -8,12 +8,14 @@ const save_folder = "application/addons/rakugo/save_folder"
 
 #Godot setting's strings
 const game_title = "application/config/name"
+const docks_text_files = "docks/filesystem/textfile_extensions"
+const editor_text_files = "editor/script/search_in_file_extensions"
 
 const version := "2.3"
 
-const StoreManager = preload ("res://addons/Rakugo/lib/systems/StoreManager.gd")
-const Parser = preload ("res://addons/Rakugo/lib/systems/Parser.gd")
-const Executer = preload ("res://addons/Rakugo/lib/systems/Executer.gd")
+const StoreManager = preload("res://addons/Rakugo/lib/systems/StoreManager.gd")
+const Parser = preload("res://addons/Rakugo/lib/systems/Parser.gd")
+const Executer = preload("res://addons/Rakugo/lib/systems/Executer.gd")
 
 var waiting_step := false: get = is_waiting_step
 
@@ -203,9 +205,9 @@ func get_character_variable(character_tag: String, var_name: String):
 			(
 				"Rakugo character with tag "
 				+ character_tag
-				+ " does not have this variable: "
+				+" does not have this variable: "
 				+ var_name
-				+ ", returning null"
+				+", returning null"
 			)
 		)
 		push_error("Available variables are: " + str(character.keys()))
@@ -220,19 +222,19 @@ func get_character_variable(character_tag: String, var_name: String):
 func _ready():
 	var version = ProjectSettings.get_setting(game_version)
 	var title = ProjectSettings.get_setting(game_title)
-	get_window().set_title(title + " " + version)
+	get_window().set_title("%s %s" % [title, version])
 
 	var narrator_name = ProjectSettings.get_setting(narrator_name)
 	define_character("narrator", narrator_name)
 
 ## Save all variables, characters, script_name and last line readed on last executed script, in user://save/save_name/save.json file.
-func save_game(save_name: String="quick"):
+func save_game(save_name: String = "quick"):
 	mutex.lock()
 	store_manager.save_game(executer.get_current_thread_datas(), save_name)
 	mutex.unlock()
 
 ## Load all variables, characters, script_name and last line readed on last executed script, from user://save/save_name/save.json file if existed.
-func load_game(save_name:="quick"):
+func load_game(save_name := "quick"):
 	last_thread_datas = store_manager.load_game(save_name)
 	parse_script(last_thread_datas["path"])
 	sg_game_loaded.emit()
@@ -272,7 +274,7 @@ func parse_script(file_name: String) -> int:
 
 ## Executer
 ## Execute a script previously registered with parse_script.
-func execute_script(script_name: String, label_name: String="", index: int=0) -> int:
+func execute_script(script_name: String, label_name: String = "", index: int = 0) -> int:
 	var error = FAILED
 	
 	mutex.lock()
@@ -292,7 +294,7 @@ func stop_last_script():
 	mutex.unlock()
 
 ## Do parse_script, if return OK then do execute_script.
-func parse_and_execute_script(file_name: String, label_name: String="") -> int:
+func parse_and_execute_script(file_name: String, label_name: String = "") -> int:
 	var error = FAILED
 	
 	mutex.lock()
