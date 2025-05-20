@@ -40,9 +40,10 @@ func _enter_tree():
 	
 	print("Rakugo is enabled")
 
-
 func _exit_tree():
 	ProjectSettings.set_setting(Rakugo.game_version, null)
 	ProjectSettings.set_setting(Rakugo.narrator_name, null)
 	ProjectSettings.set_setting(Rakugo.debug, null)
 	ProjectSettings.set_setting(Rakugo.save_folder, null)
+	remove_autoload_singleton("Rakugo")
+	print("Rakugo is disabled")
