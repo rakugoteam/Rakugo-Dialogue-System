@@ -22,43 +22,27 @@ func _enter_tree():
 	ProjectSettings.set_setting("addons/rakugo/debug", null)
 	ProjectSettings.set_setting("addons/rakugo/save_folder", null)
 
-	ProjectSettings.set_setting(
-		"application/addons/rakugo/game_version", game_version)
-	ProjectSettings.set_setting(
-		"application/addons/rakugo/narrator_name", narrator_name)
-	ProjectSettings.set_setting(
-		"application/addons/rakugo/debug", debug)
-	ProjectSettings.set_setting(
-		"application/addons/rakugo/save_folder", save_folder)
+	ProjectSettings.set_setting(Rakugo.game_version, game_version)
+	ProjectSettings.set_setting(Rakugo.narrator_name, narrator_name)
+	ProjectSettings.set_setting(Rakugo.debug, debug)
+	ProjectSettings.set_setting(Rakugo.save_folder, save_folder)
 
-	script_types = ProjectSettings.get_setting(
-		"editor/script/search_in_file_extensions")
+	script_types = ProjectSettings.get_setting(Rakugo.editor_text_files)
 	if !("rk" in script_types):
 		script_types.append("rk")
-		ProjectSettings.set_setting(
-			"editor/script/search_in_file_extensions",
-			script_types
-		)
+		ProjectSettings.set_setting(Rakugo.editor_text_files, script_types)
 	
 	editor_settings = get_editor_interface().get_editor_settings()
-	text_types = editor_settings.get(
-		"docks/filesystem/textfile_extensions")
+	text_types = editor_settings.get(Rakugo.docks_text_files)
 	if !("rk" in text_types):
 		text_types += ",rk"
-		ProjectSettings.set_setting(
-			"docks/filesystem/textfile_extensions",
-			text_types
-		)
+		ProjectSettings.set_setting(Rakugo.docks_text_files, text_types)
 	
 	print("Rakugo is enabled")
 
 
 func _exit_tree():
-	ProjectSettings.set_setting(
-		"application/addons/rakugo/game_version", null)
-	ProjectSettings.set_setting(
-		"application/addons/rakugo/narrator_name", null)
-	ProjectSettings.set_setting(
-		"application/addons/rakugo/debug", null)
-	ProjectSettings.set_setting(
-		"application/addons/rakugo/save_folder", null)
+	ProjectSettings.set_setting(Rakugo.game_version, null)
+	ProjectSettings.set_setting(Rakugo.narrator_name, null)
+	ProjectSettings.set_setting(Rakugo.debug, null)
+	ProjectSettings.set_setting(Rakugo.save_folder, null)
