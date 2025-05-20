@@ -1,25 +1,21 @@
 @tool
 extends EditorPlugin
 
-var script_types : PackedStringArray
-var text_types : String
-var editor_settings : EditorSettings
+var script_types: PackedStringArray
+var text_types: String
+var editor_settings: EditorSettings
 
 func _enter_tree():
 	# Initialization of the plugin goes here
 	add_autoload_singleton("Rakugo", "res://addons/Rakugo/Rakugo.gd")
 
 	# try to import setting from version 2.2
-	var game_version := ProjectSettings.get_setting(
-		"addons/rakugo/game_version",1.0)
-	var narrator_name := ProjectSettings.get_setting(
-		"addons/rakugo/narrator/name","narrator")
-	var debug := ProjectSettings.get_setting(
-		"addons/rakugo/debug", false)
-	var save_folder := ProjectSettings.get_setting(
-		"addons/rakugo/save_folder","user://saves")
+	var game_version := ProjectSettings.get_setting("addons/rakugo/game_version", 1.0)
+	var narrator_name := ProjectSettings.get_setting("addons/rakugo/narrator/name", "narrator")
+	var debug := ProjectSettings.get_setting("addons/rakugo/debug", false)
+	var save_folder := ProjectSettings.get_setting("addons/rakugo/save_folder", "user://saves")
 
-	# remvove old seetings
+	# remove old settings
 	ProjectSettings.set_setting("addons/rakugo/game_version", null)
 	ProjectSettings.set_setting("addons/rakugo/history_length", null)
 	ProjectSettings.set_setting("addons/rakugo/narrator/name", null)
