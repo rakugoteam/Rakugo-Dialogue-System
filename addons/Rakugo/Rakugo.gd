@@ -8,6 +8,8 @@ const save_folder = "application/addons/rakugo/save_folder"
 
 #Godot setting's strings
 const game_title = "application/config/name"
+const docks_text_files = "docks/filesystem/textfile_extensions"
+const editor_text_files = "editor/script/search_in_file_extensions"
 
 const version := "2.3"
 
