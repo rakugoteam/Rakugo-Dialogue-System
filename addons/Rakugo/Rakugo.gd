@@ -8,8 +8,10 @@ const save_folder = "application/addons/rakugo/save_folder"
 
 #Godot setting's strings
 const game_title = "application/config/name"
+const docks_text_files = "docks/filesystem/textfile_extensions"
+const editor_text_files = "editor/script/search_in_file_extensions"
 
-const version := "2.3.1"
+const version := "2.3"
 
 const StoreManager = preload("res://addons/Rakugo/lib/systems/StoreManager.gd")
 const Parser = preload("res://addons/Rakugo/lib/systems/Parser.gd")
@@ -220,7 +222,7 @@ func get_character_variable(character_tag: String, var_name: String):
 func _ready():
 	var version = ProjectSettings.get_setting(game_version)
 	var title = ProjectSettings.get_setting(game_title)
-	get_window().set_title(title + " " + str(version))
+	get_window().set_title("%s %s" % [title, version])
 
 	var narrator_name = ProjectSettings.get_setting(narrator_name)
 	define_character("narrator", narrator_name)
