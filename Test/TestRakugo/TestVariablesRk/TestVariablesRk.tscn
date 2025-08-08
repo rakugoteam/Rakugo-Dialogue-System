@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b5tsd3ullhf14"]
 
-[ext_resource type="Script" path="res://Test/TestRakugo/TestVariablesRk/TestVariablesRk.gd" id="1"]
+[ext_resource type="Script" uid="uid://ydk3abi6twb8" path="res://Test/TestRakugo/TestVariablesRk/TestVariablesRk.gd" id="1"]
 
 [node name="TestVariablesRk" type="Node"]
 script = ExtResource("1")

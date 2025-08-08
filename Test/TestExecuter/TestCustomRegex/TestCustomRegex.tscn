@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://ds2f3ywueejdo"]
 
-[ext_resource type="Script" path="res://Test/TestExecuter/TestCustomRegex/TestCustomRegex.gd" id="1_u0hr0"]
+[ext_resource type="Script" uid="uid://2mw1mtipmdku" path="res://Test/TestExecuter/TestCustomRegex/TestCustomRegex.gd" id="1_u0hr0"]
 
 [node name="TestCustomRegex" type="Node"]
 script = ExtResource("1_u0hr0")
