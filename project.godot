@@ -16,7 +16,7 @@ rakugo/rollback_steps=10
 
 config/name="Rakugo Dialogue System"
 config/tags=PackedStringArray("addon", "rakugo")
-config/features=PackedStringArray("4.2")
+config/features=PackedStringArray("4.4")
 config/icon="res://WindowIcon.png"
 addons/rakugo/game_version=1.0
 addons/rakugo/narrator_name="narrator"
@@ -38,7 +38,7 @@ script/search_in_file_extensions=PackedStringArray("gd", "gdshader", "rk")
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Rakugo/plugin.cfg", "res://addons/gut/plugin.cfg")
+enabled=PackedStringArray("res://addons/RakuScript_Color/plugin.cfg", "res://addons/Rakugo/plugin.cfg", "res://addons/gut/plugin.cfg")
 
 [filesystem]
 
