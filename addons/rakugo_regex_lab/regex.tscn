@@ -1,0 +1,188 @@
+[gd_scene load_steps=2 format=3 uid="uid://cimp70l7c0y2p"]
+
+[ext_resource type="Script" uid="uid://bvtwxemxg2fli" path="res://addons/rakugo_regex_lab/regex.gd" id="1"]
+
+[node name="RegexWindow" type="Window"]
+title = "Rakugo Regex Lab"
+initial_position = 2
+size = Vector2i(1252, 680)
+script = ExtResource("1")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HSplitContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+split_offset = 100
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RkModeButton" type="CheckButton" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+button_pressed = true
+text = "Rakugo Mode"
+flat = true
+
+[node name="RkModeLabel" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/outline_size = 2
+text = "Rakugo Regular expressions (RegEx) can be used for to add your own exstensions to RakuScript programming language."
+autowrap_mode = 3
+
+[node name="RkRegexBox" type="HBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label2" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/RkRegexBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 5
+size_flags_stretch_ratio = 0.08
+theme_override_constants/outline_size = 2
+text = "Rakugo
+RegEx"
+horizontal_alignment = 1
+
+[node name="Expression" type="LineEdit" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/RkRegexBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "\"((?:\\\\.|[^\"])*)\""
+placeholder_text = "Rakugo Regular expression to match against"
+
+[node name="RkCopyBtn" type="Button" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/RkRegexBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Copy"
+
+[node name="RegexBox" type="HBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label2" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/RegexBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 5
+size_flags_stretch_ratio = 0.08
+theme_override_constants/outline_size = 2
+text = "RegEx"
+horizontal_alignment = 1
+
+[node name="RegExpression" type="LineEdit" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/RegexBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "\"((?:\\\\.|[^\"])*)\""
+placeholder_text = "Regular expression to match against"
+
+[node name="RegexCopyBtn" type="Button" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/RegexBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Copy"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 5
+size_flags_stretch_ratio = 0.08
+theme_override_constants/outline_size = 2
+text = "Text"
+horizontal_alignment = 1
+
+[node name="Text" type="TextEdit" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "They asked me \"What's going on \\\"in the manor\\\"?\""
+placeholder_text = "Text to search in"
+
+[node name="DebugBox" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/DebugBox"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_constants/outline_size = 2
+text = "Debug"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/DebugBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/DebugBox/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RkHelp" type="RichTextLabel" parent="Panel/MarginContainer/HBoxContainer/ScrollContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "[b]Rakugo Reg Help[/b]]:
+[b]NAME[/b]: [a-zA-Z][a-zA-Z_0-9]*
+[b]NUMERIC[/b]: -?[0-9]\\.?[0-9]*
+[b]STRING[/b]: \".+?\"
+[b]VARIABLE[/b]: ((?<char_tag>{NAME})\\.)?(?<var_name>{NAME})
+[b]ASSIGNMENT[/b]: (?<assignment>=|\\+=|\\-=|\\*=|\\/=)
+"
+fit_content = true
+scroll_following = true
+
+[node name="RegxHelp" type="RichTextLabel" parent="Panel/MarginContainer/HBoxContainer/ScrollContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+fit_content = true
+scroll_following = true
+
+[connection signal="text_changed" from="Panel/MarginContainer/HBoxContainer/VBoxContainer/RkRegexBox/Expression" to="." method="_on_rkreg_expression_text_changed"]
+[connection signal="text_changed" from="Panel/MarginContainer/HBoxContainer/VBoxContainer/RegexBox/RegExpression" to="." method="update_expression"]
+[connection signal="text_changed" from="Panel/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/Text" to="." method="update_text"]
