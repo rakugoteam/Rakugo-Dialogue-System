@@ -5,9 +5,3 @@ export_presets.cfg
 /.vscode/
 /.mono/
 mono_crash.*.json
-/.plugged/
-/addons/*
-!/addons/gd-plug/
-!/addons/Rakugo/
-!/addons/gut/
-site

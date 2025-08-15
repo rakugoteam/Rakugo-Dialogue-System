@@ -1,0 +1,26 @@
+# DEMO
+Saeiron:
+	character Sa "Saeiron"
+Emily:
+	character Em "Emily"
+	Em.point = 6
+
+Sa "Hello <Em.name> !"
+Em "Salut dont !"
+Em "Tu as eu combien de points ? Moi <Em.point> !"
+
+menu menu_emily:
+	"..." > emily_silence
+	"4"
+	"6 (mentir)" > emily_lie
+
+emily_silence:
+	Em "Je vois..."
+
+jump End
+
+emily_lie:
+	Em "Mais oui..."
+	
+End:
+	"FIN"
