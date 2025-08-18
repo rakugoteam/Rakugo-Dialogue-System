@@ -11,7 +11,7 @@ func _enter_tree():
 	add_autoload_singleton("Rakugo", "res://addons/Rakugo/Rakugo.gd")
 	
 	# this fix error with enabling plugin in new godot 4.4+ projects
-	_rakugo = load("res://addons/Rakugo/_rakugo.gd").new()
+	_rakugo = load("res://addons/Rakugo/Rakugo.gd").new()
 
 	# try to import setting from version 2.2
 	var game_version := ProjectSettings.get_setting("addons/rakugo/game_version", 1.0)
